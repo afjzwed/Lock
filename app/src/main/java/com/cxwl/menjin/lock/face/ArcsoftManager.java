@@ -5,7 +5,9 @@ import android.os.Environment;
 import android.util.Log;
 
 
+import com.cxwl.menjin.lock.config.DeviceConfig;
 import com.cxwl.menjin.lock.utils.DLLog;
+import com.cxwl.menjin.lock.utils.SharedPreferencesUtil;
 
 import java.io.File;
 import java.io.IOException;
