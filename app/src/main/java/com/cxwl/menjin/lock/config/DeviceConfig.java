@@ -44,8 +44,8 @@ public class DeviceConfig {
 //    public static final int DEVICE_KEYCODE_STAR = 32;//删除键
 
     // TODO: 2018/9/3 监听程序的包名还没确定
-//    public static final String Lockaxial_Monitor_PackageName = "com.cxwl.hurry.monitor";
-//    public static final String Lockaxial_Monitor_SERVICE = "com.cxwl.hurry.monitor.MonitorService";
+    public static final String Lockaxial_Monitor_PackageName = "com.cxwl.lock.monitor";
+    public static final String Lockaxial_Monitor_SERVICE = "com.cxwl.lock.monitor.MonitorService";
     public static final String Lockaxial_PackageName = "com.cxwl.menjin.lock";
 
     public static final String SD_PATH = "CXWL/Monitor";

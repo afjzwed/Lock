@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'org.greenrobot.greendao'
 
 android {
     compileSdkVersion 26
@@ -9,6 +10,9 @@ android {
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
+        sourceSets.main {
+            jniLibs.srcDirs = ['libs']
+        }
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
         renderscriptTargetApi 19
@@ -20,10 +24,27 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-    repositories {
-        flatDir {
-            dirs 'libs'
+
+    signingConfigs {
+        release {
+            storeFile file("../signapk/newdoor.jks")
+            storePassword 'yaxin123'
+            keyAlias 'newdoor'
+            keyPassword 'yaxin123'
         }
+
+        debug {
+            storeFile file("../signapk/newdoor.jks")
+            storePassword 'yaxin123'
+            keyAlias 'newdoor'
+            keyPassword 'yaxin123'
+        }
+    }
+
+    greendao {
+        schemaVersion 8
+        daoPackage 'com.cxwl.menjin.lock.db'
+        targetGenDir 'src/main/java'
     }
 }
 
@@ -64,8 +85,8 @@ dependencies {
     compile 'io.github.silvaren:easyrs:0.5.3'
 
     //在release和test版本中，使用的是LeakCanary的no-op版本，也就是没有实际代码和操作的Wrapper版本，只包含LeakCanary和RefWatcher类的空实现，这样不会对生成的APK包体积和应用性能造成影响
-    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
-    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
-    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+//    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
+//    releaseCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
+//    testCompile 'com.squareup.leakcanary:leakcanary-android-no-op:1.5'
 
 }

@@ -7,7 +7,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 
-import com.cxwl.menjin.lock.MainActivity;
+import com.cxwl.menjin.lock.ui.MainActivity;
 import com.cxwl.menjin.lock.MainApplication;
 import com.cxwl.menjin.lock.config.DeviceConfig;
 
@@ -25,8 +25,7 @@ public class NativeAccessReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         String action = intent.getAction();
-        if (action.equals(Intent.ACTION_PACKAGE_REPLACED) || action.equals(Intent
-                .ACTION_PACKAGE_ADDED)) {
+        if (action.equals(Intent.ACTION_PACKAGE_REPLACED) || action.equals(Intent.ACTION_PACKAGE_ADDED)) {
             String packageName = intent.getData().getSchemeSpecificPart();
             if (packageName.equals(Lockaxial_PackageName)) {
                 startActivity(context, MainActivity.class, null);
@@ -43,18 +42,6 @@ public class NativeAccessReceiver extends BroadcastReceiver {
 //            ToastUtil.showShort("开机启动成功");
         }
 
-//        if (intent.getAction().equals(Intent.ACTION_PACKAGE_ADDED)) {
-//            String packageName = intent.getData().getSchemeSpecificPart();
-//            Toast.makeText(context, "安装成功" + packageName, Toast.LENGTH_LONG).show();
-//        }
-//        if (intent.getAction().equals(Intent.ACTION_PACKAGE_REMOVED)) {
-//            String packageName = intent.getData().getSchemeSpecificPart();
-//            Toast.makeText(context, "卸载成功" + packageName, Toast.LENGTH_LONG).show();
-//        }
-//        if (intent.getAction().equals(Intent.ACTION_PACKAGE_REPLACED)) {
-//            String packageName = intent.getData().getSchemeSpecificPart();
-//            Toast.makeText(context, "替换成功" + packageName, Toast.LENGTH_LONG).show();
-//        }
     }
 
 

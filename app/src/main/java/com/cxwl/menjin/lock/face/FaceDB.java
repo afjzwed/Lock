@@ -8,7 +8,9 @@ import com.arcsoft.facerecognition.AFR_FSDKEngine;
 import com.arcsoft.facerecognition.AFR_FSDKError;
 import com.arcsoft.facerecognition.AFR_FSDKFace;
 import com.arcsoft.facerecognition.AFR_FSDKVersion;
+import com.cxwl.menjin.lock.config.Constant;
 import com.cxwl.menjin.lock.entity.FaceRegist;
+import com.cxwl.menjin.lock.utils.BitmapUtils;
 import com.guo.android_extend.java.ExtInputStream;
 import com.guo.android_extend.java.ExtOutputStream;
 
@@ -42,7 +44,7 @@ public class FaceDB {
         mFRVersion = new AFR_FSDKVersion();
         mUpgrade = false;
         mFREngine = new AFR_FSDKEngine();
-        AFR_FSDKError error = mFREngine.AFR_FSDK_InitialEngine(arc_appid, fr_key);
+        AFR_FSDKError error = mFREngine.AFR_FSDK_InitialEngine(Constant.arc_appid,Constant.fr_key);
         if (error.getCode() != AFR_FSDKError.MOK) {
             Log.e(TAG, "AFR_FSDK_InitialEngine fail! error code :" + error.getCode());
         } else {

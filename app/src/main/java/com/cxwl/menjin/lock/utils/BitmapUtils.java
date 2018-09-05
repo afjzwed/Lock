@@ -10,6 +10,7 @@ import android.util.Log;
 
 
 import com.cxwl.menjin.lock.MainApplication;
+import com.cxwl.menjin.lock.config.DeviceConfig;
 
 import java.io.File;
 import java.io.FileOutputStream;

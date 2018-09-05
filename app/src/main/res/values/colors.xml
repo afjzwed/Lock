@@ -3,4 +3,72 @@
     <color name="colorPrimary">#3F51B5</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+
+    <drawable name="label_color">#FF6BB324</drawable>
+    <drawable name="status_color">#FFFF0000</drawable>
+    <drawable name="tweet_user_color">#FF52991F</drawable>
+    <drawable name="tweet_color">#FF000000</drawable>
+    <drawable name="tweet_meta_color">#FF999999</drawable>
+
+    <color name="opaque_red">#f00</color>
+    <color name="translucent_red">#80ff0000</color>
+    <color name="link_color">#FF0066CC</color>
+
+    <color name="status_background">#FFA</color>
+    <color name="status_text">#000</color>
+
+    <color name="simiple_button_color">#FFF</color>
+    <color name="simple_text_color">#FF52991F</color>
+    <color name="body_background">#FFF</color>
+
+    <color name="clear">#00000000</color>
+    <color name="button_text">#444</color>
+    <color name="action_bar">#fff</color>
+    <color name="action_bar_pressed">#ffd0d0d0</color>
+
+    <color name="self_background">#FFFAF4BE</color>
+    <color name="mention_background">#FFC9E6F8</color>
+
+    <color name="head_back">#ffffffff</color>
+    <color name="tip">#ffffff00</color>
+    <color name="info">#ff777777</color>
+    <color name="black">#ff000000</color>
+    <color name="bar">#55aaaaaa</color>
+    <color name="barText">#ffaaaaaa</color>
+    <color name="btn_quit">#ffffffff</color>
+    <color name="btn_bankcard">#ffffffff</color>
+    <color name="btn_idcard">#ffffffff</color>
+    <color name="transparence">#000000ff</color>
+
+    <color name="Text_BLACK">#ff000000</color>
+    <color name="Text_WHITE">#ffffffff</color>
+    <color name="Text_BLUE">#ff278eff</color>
+    <color name="Text_GRAY">#ff808080</color>
+    <color name="main_app_color">#ffcf4c29</color>
+
+    <color name="text_selected">#ffcf4c29</color>
+    <color name="text_over">#ffb9c4cb</color>
+    <color name="text_default">#ff5b656f</color>
+    <color name="text_disabled">#ffa6b3bf</color>
+    <color name="text_header">#ff7e8e9e</color>
+    <color name="text_switch_selected">#ffffff</color>
+    <color name="text_switch">#ff41484f</color>
+    <color name="text_button">#ff41484f</color>
+    <color name="text_button_disabled">#ffa6b3bf</color>
+    <color name="text_button_selected">#ff41484f</color>
+    <color name="text_button_over">#ffcf4c29</color>
+    <color name="numpad_background_bottom">#ffe4edf2</color>
+    <color name="numpad_background_dialer">#ffd8d8d8</color>
+    <color name="numpad_background_top">#ffb1bdc3</color>
+    <color name="missed_calls_background">#ffcf4c29</color>
+    <color name="transparent">#00000000</color>
+    <color name="landscape_background">#CCCCCC</color>
+    <color name="text_contrast">#ff000000</color> <!-- If background is white, set to black, else set to white -->
+
+
+    <color name="yellow_warning">#FFFF99</color>
+    <color name="spots_dialog_color">@android:color/holo_blue_dark</color>
+    <color name="spots_dialog_bg">#11ffffff</color>
+    <color name="num_red">#ffcb0f0a</color>
+    <color name="black95">#95000000</color>
 </resources>
