@@ -8,7 +8,6 @@ import android.app.Service;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
@@ -20,8 +19,6 @@ import android.hardware.Camera;
 import android.media.AudioManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
-import android.nfc.NfcAdapter;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -35,6 +32,7 @@ import android.text.InputFilter;
 import android.text.TextUtils;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
@@ -76,6 +74,7 @@ import com.cxwl.menjin.lock.face.ArcsoftManager;
 import com.cxwl.menjin.lock.face.PhotographActivity;
 import com.cxwl.menjin.lock.face.PhotographActivity2;
 import com.cxwl.menjin.lock.http.API;
+import com.cxwl.menjin.lock.interfac.TakePictureCallback;
 import com.cxwl.menjin.lock.service.MainService;
 import com.cxwl.menjin.lock.utils.AdvertiseHandler;
 import com.cxwl.menjin.lock.utils.BitmapUtils;
@@ -122,19 +121,25 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.UUID;
 
 import jni.util.Utils;
 import okhttp3.Call;
 
+import static com.cxwl.menjin.lock.config.Constant.CALLING_MODE;
 import static com.cxwl.menjin.lock.config.Constant.CALL_MODE;
+import static com.cxwl.menjin.lock.config.Constant.ERROR_MODE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_ADVERTISE_REFRESH;
 import static com.cxwl.menjin.lock.config.Constant.MSG_ADVERTISE_REFRESH_PIC;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CALLMEMBER_ERROR;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CALLMEMBER_NO_ONLINE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CALLMEMBER_SERVER_ERROR;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CALLMEMBER_TIMEOUT;
+import static com.cxwl.menjin.lock.config.Constant.MSG_CANCEL_CALL;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CARD_OPENLOCK;
+import static com.cxwl.menjin.lock.config.Constant.MSG_CHECK_PASSWORD;
 import static com.cxwl.menjin.lock.config.Constant.MSG_DELETE_FACE;
+import static com.cxwl.menjin.lock.config.Constant.MSG_DISCONNECT_VIEDO;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_DETECT_CHECK;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_DETECT_CONTRAST;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_DETECT_INPUT;
@@ -160,6 +165,8 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_RTC_DISCONNECT;
 import static com.cxwl.menjin.lock.config.Constant.MSG_RTC_NEWCALL;
 import static com.cxwl.menjin.lock.config.Constant.MSG_RTC_ONVIDEO;
 import static com.cxwl.menjin.lock.config.Constant.MSG_RTC_REGISTER;
+import static com.cxwl.menjin.lock.config.Constant.MSG_START_DIAL;
+import static com.cxwl.menjin.lock.config.Constant.MSG_START_DIAL_PICTURE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_TONGJI_VEDIO;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPDATE_NETWORKSTATE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPLOAD_LIXIAN_IMG;
@@ -170,9 +177,13 @@ import static com.cxwl.menjin.lock.config.Constant.ONVIDEO_MODE;
 import static com.cxwl.menjin.lock.config.Constant.PASSWORD_CHECKING_MODE;
 import static com.cxwl.menjin.lock.config.Constant.PASSWORD_MODE;
 import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK;
+import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK1;
+import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK2;
 import static com.cxwl.menjin.lock.config.Constant.arc_appid;
 import static com.cxwl.menjin.lock.config.Constant.fr_key;
 import static com.cxwl.menjin.lock.config.Constant.ft_key;
+import static com.cxwl.menjin.lock.config.DeviceConfig.DEVICE_KEYCODE_POUND;
+import static com.cxwl.menjin.lock.config.DeviceConfig.DEVICE_KEYCODE_STAR;
 import static com.cxwl.menjin.lock.config.DeviceConfig.LOCAL_IMG_PATH;
 import static com.cxwl.menjin.lock.utils.NetWorkUtils.NETWOKR_TYPE_ETHERNET;
 import static com.cxwl.menjin.lock.utils.NetWorkUtils.NETWOKR_TYPE_MOBILE;
@@ -180,7 +191,8 @@ import static com.cxwl.menjin.lock.utils.NetWorkUtils.NETWORK_TYPE_NONE;
 import static com.cxwl.menjin.lock.utils.NetWorkUtils.NETWORK_TYPE_WIFI;
 import static java.lang.Thread.sleep;
 
-public class MainActivity extends AppCompatActivity implements View.OnClickListener, CameraSurfaceView.OnCameraListener {
+public class MainActivity extends AppCompatActivity implements View.OnClickListener, CameraSurfaceView
+        .OnCameraListener, TakePictureCallback {
 
     private static String TAG = "MainActivity";
     public static final int MSG_RTC_ONVIDEO_IN = 10011;//接收到视频呼叫
@@ -222,7 +234,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Thread videoThread = null;//视频更新线程
     private boolean isVideoThreadStart = false;//视频更新线程是否开启的标志
     private boolean isNfcFlag = false;//串口库是否打开的标识（默认失败）
-//    private DoorLock doorLock;//用于nfc卡扫描
+    //    private DoorLock doorLock;//用于nfc卡扫描
     private Dialog weituoDialog = null;
 
     private String cardId;//卡ID
@@ -678,6 +690,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
         return b;
     }
+
     /**************************图片轮播***************/
 
     private TextView textViewGongGao;
@@ -792,6 +805,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         IntentFilter intentFilter = new IntentFilter();
         intentFilter.addAction(ACTION_NFC_CARDINFO);//NFC读取到卡片信息
         registerReceiver(receive, intentFilter);*/
+
+//        control = new SerialHelper();
+//        control.setDataReceived(this);
+//        control.setPort("/dev/ttyS4");
+//        control.setBaudRate(9600);
+//        OpenComPort(control);
+    }
+
+    // ------------------------------------------显示消息
+    private void ShowMessage(String sMsg) {
+        Toast.makeText(this, sMsg, Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -879,10 +903,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Log.i(TAG, "视频通话断开");
                         onRtcDisconnect();
                         //启动人脸识别
-//                        if (faceHandler != null) {
-//                            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 3000);
-//                        }
-                        handler.sendEmptyMessage(START_FACE_CHECK);
+                        if (faceHandler != null) {
+                            Log.e(TAG, "人脸90");
+                            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 3000);
+                        }
+//                        handler.sendEmptyMessage(START_FACE_CHECK);
                         break;
                     case MSG_RTC_NEWCALL:
                         //收到新的来电
@@ -920,6 +945,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         // TODO: 2018/6/19    faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_INPUT, 100);
                         break;
                     case MSG_FACE_INFO_FINISH://人脸录入完成，重新开始人脸识别
+                        Log.e(TAG, "人脸91");
                         faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 1000);
                         break;
                     case MSG_LOCK_OPENED://开锁
@@ -1011,10 +1037,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                         break;
                     case MSG_YIJIANKAIMEN_TAKEPIC1:
-                        handler.sendEmptyMessage(START_FACE_CHECK);
-//                        if (faceHandler != null) {
-//                            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 1000);
-//                        }
+//                        handler.sendEmptyMessage(START_FACE_CHECK);
+                        Log.e(TAG, "人脸96");
+                        if (faceHandler != null) {
+                            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 1000);
+                        }
                         break;
                     case START_FACE_CHECK:
                         Log.e(TAG, "人脸识别前的准备 " + "释放相机");
@@ -1028,6 +1055,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                         break;
 
+                    case START_FACE_CHECK1:
+                        Log.e(TAG, "登录天翼RTC之后再重新打开");
+//                        faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 100);//在登录天翼RTC之前先把人脸识别关掉
+                        faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 4000);
+                        break;
+                    case START_FACE_CHECK2:
+                        Log.e(TAG, "登录天翼RTC之前先释放相机");
+                        faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 100);//在登录天翼RTC之前先把人脸识别关掉
+                        break;
                     default:
                         break;
                 }
@@ -1181,11 +1217,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.e(TAG, "可以读卡");
             enableReaderMode();//登录成功后开启读卡
 
-            //人脸识别开始
+            Log.e(TAG, "人脸94");
+            //人脸识别开始  这里的人脸识别开始移到rtc登录成功以后
 //            if (faceHandler != null) {
 //                faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 1000);
 //            }
-            handler.sendEmptyMessage(START_FACE_CHECK);
+//            handler.sendEmptyMessage(START_FACE_CHECK);
 
             sendMainMessager(MainService.REGISTER_ACTIVITY_DIAL, null);//开始心跳包
         }
@@ -1265,6 +1302,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }).start();
         }
     }
+
     private boolean checkTime(Calendar c) {
         // TODO: 2018/9/5 没测
         Calendar c1 = Calendar.getInstance();
@@ -1348,13 +1386,378 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
             }
 
-        }, 1000, 5000); }
+        }, 1000, 5000);
+    }
 
     /**********************************************按键相关start***************************/
 
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        if (event.getAction() == KeyEvent.ACTION_DOWN) {
+            int keyCode = event.getKeyCode();
+            onKeyDown(keyCode);
+        }
+        return false;
+    }
+
+    private int convertKeyCode(int keyCode) {
+        int value = -1;
+        if ((keyCode == KeyEvent.KEYCODE_0)) {
+            value = 0;
+        } else if ((keyCode == KeyEvent.KEYCODE_1)) {
+            value = 1;
+        } else if ((keyCode == KeyEvent.KEYCODE_2)) {
+            value = 2;
+        } else if ((keyCode == KeyEvent.KEYCODE_3)) {
+            value = 3;
+        } else if ((keyCode == KeyEvent.KEYCODE_4)) {
+            value = 4;
+        } else if ((keyCode == KeyEvent.KEYCODE_5)) {
+            value = 5;
+        } else if ((keyCode == KeyEvent.KEYCODE_6)) {
+            value = 6;
+        } else if ((keyCode == KeyEvent.KEYCODE_7)) {
+            value = 7;
+        } else if ((keyCode == KeyEvent.KEYCODE_8)) {
+            value = 8;
+        } else if ((keyCode == KeyEvent.KEYCODE_9)) {
+            value = 9;
+        }
+        return value;
+    }
+
+    /**
+     * 强制让控件获取焦点
+     *
+     * @param view
+     */
+    private void getFocus(View view) {
+        view.setFocusable(true);//普通物理方式获取焦点
+        view.setFocusableInTouchMode(true);//触摸模式获取焦点,不是触摸屏啊
+        view.requestFocus();//要求获取焦点
+
+        boolean focusable = view.isFocusable();
+        Log.e(TAG, "获取焦点 " + focusable);
+    }
+
+    /**
+     * 强制让控件失去焦点
+     *
+     * @param view
+     */
+    private void delFocus(View view) {
+        view.setFocusable(false);//普通物理方式获取焦点
+        view.setFocusableInTouchMode(false);//触摸模式获取焦点,不是触摸屏啊
+
+        boolean focusable = view.isFocusable();
+        Log.e(TAG, "失去焦点 " + focusable);
+    }
+
+    private String str;//输入框内容
+
+    private void onKeyDown(int keyCode) {
+        Log.i(TAG, "默认按键key=" + keyCode);
+        if (nfcFlag) {
+            deleteFaceInfo(keyCode);//删除人脸信息
+            //  inputCardInfo(keyCode);//录入卡片信息
+        } else {
+            int key = convertKeyCode(keyCode);
+            Log.i(TAG, "按键key=" + key + "模式currentStatus" + currentStatus);
+            if (currentStatus == CALL_MODE || currentStatus == PASSWORD_MODE) {//处于呼叫模式或密码模式
+                // TODO: 2018/5/4 这里的判断得改成输入框是否有值,有值确认键走呼叫或密码,没值走切换模式
+                tv_input_text.setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)});
+                str = tv_input_text.getText().toString();
+                if (keyCode == DEVICE_KEYCODE_POUND) {//确认键
+                    if ("".equals(str)) {//输入框没值走切换模式
+                        if (currentStatus == CALL_MODE) {//呼叫模式下，按确认键切换成密码模式
+                            //密码模式
+                            tv_input_text.setFilters(new InputFilter[]{new InputFilter.LengthFilter(6)});
+                            initPasswordStatus();
+                        } else {
+                            tv_input_text.setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)});
+                            initDialStatus();
+                        }
+                    } else {//输入框有值走呼叫或密码
+                        if (currentStatus == CALL_MODE) {//呼叫
+                            if ("C".equals(DeviceConfig.DEVICE_TYPE)) {//大门
+                                if (blockNo.length() == DeviceConfig.BLOCK_LENGTH) {
+                                    startDialing(blockNo);
+                                } else if (blockNo.length() == DeviceConfig.MOBILE_NO_LENGTH) {//手机号
+                                    if (true) {//正则判断
+                                        startDialing(blockNo);
+                                    }
+                                }
+                            } else {//单元
+                                if (blockNo.length() == DeviceConfig.UNIT_NO_LENGTH) {
+                                    startDialing(blockNo);
+                                } else if (blockNo.length() == DeviceConfig.MOBILE_NO_LENGTH) {//手机号
+                                    if (true) {//正则判断
+                                        startDialing(blockNo);
+                                    }
+                                }
+                            }
+                        } else {//密码开门
+                            if (guestPassword.length() == 6) {
+                                checkPassword();
+                            }
+                        }
+                    }
+                } else if (keyCode == DEVICE_KEYCODE_STAR) {//删除键
+                    if (currentStatus == CALL_MODE) {
+                        callInput();//房号或手机号删除一位
+                    } else {
+                        passwordInput();//密码删除一位
+                    }
+                    if (str == null || str.equals("")) {
+                        //跳转到登录界面
+//                        Intent intent = new Intent(this, InputCardInfoActivity.class);
+//                        startActivityForResult(intent, INPUT_CARDINFO_REQUESTCODE);
+                    }
+                } else if (key >= 0) {//数字键
+                    if (currentStatus == CALL_MODE) {
+                        unitNoInput(key);
+//                        callInput(key);
+                    } else {
+                        passwordInput(key);//密码开门
+                    }
+                }
+            } else if (currentStatus == ERROR_MODE) {
+                Utils.DisplayToast(MainActivity.this, "当前网络异常");
+            } else if (currentStatus == CALLING_MODE) {//处于正在呼叫模式
+                tv_input_text.setFilters(new InputFilter[]{new InputFilter.LengthFilter(20)});
+                Log.v(TAG, "onKeyDown-->111");
+                if (keyCode == KeyEvent.KEYCODE_STAR || keyCode == DEVICE_KEYCODE_STAR) {
+                    Log.v(TAG, "onKeyDown-->222");
+                    startCancelCall();//取消呼叫
+                }
+            } else if (currentStatus == ONVIDEO_MODE) {
+                tv_input_text.setFilters(new InputFilter[]{new InputFilter.LengthFilter(20)});
+                if (keyCode == KeyEvent.KEYCODE_STAR || keyCode == DEVICE_KEYCODE_STAR) {
+                    sendMainMessager(MSG_DISCONNECT_VIEDO, "");
+                }
+            }
+        }
+    }
+
     /**********************************************按键相关end***************************/
 
+    /**
+     * 删除人脸信息
+     *
+     * @param keyCode
+     */
+    private void deleteFaceInfo(int keyCode) {
+        String unit = et_unitno.getText().toString().trim();
+        if (keyCode == DEVICE_KEYCODE_STAR) {//取消
+            if (isFlag && TextUtils.isEmpty(unit)) {
+                rl_nfc.setVisibility(View.GONE);
+                nfcFlag = false;
+                initDialStatus();
+                isFlag = false;
+                phone_face = "";
+            } else if (isFlag && !TextUtils.isEmpty(unit)) {
+                unit = backKey(unit);
+                setTextValue(R.id.et_unitno, unit);
+            }
+        } else if (keyCode == DEVICE_KEYCODE_POUND) {//确认
+            if (TextUtils.isEmpty(unit)) {
+                Toast.makeText(this, "楼栋编号或者房屋编号不能为空", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (unit.length() < 11) {
+                Toast.makeText(this, "手机号长度不对", Toast.LENGTH_SHORT).show();
+                return;
+            }
+            if (isFlag && unit.length() == 11) {
+                deleteFaceInfoThread(unit);
+            }
+        } else {
+            int key = convertKeyCode(keyCode);
+            if (key >= 0) {
+                phone_face = phone_face + key;
+                setTextValue(R.id.et_unitno, phone_face);
+            }
+        }
+    }
+
+    /**
+     * 开启删除人脸信息线程
+     *
+     * @param phone 手机号
+     */
+    private void deleteFaceInfoThread(final String phone) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                boolean delete = ArcsoftManager.getInstance().mFaceDB.delete(phone);//删除
+
+                Message message = Message.obtain();
+                message.what = MSG_DELETE_FACE;
+                message.obj = delete;
+                handler.sendMessage(message);
+
+                Log.e(TAG, "人脸信息删除" + "线程");
+            }
+        }).start();
+    }
+
+    void setTextValue(final int id, String value) {
+        final String thisValue = value;
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                setTextView(id, thisValue);
+            }
+        });
+    }
+
     /*********************************密码房号等输入状态相关start*******************************************/
+
+    /**
+     * 输入的房号或手机号的输入  1
+     *
+     * @param key
+     */
+    private void unitNoInput(int key) {
+        blockNo = blockNo + key;
+        if (blockNo.length() > 11) {
+            blockNo = blockNo.substring(0, 11);
+        }
+        setDialValue(blockNo);
+        // TODO: 2018/5/4 这个判断交给确认键去做,暂时注释
+//        if (DeviceConfig.DEVICE_TYPE.equals("C")) {
+//            if (blockNo.length() == DeviceConfig.BLOCK_LENGTH) {
+//                startDialing(blockNo);
+//            }
+//        } else {
+//            if (blockNo.length() == DeviceConfig.UNIT_NO_LENGTH) {
+//                startDialing(blockNo);
+//            }
+//        }
+
+
+//         TODO: 2018/5/3 暂时注释 测试呼叫手机号
+//        if (DeviceConfig.DEVICE_TYPE.equals("C")) {
+//            if (blockNo.length() == DeviceConfig.BLOCK_LENGTH) {
+//                startDialing(blockNo);
+//            }
+//        } else {
+//            if (blockNo.equals("0101") || blockNo.equals("9999")) {
+//                startDialing(blockNo);
+//            } else if (blockNo.length() == 11) {
+//                startDialing(blockNo);
+//            }
+//        }
+
+    }
+
+    /**
+     * 房号或手机号删除最后一位
+     */
+    private void callInput() {
+        if (DeviceConfig.DEVICE_TYPE.equals("C")) {
+            if (blockId > 0) {
+                if (blockNo.equals("")) {
+                    blockId = 0;
+                    blockNo = backKey(blockNo);
+                    setDialStatus("请输入楼栋编号");
+                    setDialValue(blockNo);
+                } else {
+                    blockNo = backKey(blockNo);
+                    setDialValue(blockNo);
+                }
+            } else {
+                blockNo = backKey(blockNo);
+                setDialValue(blockNo);
+            }
+        } else {
+            blockNo = backKey(blockNo);
+            setDialValue(blockNo);
+        }
+    }
+
+    /**
+     * 密码输入
+     *
+     * @param key
+     */
+    private void passwordInput(int key) {
+        guestPassword = guestPassword + key;
+        if (guestPassword.length() > 6) {
+            guestPassword = guestPassword.substring(0, 6);
+        }
+        setTempkeyValue(guestPassword);
+        // TODO: 2018/5/4 这个判断交给确认键去做,暂时注释
+//        if (guestPassword.length() == 6) {
+//            checkPassword();
+//        }
+    }
+
+    /**
+     * 密码 删除最后一位
+     */
+    private void passwordInput() {
+        guestPassword = backKey(guestPassword);
+        setTempkeyValue(guestPassword);
+    }
+
+    /**
+     * 删除最后一位
+     *
+     * @param code
+     * @return
+     */
+    private String backKey(String code) {
+        if (code != null && code != "") {
+            int length = code.length();
+            if (length == 1) {
+                code = "";
+            } else {
+                code = code.substring(0, (length - 1));
+            }
+        }
+        return code;
+    }
+
+    private void checkPassword() {
+        setCurrentStatus(PASSWORD_CHECKING_MODE);
+        String thisPassword = guestPassword;
+        guestPassword = "";
+//        呼叫前，确认摄像头不被占用 虹软
+        if (faceHandler != null) {
+            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 0);
+        }
+        takePicture(thisPassword, false, this);
+    }
+
+    /**
+     * 桌面显示呼叫模式
+     */
+    private void initDialStatus() {
+        videoLayout.setVisibility(View.INVISIBLE);
+        setCurrentStatus(CALL_MODE);
+        blockNo = "";
+        blockId = 0;
+        if (DeviceConfig.DEVICE_TYPE.equals("C")) {
+            setDialStatus("请输入楼栋编号");
+        } else {
+            setDialStatus("请输入房屋编号");
+        }
+        setDialValue(blockNo);
+    }
+
+    /**
+     * 界面显示输入密码模式
+     */
+    private void initPasswordStatus() {
+        stopPasswordTimeoutChecking();
+        setDialStatus("请输入访客密码");
+        videoLayout.setVisibility(View.INVISIBLE);
+        setCurrentStatus(PASSWORD_MODE);
+        guestPassword = "";
+        setTempkeyValue(guestPassword);
+        startTimeoutChecking();
+    }
 
     /**
      * 密码验证后 是否成功等
@@ -1378,10 +1781,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Toast.makeText(MainActivity.this, "密码验证不成功", Toast.LENGTH_SHORT).show();
         }
 
-//        if (faceHandler != null) {
-//            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 3000);
-//        }
-        handler.sendEmptyMessage(START_FACE_CHECK);
+        if (faceHandler != null) {
+            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 3000);
+        }
+//        handler.sendEmptyMessage(START_FACE_CHECK);
     }
 
     /**
@@ -1390,7 +1793,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @param code
      */
     private void onCheckLixianPasswordAfter(boolean code) {
-        // TODO: 2018/9/5 没测
         setCurrentStatus(PASSWORD_MODE);
         setTempkeyValue("");
         if (code) {
@@ -1400,10 +1802,49 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Utils.DisplayToast(MainActivity.this, "密码验证不成功");
         }
 
-//        if (faceHandler != null) {
-//            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 3000);
-//        }
-        handler.sendEmptyMessage(START_FACE_CHECK);
+        if (faceHandler != null) {
+            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 3000);
+        }
+//        handler.sendEmptyMessage(START_FACE_CHECK);
+    }
+
+    /**
+     * 输入密码 无操作 启动自动跳转到输入房号的状态的线程
+     */
+    private void startTimeoutChecking() {
+        passwordTimeoutThread = new Thread() {
+            public void run() {
+                try {
+                    sleep(DeviceConfig.PASSWORD_WAIT_TIME); //等待指定的一个等待时间
+                    if (!isInterrupted()) { //检查线程没有被停止
+                        if (currentStatus == PASSWORD_MODE) { //如果现在是密码输入状态
+                            if (TextUtils.isEmpty(guestPassword)) { //如果密码一直是空白的
+                                handler.post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        initDialStatus();
+                                    }
+                                });
+                                stopPasswordTimeoutChecking();
+                            }
+                        }
+                    }
+                } catch (InterruptedException e) {
+                }
+                passwordTimeoutThread = null;
+            }
+        };
+        passwordTimeoutThread.start();
+    }
+
+    /**
+     * 输入密码 无操作 停止自动跳转到输入房号的状态的线程
+     */
+    protected void stopPasswordTimeoutChecking() {
+        if (passwordTimeoutThread != null) {
+            passwordTimeoutThread.interrupt();
+            passwordTimeoutThread = null;
+        }
     }
 
     /*********************************密码房号等输入状态相关end*******************************************/
@@ -1509,13 +1950,41 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     String curUrl;
     String faceOpenUrl;//人脸开门截图URL
 
+    protected void takePicture(final String thisValue, final boolean isCall, final TakePictureCallback callback) {
+        if (currentStatus == CALLING_MODE || currentStatus == PASSWORD_CHECKING_MODE) {
+            final String uuid = getUUID(); //随机生成UUID
+            lastImageUuid = uuid;
+            setImageUuidAvaibale(uuid);
+            //创建地址
+            curUrl = "door/img/" + System.currentTimeMillis() + ".jpg";
+            callback.beforeTakePickture(thisValue, curUrl, isCall, uuid);//校验房间号是否存在
+            Log.v("MainActivity", "开始启动拍照");
+            new Thread() {
+                @Override
+                public void run() {
+                    try {
+                        sleep(300);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    final String thisUuid = uuid;
+                    if (checkTakePictureAvailable(thisUuid)) {
+                        doTakePicture(thisValue, curUrl, isCall, uuid, callback);
+                    } else {
+                        Log.v("MainActivity", "取消拍照");
+                    }
+                }
+            }.start();
+        }
+    }
+
     protected void takePicture1(final String imgUrl) {
         // TODO: 2018/9/5 没测
         Log.v("MainActivity", "开始启动拍照");
         //启动人脸识别
         if (faceHandler != null) {
             faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 0);
-            // TODO: 2018/8/28 把人脸识别的开启放在拍照完成后进行  faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 4000);
+            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 4000);
         }
         new Thread() {
             @Override
@@ -1527,7 +1996,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
                 mCamerarelease = false;
                 try {
-                    camera = Camera.open();
+                    camera = Camera.open(1);
                     Log.e(TAG, "打开照相机 1");
                 } catch (Exception e) {
                     Log.e(TAG, "打开照相机 2 " + e.toString());
@@ -1578,7 +2047,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         camera = null;
                                         mCamerarelease = true;
                                     }
-                                    handler.sendEmptyMessage(START_FACE_CHECK);
+//                                    handler.sendEmptyMessage(START_FACE_CHECK);
                                     OkHttpUtils.post().url(API.QINIU_IMG).build().execute(new StringCallback() {
                                         @Override
                                         public void onError(Call call, Exception e, int id) {
@@ -1625,7 +2094,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         camera = null;
                                         mCamerarelease = true;
                                     }
-                                    handler.sendEmptyMessage(START_FACE_CHECK);
+//                                    handler.sendEmptyMessage(START_FACE_CHECK);
                                     Log.e(TAG, "打开照相机 5" + e.toString());
                                     e.printStackTrace();
                                 }
@@ -1640,7 +2109,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             mCamerarelease = true;
                         }
                         Log.v("MainActivity", "照相出异常清除UUID");
-                        handler.sendEmptyMessage(START_FACE_CHECK);
+//                        handler.sendEmptyMessage(START_FACE_CHECK);
                     }
                 }
             }
@@ -1731,6 +2200,172 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    private synchronized void doTakePicture(final String thisValue, final String curUrl, final boolean isCall, final
+    String uuid, final TakePictureCallback callback) {
+        mCamerarelease = false;
+        try {
+            camera = Camera.open();
+            Log.e(TAG, "打开照相机 1");
+        } catch (Exception e) {
+            Log.e(TAG, "打开照相机 2 " + e.toString());
+        }
+        Log.v(TAG, "打开照相机");
+        if (camera == null) {
+            try {
+                camera = Camera.open(0);
+                Log.e(TAG, "打开照相机 3");
+            } catch (Exception e) {
+                Log.e(TAG, "打开照相机 4" + e.toString());
+            }
+        }
+        if (camera != null) {
+            try {
+                Camera.Parameters parameters = camera.getParameters();
+                parameters.setPreviewSize(320, 240);
+                camera.setParameters(parameters);
+                camera.setPreviewDisplay(autoCameraHolder);
+                camera.startPreview();
+                camera.autoFocus(null);
+                Log.v("MainActivity", "开始拍照");
+                camera.takePicture(null, null, new Camera.PictureCallback() {
+                    @Override
+                    public void onPictureTaken(byte[] data, Camera camera1) {
+                        try {
+                            if (camera != null) {
+                                camera.setPreviewCallback(null);
+                                camera.stopPreview();
+                                camera.release();
+                                camera = null;
+                                mCamerarelease = true;
+                            }
+                            Log.v("MainActivity", "释放照相机资源");
+                            Log.v("MainActivity", "拍照成功");
+                            Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
+                            String fileurl = Environment.getExternalStorageDirectory() + "/" + LOCAL_IMG_PATH + "/" +
+                                    System.currentTimeMillis() + ".jpg";
+                            final File file = new File(fileurl);
+                            File parentFile = file.getParentFile();
+                            if (!parentFile.exists()) {
+                                parentFile.mkdirs();
+                            }
+                            FileOutputStream outputStream = new FileOutputStream(file);
+                            bitmap.compress(Bitmap.CompressFormat.JPEG, 50, outputStream);
+                            outputStream.close();
+                            final ImgFile imgFile = new ImgFile();
+                            imgFile.setImg_localurl(fileurl);
+                            imgFile.setImg_uploadurl(curUrl);
+                            if (checkTakePictureAvailable(uuid)) {
+                                OkHttpUtils.post().url(API.QINIU_IMG).build().execute(new StringCallback() {
+                                    @Override
+                                    public void onError(Call call, Exception e, int id) {
+                                        Log.i(TAG, "获取七牛token失败 e" + e.toString() + "保存照片信息到数据库");
+                                        DbUtils.getInstans().insertOneImg(imgFile);
+                                    }
+
+                                    @Override
+                                    public void onResponse(final String response, int id) {
+                                        new Thread() {
+                                            @Override
+                                            public void run() {
+                                                String token = JsonUtil.getFieldValue(response, "data");
+                                                Log.i(TAG, "获取七牛token成功 开始上传照片  token" + token);
+                                                Log.e(TAG, "file七牛储存地址：" + curUrl);
+                                                Log.e(TAG, "file本地地址：" + file.getPath() + "file大小" + file.length());
+
+                                                uploadManager.put(file.getPath(), curUrl, token, new
+                                                        UpCompletionHandler() {
+                                                            @Override
+                                                            public void complete(String key, ResponseInfo info,
+                                                                                 JSONObject
+                                                                                         response) {
+                                                                if (info.isOK()) {
+                                                                    Log.e(TAG, "七牛上传图片成功 删除本地图片");
+                                                                    if (file != null) {
+                                                                        file.delete();
+                                                                    }
+                                                                } else {
+                                                                    Log.e(TAG, "七牛上传图片失败 保存照片信息到数据库");
+                                                                    DbUtils.getInstans().insertOneImg(imgFile);
+                                                                }
+                                                                if (checkTakePictureAvailable(uuid) && info.isOK() &&
+                                                                        isCall) {
+                                                                    Log.i(TAG, "开始发送图片到手机显示照片");
+                                                                    callback.afterTakePickture(thisValue, curUrl,
+                                                                            isCall, uuid);
+                                                                } else {
+                                                                    Log.v("MainActivity", "上传照片成功不发送到手机,但已取消");
+                                                                }
+                                                                clearImageUuidAvaible(uuid);
+                                                                Log.v(TAG, "正常清除" + uuid);
+                                                                Log.e(TAG, "七牛info" + info.toString());
+                                                            }
+                                                        }, null);
+                                            }
+                                        }.start();
+                                    }
+                                });
+                            } else {
+                                Log.v("MainActivity", "拍照成功，但已取消");
+                            }
+                        } catch (Exception e) {
+                            Log.e(TAG, "打开照相机 5" + e.toString());
+                            e.printStackTrace();
+                            if (camera != null) {
+                                camera.setPreviewCallback(null);
+                                camera.stopPreview();
+                                camera.release();
+                                camera = null;
+                                mCamerarelease = true;
+                            }
+                        }
+                    }
+                });
+            } catch (Exception e) {
+                // TODO: 2018/8/28 这里不知道要不要加 callback.afterTakePickture(thisValue, null, isCall, uuid);
+                if (camera != null) {
+                    camera.setPreviewCallback(null);
+                    camera.stopPreview();
+                    camera.release();
+                    camera = null;
+                    mCamerarelease = true;
+                }
+                Log.v("MainActivity", "照相出异常清除UUID");
+                clearImageUuidAvaible(uuid);
+            }
+        }
+    }
+
+    @Override
+    public void beforeTakePickture(String thisValue, String curUrl, boolean isCall, String uuid) {
+        startDialorPasswordDirectly(thisValue, curUrl, isCall, uuid);
+    }
+
+    @Override
+    public void afterTakePickture(String thisValue, String fileUrl, boolean isCall, String uuid) {
+        startSendPictureDirectly(thisValue, fileUrl, isCall, uuid);
+    }
+
+    private boolean checkTakePictureAvailable(String uuid) {
+        String thisValue = uuidMaps.get(uuid);
+        boolean result = false;
+        if (thisValue != null && thisValue.equals("Y")) {
+            result = true;
+        }
+        Log.v(TAG, "检查UUID" + uuid + result);
+        return result;
+    }
+
+    private String getUUID() {
+        UUID uuid = UUID.randomUUID();
+        String result = UUID.randomUUID().toString();
+        return result;
+    }
+
+    private void setImageUuidAvaibale(String uuid) {
+        Log.v("MainActivity", "加入UUID" + uuid);
+        uuidMaps.put(uuid, "Y");
+    }
+
     private void clearImageUuidAvaible(String uuid) {
         // TODO: 2018/9/5 没测
         Log.v("MainActivity", "清除UUID" + uuid);
@@ -1768,10 +2403,156 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
         //启动人脸识别
-//        if (faceHandler != null) {
-//            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 3000);
-//        }
-        handler.sendEmptyMessage(START_FACE_CHECK);
+        if (faceHandler != null) {
+            Log.e(TAG, "人脸99");
+            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 3000);
+        }
+//        handler.sendEmptyMessage(START_FACE_CHECK);
+    }
+
+    /**
+     * 删除键取消拨号
+     */
+    protected void startCancelCall() {
+        new Thread() {
+            @Override
+            public void run() {
+                //  stopCallCamera();
+                try {
+                    sleep(1000);
+                } catch (Exception e) {
+                }
+                sendMainMessager(MSG_CANCEL_CALL, "");
+                if (faceHandler != null) {
+                    faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 1000);
+                }
+//                handler.sendEmptyMessage(START_FACE_CHECK);
+                try {
+                    sleep(1000);
+                } catch (Exception e) {
+                }
+                toast("您已经取消拨号");
+                resetDial();
+            }
+        }.start();
+    }
+
+    /**
+     * 开始呼叫
+     *
+     * @param blockNo
+     */
+    private void startDialing(String blockNo) {
+        if (blockNo.equals("9999") || blockNo.equals("99999999")) {
+            if (faceHandler != null) {
+                //人脸识别录入
+                faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 100);
+                faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_INPUT, 100);
+                return;
+            }
+        }
+
+        if (blockNo.equals("99999998")) {
+            if (videoList != null && videoList.size() > 0) {
+                videoList.clear();
+            }
+            return;
+        }
+
+        if (blockNo.equals(("8888")) || blockNo.equals("88888888")) {
+            if (faceHandler != null) {
+                // TODO: 2018/5/28 不暂停人脸识别
+//                faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 100);
+//                faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_INPUT, 100);
+                if (ArcsoftManager.getInstance().mFaceDB.mRegister.isEmpty()) {
+                    Utils.DisplayToast(MainActivity.this, "没有注册人脸，请先注册");
+                } else {
+                    rl_nfc.setVisibility(View.VISIBLE);
+                    tv_message.setText("");
+                    nfcFlag = true;
+                    isFlag = true;
+                    cardId = null;
+                    //录卡楼栋号输入栏强制获取焦点
+                    getFocus(et_unitno);
+                    et_unitno.setText("");
+                    return;
+                }
+            }
+        }
+
+        //呼叫前，确认摄像头不被占用 虹软
+        if (faceHandler != null) {
+            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 0);
+        }
+
+        Log.i(TAG, "拍摄访客照片 并进行呼叫" + blockNo);
+        setCurrentStatus(CALLING_MODE);
+        //拍摄访客照片 并进行呼叫
+        takePicture(blockNo, true, MainActivity.this);
+    }
+
+    /**
+     * 开始呼叫
+     */
+    protected void startDialorPasswordDirectly(final String thisValue, final String fileUrl, final boolean isCall,
+                                               String uuid) {
+        if (currentStatus == CALLING_MODE || currentStatus == PASSWORD_CHECKING_MODE) {
+            Message message = Message.obtain();
+            String[] parameters = new String[3];
+            if (isCall) {
+                setDialValue1("呼叫" + thisValue + "，取消请按删除键");
+                message.what = MSG_START_DIAL;
+                if (DeviceConfig.DEVICE_TYPE.equals("C")) {
+                    parameters[0] = thisValue;
+                } else {
+                    parameters[0] = thisValue;
+                }
+            } else {
+                tv_input_text.setFilters(new InputFilter[]{new InputFilter.LengthFilter(20)});
+                setTempkeyValue("准备验证密码" + thisValue + "...");
+                message.what = MSG_CHECK_PASSWORD;
+                parameters[0] = thisValue;
+            }
+            parameters[1] = fileUrl;
+            parameters[2] = uuid;
+            message.obj = parameters;
+            try {
+                serviceMessage.send(message);
+            } catch (RemoteException er) {
+                er.printStackTrace();
+            }
+        }
+    }
+
+    /**
+     * 发送访客图片地址
+     *
+     * @param thisValue
+     * @param fileUrl
+     * @param isCall
+     * @param uuid
+     */
+    protected void startSendPictureDirectly(final String thisValue, final String fileUrl, final boolean isCall,
+                                            String uuid) {
+        if (fileUrl == null || fileUrl.length() == 0) {
+            return;
+        }
+        Message message = Message.obtain();
+        if (isCall) {
+            message.what = MSG_START_DIAL_PICTURE;
+        } else {
+            // message.what = MainService.MSG_CHECK_PASSWORD_PICTURE;
+        }
+        String[] parameters = new String[3];
+        parameters[0] = thisValue;
+        parameters[1] = fileUrl;
+        parameters[2] = uuid;
+        message.obj = parameters;
+        try {
+            serviceMessage.send(message);
+        } catch (RemoteException er) {
+            er.printStackTrace();
+        }
     }
 
     /****************************呼叫相关end************************/
@@ -1845,6 +2626,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 });
             }
         }
+    }
+
+    private void toast(final String message) {
+        handler.post(new Runnable() {
+            @Override
+            public void run() {
+                Utils.DisplayToast(MainActivity.this, message);
+            }
+        });
     }
 
     private void setTempkeyValue(String value) {
@@ -1990,6 +2780,16 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             showMacText.setVisibility(View.VISIBLE);
             showMacText.setText("MAC地址未注册，请添加\nMac地址：" + mac);
         }
+    }
+
+    /**
+     * 取消呼叫设置状态
+     */
+    protected void resetDial() {
+        // TODO: 2018/9/5 没测
+        blockNo = "";
+        setDialValue(blockNo);
+        setCurrentStatus(CALL_MODE);
     }
 
     /****************************设置一些状态end************************/
@@ -2293,23 +3093,27 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                        idOperation =true;
                         break;
                     case MSG_FACE_DETECT_INPUT://人脸识别录入(拿到网络图片后发出人脸识别暂停，然后发出录入消息)
-                        Log.e(TAG, "人脸" + "识别录入");
+                        Log.e(TAG, "人脸识别录入");
                         // TODO: 2018/5/11  这里要传入整个网络图片的所有地址过来给faceDetectInput方法使用
                         faceDetectInput();
                         break;
                     case MSG_FACE_DETECT_CONTRAST://人脸识别对比
-                        Log.e(TAG, "人脸" + "识别对比");
+                        Log.e(TAG, "人脸识别对比");
                         identification = true;
                         if (mFRAbsLoop != null) {
+                            Log.e(TAG, "人脸识别对比1");
                             mFRAbsLoop.resumeThread();
                         }
                         if (mSurfaceView.getVisibility() != View.VISIBLE) {
+                            Log.e(TAG, "人脸识别对比2");
                             mGLSurfaceView.setVisibility(View.VISIBLE);
                             mSurfaceView.setVisibility(View.VISIBLE);
                         }
                         break;
                     case MSG_FACE_DETECT_PAUSE://人脸识别暂停
-                        Log.e(TAG, "人脸" + "识别暂停" + "开始照相");
+                        Log.e(TAG, "人脸识别暂停开始照相");
+//                        faceHandler.removeMessages(MSG_FACE_DETECT_CONTRAST);
+//                        handler.removeMessages(START_FACE_CHECK);
                         identification = false;
                         if (mFRAbsLoop != null) {
                             mFRAbsLoop.pauseThread();
@@ -2369,13 +3173,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                        mProgressDialog.cancel();
                         if (ArcsoftManager.getInstance().mFaceDB.mRegister.isEmpty()) {
                             Log.v("人脸识别", "initFaceDetect-->" + 333);
-//                            hasFaceInfo = false;
-//                            Utils.DisplayToast(MainActivity.this, "没有注册人脸，请先注册");
+                            hasFaceInfo = false;
+                            Utils.DisplayToast(MainActivity.this, "没有注册人脸，请先注册");
                             return;
                         }
-//                        hasFaceInfo = true;//有注册人脸
+                        hasFaceInfo = true;//有注册人脸
                         identification = true;
-//                        Utils.DisplayToast(MainActivity.this, "人脸数据加载完成");
+                        Utils.DisplayToast(MainActivity.this, "人脸数据加载完成");
                     }
                 });
             }
@@ -2403,7 +3207,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     @Override
     public Camera setupCamera() {
 //        Log.e(TAG, "相机" + "setupCamera");
-        mCamera = Camera.open();
+//        mCamera = Camera.open();
+        mCamera = Camera.open(1);//打开前置相机
+//        mCamera = Camera.open(0);//打开前置相机
         try {//这里其实不用捕捉错误
             Camera.Parameters parameters = mCamera.getParameters();
 //            parameters.setPreviewSize(800, 600);//设置尺寸
@@ -2417,11 +3223,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 // (NV21：是一种YUV420SP格式，紧跟Y平面的是VU交替的平面)
                 mCamera.setParameters(parameters1);
             }
-//            Camera.Parameters parameters2 = mCamera.getParameters();
-//            if (null != parameters2) {
-//                parameters2.setPreviewFpsRange(15000, 30000);//指定相机预览帧数
-//                mCamera.setParameters(parameters2);
-//            }
+
 //            for (Camera.Size size : parameters.getSupportedPreviewSizes()) {
 //                LogDoor.v(TAG, "SIZE:" + size.width + "x" + size.height);
 //            }
@@ -2658,32 +3460,32 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
 
             // TODO: 2018/8/8 一键开门暂时不用截图，用照相
-            if (DeviceConfig.PRINTSCREEN_STATE == 3) {
-                //将byte数组转成bitmap再转成图片文件
-                byte[] data = picData;
-                if (data != null && data.length > 0) {
-                    Log.e("wh", "不会吧");
-                    Bitmap bmp = BitmapUtils.byteToFile(data, mWidth, mHeight);
-                    Bitmap bitmap = BitmapUtils.rotateBitmap(bmp);//旋转180度
-                    File file = null;
-                    if (null != bitmap) {
-                        file = BitmapUtils.saveBitmap(bitmap);//本地截图文件地址
-                    }
-                    if (null != file && !TextUtils.isEmpty(file.getPath())) {
-                        uploadToQiNiu(file, 1);//这里做上传到七牛的操作，不返回图片URL
-                    } else {
-                        faceOpenUrl = "";
-                    }
-                    DeviceConfig.PRINTSCREEN_STATE = 0;//图片处理完成,重置状态
-                    sendMainMessager(MSG_YIJIANKAIMEN_OPENLOCK, faceOpenUrl);
-                    file = null;
-                    bitmap = null;
-                    bmp = null;
-                    data = null;
-                }
-            }
+//            if (DeviceConfig.PRINTSCREEN_STATE == 3) {
+//                //将byte数组转成bitmap再转成图片文件
+//                byte[] data = picData;
+//                if (data != null && data.length > 0) {
+//                    Log.e("wh", "不会吧");
+//                    Bitmap bmp = BitmapUtils.byteToFile(data, mWidth, mHeight);
+//                    Bitmap bitmap = BitmapUtils.rotateBitmap(bmp);//旋转180度
+//                    File file = null;
+//                    if (null != bitmap) {
+//                        file = BitmapUtils.saveBitmap(bitmap);//本地截图文件地址
+//                    }
+//                    if (null != file && !TextUtils.isEmpty(file.getPath())) {
+//                        uploadToQiNiu(file, 1);//这里做上传到七牛的操作，不返回图片URL
+//                    } else {
+//                        faceOpenUrl = "";
+//                    }
+//                    DeviceConfig.PRINTSCREEN_STATE = 0;//图片处理完成,重置状态
+//                    sendMainMessager(MSG_YIJIANKAIMEN_OPENLOCK, faceOpenUrl);
+//                    file = null;
+//                    bitmap = null;
+//                    bmp = null;
+//                    data = null;
+//                }
+//            }
 
-            if (DeviceConfig.DEVICE_TYPE.equals("B") && netWorkFlag == 1) {//大门,人脸验证走网络
+            if (DeviceConfig.DEVICE_TYPE.equals("C") && netWorkFlag == 1) {//大门,人脸验证走网络
                 if (DeviceConfig.PRINTSCREEN_STATE == 0) {
                     if (mImageNV21 != null && identification) {//摄像头检测到人脸信息且处于人脸识别状态
                         DeviceConfig.PRINTSCREEN_STATE = 1;//开启截图、上传图片、开门、上传日志流程
@@ -2954,6 +3756,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onResume();
         Log.v(TAG, "MainActivity/onResume-->");
         if (faceHandler != null) {
+            Log.e(TAG, "人脸95");
             faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 3000);
             faceHandler.sendEmptyMessageDelayed(MSG_ID_CARD_DETECT_RESTART, 1000);
         }
@@ -2999,6 +3802,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         unbindService(serviceConnection);
 //        unregisterReceiver(receive);
+
         disableReaderMode();
         if (netTimer != null) {
             netTimer.cancel();

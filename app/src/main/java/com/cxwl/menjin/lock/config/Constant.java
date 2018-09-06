@@ -34,6 +34,9 @@ public class Constant {
 
     public static final int START_FACE_CHECK = 11110;//人脸对比前的过滤准备流程(释放相机)
 
+    public static final int START_FACE_CHECK1 = 11111;//登录天翼RTC之后再重新打开人脸识别
+    public static final int START_FACE_CHECK2 = 11112;//登录天翼RTC之前先释放相机
+
     public static final float FACE_MAX = 0.6f;
     /********************虹软相关*********************/
 
@@ -119,7 +122,7 @@ public class Constant {
 
     public static final int MSG_RESTART_VIDEO1 = 11110;//媒体流的重启
     public static final int MSG_RESTART_VIDEO = 100002;//媒体流的重启
-    public static  boolean RESTART_PHONE = false;//手机重启
+    public static boolean RESTART_PHONE = false;//手机重启
     public static boolean RESTART_AUDIO = false;//媒体流重启
 
 }

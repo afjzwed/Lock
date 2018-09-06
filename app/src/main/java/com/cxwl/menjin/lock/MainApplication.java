@@ -2,10 +2,14 @@ package com.cxwl.menjin.lock;
 
 import android.app.Application;
 import android.app.PendingIntent;
+import android.content.Intent;
+import android.util.Log;
 
 import com.cxwl.menjin.lock.db.DaoMaster;
 import com.cxwl.menjin.lock.db.DaoSession;
 import com.cxwl.menjin.lock.face.ArcsoftManager;
+import com.cxwl.menjin.lock.utils.DLLog;
+import com.squareup.leakcanary.LeakCanary;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.log.LoggerInterceptor;
@@ -41,24 +45,30 @@ public class MainApplication  extends Application {
                 //其他配置
                 .build();
         OkHttpUtils.initClient(okHttpClient);
-//        Intent intent = new Intent();
-//        // 参数1：包名，参数2：程序入口的activity
-//        intent.setClassName("com.cxwl.hurry.doorlock", "com.cxwl.hurry.doorlock.ui.activity.MainActivity");
-//        restartIntent = PendingIntent.getActivity(getApplicationContext(), 0,
-//                intent, Intent.FLAG_ACTIVITY_NEW_TASK);
-//        Thread.setDefaultUncaughtExceptionHandler(restartHandler); // 程序崩溃时触发线程
+
+        LeakCanary.install(this);
+
+        Intent intent = new Intent();
+        // 参数1：包名，参数2：程序入口的activity
+        intent.setClassName("com.cxwl.hurry.doorlock", "com.cxwl.hurry.doorlock.ui.activity.MainActivity");
+        restartIntent = PendingIntent.getActivity(getApplicationContext(), 0,
+                intent, Intent.FLAG_ACTIVITY_NEW_TASK);
+        Thread.setDefaultUncaughtExceptionHandler(restartHandler); // 程序崩溃时触发线程
     }
 
-//    public Thread.UncaughtExceptionHandler restartHandler = new Thread.UncaughtExceptionHandler() {
-//        @Override
-//        public void uncaughtException(Thread thread, Throwable ex) {
-//            DLLog.e("崩溃重启", "错误 " + ex);
+    public Thread.UncaughtExceptionHandler restartHandler = new Thread.UncaughtExceptionHandler() {
+        @Override
+        public void uncaughtException(Thread thread, Throwable ex) {
+            Log.e("崩溃重启", "错误 " + ex);
+            DLLog.e("崩溃重启", "错误 " + ex);
 //            AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 //            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000,
 //                    restartIntent); // 1秒钟后重启应用
 //            android.os.Process.killProcess(android.os.Process.myPid()); // 自定义方法，关闭当前打开的所有avtivity
-//        }
-//    };
+//            System.exit(0);
+//            System.gc();
+        }
+    };
 
     static DaoSession mDaoSessin;
 

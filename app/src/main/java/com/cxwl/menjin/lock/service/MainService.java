@@ -121,6 +121,7 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_CARD_OPENLOCK;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CHECK_PASSWORD;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CHECK_PASSWORD_PICTURE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_DISCONNECT_VIEDO;
+import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_DETECT_PAUSE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_DOWNLOAD;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_INFO;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_INFO_FINISH;
@@ -157,6 +158,8 @@ import static com.cxwl.menjin.lock.config.Constant.RTC_APP_KEY;
 import static com.cxwl.menjin.lock.config.Constant.SP_LIXIAN_MIMA;
 import static com.cxwl.menjin.lock.config.Constant.SP_VISION_LIAN;
 import static com.cxwl.menjin.lock.config.Constant.SP_XINTIAO_TIME;
+import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK1;
+import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK2;
 import static com.cxwl.menjin.lock.config.DeviceConfig.LOCAL_APK_PATH;
 
 /**
@@ -950,9 +953,9 @@ public class MainService  extends Service {
 //                                    startService(i);
 //                                }
 
-                                if (RESTART_AUDIO) {
-                                    sendMessageToMainAcitivity(MSG_RESTART_VIDEO, imgFiles);
-                                }
+//                                if (RESTART_AUDIO) {
+//                                    sendMessageToMainAcitivity(MSG_RESTART_VIDEO, imgFiles);
+//                                }
                             }
                         } else {
                             //服务器异常或没有网络
@@ -2348,6 +2351,7 @@ public class MainService  extends Service {
      * 初始化天翼sdk
      */
     private void initTYSDK() {
+        sendMessageToMainAcitivity(START_FACE_CHECK2,null);
         if (!isRtcInit) {
             rtcClient = new RtcClientImpl();
             Log.i(TAG, getApplicationContext() == null ? "yes" : "no");
@@ -2456,6 +2460,7 @@ public class MainService  extends Service {
             Log.i(TAG, "登陆状态 ,result=" + result);
             if (result == RtcConst.CallCode_Success) { //注销也存在此处
                 Log.e(TAG, "-----------登陆成功-------------key=" + key + "------------");
+                sendMessageToMainAcitivity(START_FACE_CHECK1,null);
             } else if (result == RtcConst.NoNetwork || result == RtcConst.CallCode_Network) {
                 onNoNetWork();
                 Log.i(TAG, "断网销毁，自动重连接");
@@ -2465,6 +2470,7 @@ public class MainService  extends Service {
                 Log.i(TAG, "网络差，自动重连接");
             } else if (result == RtcConst.ReLoginNetwork) {
                 Log.i(TAG, " 网络原因导致多次登陆不成功，由用户选择是否继续，如想继续尝试，可以重建device");
+                sendMessageToMainAcitivity(START_FACE_CHECK1,null);
             } else if (result == RtcConst.DeviceEvt_KickedOff) {
                 Log.i(TAG, "被另外一个终端踢下线，由用户选择是否继续，如果再次登录，需要重新获取token，重建device");
                 isRtcInit = false;
@@ -3250,9 +3256,9 @@ public class MainService  extends Service {
     /****************************卡相关end************************/
     protected void openLock(int type) {
         // TODO: 2018/9/5 没测 硬件不一样
-   /*     openAexLock(type);
+        openAexLock(type);
 
-        int status = 2;
+      /*  int status = 2;
         Intent ds_intent = new Intent();
         ds_intent.setAction(DoorLock.DoorLockOpenDoor);
         ds_intent.putExtra("index", 0);
@@ -3265,12 +3271,11 @@ public class MainService  extends Service {
     }
 
     private void openAexLock(int type) {
+        sendMessageToMainAcitivity(MSG_LOCK_OPENED, type);//开锁
+        SoundPoolUtil.getSoundPoolUtil().loadVoice(getBaseContext(), 011111);
         // TODO: 2018/9/5 没测 硬件不一样
        /* int result = aexUtil.openLock();
         if (result > 0) {
-            if (type == 3) {
-                DLLog.e("人脸识别", "开门完成");
-            }
             sendMessageToMainAcitivity(MSG_LOCK_OPENED, type);//开锁
             SoundPoolUtil.getSoundPoolUtil().loadVoice(getBaseContext(), 011111);
         }*/
