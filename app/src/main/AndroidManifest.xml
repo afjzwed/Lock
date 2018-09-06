@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
           package="com.cxwl.menjin.lock"
-    android:installLocation="internalOnly"
-    android:sharedUserId="android.uid.system">
-
+          android:installLocation="internalOnly"
+          android:sharedUserId="android.uid.system">
 
 
     <!--允许程序读取底层系统日志文件-->
@@ -92,7 +91,7 @@
     <!--允许程序改变Wi-Fi连接状态-->
     <uses-permission android:name="android.permission.CHANGE_WIFI_STATE"/>
     <!--允许程序监控或控制activities已经启动全局系统中-->
-    <uses-permission android:name="android.permission.SET_ACTIVITY_WATCHER" />
+    <uses-permission android:name="android.permission.SET_ACTIVITY_WATCHER"/>
 
     <application
         android:name=".MainApplication"
@@ -103,10 +102,11 @@
         android:largeHeap="true"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".ui.MainActivity"
-                  android:launchMode="singleTask"
-                  android:screenOrientation="landscape"
-                  android:windowSoftInputMode="stateHidden">
+        <activity
+            android:name=".ui.MainActivity"
+            android:launchMode="singleTask"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="stateHidden">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 
@@ -115,8 +115,13 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".face.FaceRegisterActivity"/>
 
+        <activity android:name=".face.PhotographActivity2"/>
 
+        <activity android:name=".face.PhotographActivity"/>
+
+        <service android:name=".service.MainService"/>
 
 
         <!--开机(更新)启动广播-->
@@ -137,6 +142,12 @@
                 <action android:name="android.intent.action.PACKAGE_REMOVED"/>
             </intent-filter>
         </receiver>
+
+        <service android:name="rtc.sdk.impl.SdkService">
+            <intent-filter>
+                <action android:name="rtc.sdk.service"/>
+            </intent-filter>
+        </service>
     </application>
 
 </manifest>
