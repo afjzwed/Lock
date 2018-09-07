@@ -92,8 +92,13 @@ public class DbUtils {
      * 更具卡id查询卡信息
      */
     public Ka getKaInfo(String ka_id) {
-        Ka unique = mKaDao.queryBuilder().where(KaDao.Properties.Ka_id.eq(ka_id)).unique();
-        if (unique != null) {
+//        Ka unique = mKaDao.queryBuilder().where(KaDao.Properties.Ka_id.eq(ka_id)).unique();
+//        if (unique != null) {
+//            return unique;
+//        }
+        List<Ka> list = mKaDao.queryBuilder().where(KaDao.Properties.Ka_id.eq(ka_id)).list();
+        if (null != list && list.size() > 0) {
+            Ka unique = list.get(0);
             return unique;
         }
         return null;

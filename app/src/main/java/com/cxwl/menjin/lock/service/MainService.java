@@ -160,13 +160,14 @@ import static com.cxwl.menjin.lock.config.Constant.SP_VISION_LIAN;
 import static com.cxwl.menjin.lock.config.Constant.SP_XINTIAO_TIME;
 import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK1;
 import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK2;
+import static com.cxwl.menjin.lock.config.Constant.identification;
 import static com.cxwl.menjin.lock.config.DeviceConfig.LOCAL_APK_PATH;
 
 /**
  * Created by William on 2018/9/4.
  */
 
-public class MainService  extends Service {
+public class MainService extends Service {
 
     private static final String TAG = "MainService";
     private static final String RTCTAG = "RTCTAG";
@@ -175,7 +176,7 @@ public class MainService  extends Service {
 
     public int callConnectState = CALL_WAITING;//视频通话链接状态  默认等待
 
-//    protected AexUtil aexUtil = null;
+    //    protected AexUtil aexUtil = null;
     protected CardRecord cardRecord = new CardRecord();
     private String mac;
     private String key;
@@ -929,19 +930,24 @@ public class MainService  extends Service {
                                 }
                                 calendar = null;
 
-//                                ActivityManager activityManager = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
-//                                int memoryClass = activityManager.getMemoryClass();
-//                                Log.e(TAG, "内存 " + memoryClass);
-//                                int largeMemoryClass = activityManager.getLargeMemoryClass();
-//                                Log.e(TAG, "最大内存 " + memoryClass);
-//
-//                                float maxMemory = (float) (Runtime.getRuntime().maxMemory() * 1.0/ (1024 * 1024));
-//                                //当前分配的总内存
-//                                float totalMemory = (float) (Runtime.getRuntime().totalMemory() * 1.0/ (1024 * 1024));
-//                                //剩余内存
-//                                float freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0/ (1024 * 1024));
+                                ActivityManager activityManager = (ActivityManager) getSystemService(Context
+ .ACTIVITY_SERVICE);
+                                int memoryClass = activityManager.getMemoryClass();
+                                Log.e(TAG, "内存 " + memoryClass);
+                                int largeMemoryClass = activityManager.getLargeMemoryClass();
+                                Log.e(TAG, "最大内存 " + memoryClass);
+
+                                float maxMemory = (float) (Runtime.getRuntime().maxMemory() * 1.0/ (1024 * 1024));
+                                //当前分配的总内存
+                                float totalMemory = (float) (Runtime.getRuntime().totalMemory() * 1.0/ (1024 * 1024));
+                                //剩余内存
+                                float freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0/ (1024 * 1024));
+
+                                Log.e(TAG, "分配内存" + maxMemory + " " + freeMemory+" "+totalMemory);
 
                                 clearMemory();
+
+                                displayBriefMemory();
 
 //                                if (!isServiceRunning()) {
 //                                    //监控程序未开启，启动监控服务,并开始监听
@@ -968,6 +974,15 @@ public class MainService  extends Service {
         } catch (JSONException e) {
             e.printStackTrace();
         }
+    }
+
+    private void displayBriefMemory() {
+        ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
+        activityManager.getMemoryInfo(info);
+        Log.i(TAG, "系统剩余内存:" + (info.availMem >> 10) / 1024 + "M");
+        Log.i(TAG, "系统是否处于低内存运行：" + info.lowMemory);
+        Log.i(TAG, "当系统剩余内存低于" + (info.threshold) / 1024 + "时就看成低内存运行");
     }
 
     private boolean isServiceRunning() {
@@ -1012,10 +1027,10 @@ public class MainService  extends Service {
                     int[] myMempid = new int[]{appProcessInfo.pid};
                     Debug.MemoryInfo[] appMem = am.getProcessMemoryInfo(myMempid);
                     int memSize = appMem[0].dalvikPrivateDirty / 1024;
-                    if (memSize > 110) {//内存占用超过180M就重启
+                    if (memSize > 120) {//内存占用超过180M就重启
                         onReStartVideo();
                     }
-                    Log.d("进程", "当前进程 : "+appProcessInfo.processName +  ":" + memSize);
+                    Log.d("进程", "当前进程 : " + appProcessInfo.processName + ":" + memSize);
                     DLLog.w("进程", appProcessInfo.processName + ":" + memSize);
                 }
 
@@ -1029,7 +1044,7 @@ public class MainService  extends Service {
                     String[] pkgList = appProcessInfo.pkgList;
                     for (int j = 0; j < pkgList.length; ++j) {//pkgList 得到该进程下运行的包名
                         // TODO: 2018/9/5 这里的包名都要改
-                      /*  if ("com.cxwl.menjin.lock".equals(pkgList[j]) || "com.cxwl.hurry.monitor".equals
+                      /*  if ("com.cxwl.menjin.lock".equals(pkgList[j]) || "com.cxwl.lock.monitor".equals
                                 (pkgList[j]) || "com.android.providers.media".equals
                                 (pkgList[j]) || "com.cxwl.menjin.lock:leakcanary".equals
                                 (pkgList[j])) {
@@ -2351,7 +2366,7 @@ public class MainService  extends Service {
      * 初始化天翼sdk
      */
     private void initTYSDK() {
-        sendMessageToMainAcitivity(START_FACE_CHECK2,null);
+        sendMessageToMainAcitivity(START_FACE_CHECK2, null);
         if (!isRtcInit) {
             rtcClient = new RtcClientImpl();
             Log.i(TAG, getApplicationContext() == null ? "yes" : "no");
@@ -2460,7 +2475,7 @@ public class MainService  extends Service {
             Log.i(TAG, "登陆状态 ,result=" + result);
             if (result == RtcConst.CallCode_Success) { //注销也存在此处
                 Log.e(TAG, "-----------登陆成功-------------key=" + key + "------------");
-                sendMessageToMainAcitivity(START_FACE_CHECK1,null);
+                sendMessageToMainAcitivity(START_FACE_CHECK1, null);
             } else if (result == RtcConst.NoNetwork || result == RtcConst.CallCode_Network) {
                 onNoNetWork();
                 Log.i(TAG, "断网销毁，自动重连接");
@@ -2470,7 +2485,7 @@ public class MainService  extends Service {
                 Log.i(TAG, "网络差，自动重连接");
             } else if (result == RtcConst.ReLoginNetwork) {
                 Log.i(TAG, " 网络原因导致多次登陆不成功，由用户选择是否继续，如想继续尝试，可以重建device");
-                sendMessageToMainAcitivity(START_FACE_CHECK1,null);
+                sendMessageToMainAcitivity(START_FACE_CHECK1, null);
             } else if (result == RtcConst.DeviceEvt_KickedOff) {
                 Log.i(TAG, "被另外一个终端踢下线，由用户选择是否继续，如果再次登录，需要重新获取token，重建device");
                 isRtcInit = false;
@@ -2945,6 +2960,7 @@ public class MainService  extends Service {
 
                 @Override
                 public void onResponse(String response, int id) {
+                    Log.e(TAG, "服务器异常或没有网络 " + response.toString());
                     if (null != response) {
                         String code = JsonUtil.getFieldValue(response, "code");
                         if ("0".equals(code) && isCurrentCallWorking(callUuid)) {
@@ -3233,10 +3249,12 @@ public class MainService  extends Service {
                 Log.v("MainService", "onCard====当前时间：" + System.currentTimeMillis() + "卡过期时间：" + kaInfo.getGuoqi_time
                         () + "是否失效  》0表示失效" + (System.currentTimeMillis() - Long.parseLong(kaInfo.getGuoqi_time())));
                 Log.i(TAG, "刷卡开门成功" + card);
-                //开始截图
-                if (DeviceConfig.PRINTSCREEN_STATE == 0) {
-                    Log.e(TAG, "刷卡开门，开始截图");
-                    DeviceConfig.PRINTSCREEN_STATE = 2;
+                if (identification) {//只有在人脸线程开启时才能卡开门并截图
+                    //开始截图
+                    if (DeviceConfig.PRINTSCREEN_STATE == 0) {
+                        Log.e(TAG, "刷卡开门，开始截图");
+                        DeviceConfig.PRINTSCREEN_STATE = 2;
+                    }
                     openLock(1);
                 }
                 Log.e(TAG, "onCard====:" + card);
@@ -3244,11 +3262,13 @@ public class MainService  extends Service {
                 Log.e(TAG, "数据库中不存在这个卡 刷卡开门失败" + card);
                 cardId = card;
                 kaInfo = null;//卡信息置为空
-                if (DeviceConfig.PRINTSCREEN_STATE == 0) {
-                    DeviceConfig.PRINTSCREEN_STATE = 2;
-                    Log.e(TAG, "刷卡开门失败，开始截图" + DeviceConfig.PRINTSCREEN_STATE);
+                if (identification) {
+                    if (DeviceConfig.PRINTSCREEN_STATE == 0) {//只有在人脸线程开启时才能截图
+                        DeviceConfig.PRINTSCREEN_STATE = 2;
+                        Log.e(TAG, "刷卡开门失败，开始截图" + DeviceConfig.PRINTSCREEN_STATE);
+                    }
+                    sendMessageToMainAcitivity(MSG_INVALID_CARD, null);//无效房卡
                 }
-                sendMessageToMainAcitivity(MSG_INVALID_CARD, null);//无效房卡
             }
         }
     }

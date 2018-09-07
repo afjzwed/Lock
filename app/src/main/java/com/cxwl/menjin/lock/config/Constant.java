@@ -25,6 +25,8 @@ public class Constant {
 
     public static final int MSG_FACE_DETECT_CHECK = -1;//人脸识别重置标志位
 
+    public static boolean identification = false;//人脸识别可以开始对比的标识
+
     public static final int MSG_FACE_INFO = 11106;//获取人脸照片URL
     public static final int MSG_FACE_DOWNLOAD = 11107;//下载照片并录入人脸
     public static final int MSG_FACE_INFO_FINISH = 11108;//获取人脸照片信息录入完成
@@ -94,6 +96,8 @@ public class Constant {
     public static final int MSG_INPUT_CARDINFO = 0x04;//重复录入卡信息
     public static final int MSG_CARD_OPENLOCK = 10016;//卡开门后截图和上传日志
     public static final int MSG_CARD_INCOME = 20008;//刷卡回调
+
+    public static final int MSG_CARD_KEY_INCOM = 20011;//刷卡及按键回调
     /********************卡相关*******************/
 
     /*******************sp保存的心跳信息****************/

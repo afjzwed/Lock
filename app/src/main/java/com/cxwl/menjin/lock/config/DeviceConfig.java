@@ -36,7 +36,7 @@ public class DeviceConfig {
     public static int UNIT_NO_LENGTH = 4;//房屋号长度
     public static int BLOCK_LENGTH = 8;//楼栋房屋号长度
 
-    public static int PRINTSCREEN_STATE = 0;//各种方式(人脸/卡)是否开始处理图片并上传日志的状态  0:未开始 1:人脸 2:卡成功 3:一键开门
+    public static int PRINTSCREEN_STATE = 0;//各种方式(人脸/卡通过人脸线程截图)是否开始处理图片并上传日志的状态  0:未开始 1:人脸 2:卡成功 3:代表人脸线程未开
 
     public static final int DEVICE_KEYCODE_POUND = 66;//确认键
     public static final int DEVICE_KEYCODE_STAR = 67;//删除键
