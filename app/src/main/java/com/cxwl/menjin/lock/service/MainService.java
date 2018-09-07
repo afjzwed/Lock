@@ -158,6 +158,7 @@ import static com.cxwl.menjin.lock.config.Constant.RTC_APP_KEY;
 import static com.cxwl.menjin.lock.config.Constant.SP_LIXIAN_MIMA;
 import static com.cxwl.menjin.lock.config.Constant.SP_VISION_LIAN;
 import static com.cxwl.menjin.lock.config.Constant.SP_XINTIAO_TIME;
+import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK;
 import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK1;
 import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK2;
 import static com.cxwl.menjin.lock.config.Constant.identification;
@@ -2366,8 +2367,9 @@ public class MainService extends Service {
      * 初始化天翼sdk
      */
     private void initTYSDK() {
-        sendMessageToMainAcitivity(START_FACE_CHECK2, null);
         if (!isRtcInit) {
+            sendMessageToMainAcitivity(START_FACE_CHECK2, null);
+            Log.e(TAG, "天翼rtc初始化");
             rtcClient = new RtcClientImpl();
             Log.i(TAG, getApplicationContext() == null ? "yes" : "no");
             rtcClient.initialize(getApplicationContext(), new ClientListener() {
@@ -2389,13 +2391,17 @@ public class MainService extends Service {
                 }
             });
         }
+//        else {
+//            Log.e(TAG, "相机天翼已经rtc初始化完成了");
+//            sendMessageToMainAcitivity(START_FACE_CHECK, null);
+//        }
     }
 
     /**
      * 开启线程获取token
      */
     private void startGetToken() {
-        Log.i(TAG, "开始获取Token ");
+        Log.i(TAG, "天翼开始获取Token ");
         new Thread() {
             @Override
             public void run() {
@@ -2410,7 +2416,7 @@ public class MainService extends Service {
      * 终端直接从rtc平台获取token，应用产品需要通过自己的服务器来获取，rtc平台接口请参考开发文档<2.5>章节.
      */
     private void getTokenFromServer() {
-        Log.i(TAG, "rtc平台获取token");
+        Log.i(TAG, "天翼rtc平台获取token");
         RtcConst.UEAPPID_Current = RtcConst.UEAPPID_Self;//账号体系，包括私有、微博、QQ等，必须在获取token之前确定。
         JSONObject jsonobj = HttpManager.getInstance().CreateTokenJson(0, key, RtcHttpClient.grantedCapabiltyID, "");
         HttpResult ret = HttpManager.getInstance().getCapabilityToken(jsonobj, RTC_APP_ID, RTC_APP_KEY);
@@ -2421,7 +2427,7 @@ public class MainService extends Service {
      * 获取TOKEN
      */
     private void onResponseGetToken(HttpResult ret) {
-        Log.i(TAG, "rtc平台获取token 的状态  status=" + ret.getStatus());
+        Log.i(TAG, "天翼rtc平台获取token 的状态  status=" + ret.getStatus());
         JSONObject jsonrsp = (JSONObject) ret.getObject();
         if (jsonrsp != null && jsonrsp.isNull("code") == false) {
             try {
@@ -2430,23 +2436,23 @@ public class MainService extends Service {
                 Log.v("MainService", "Response getCapabilityToken code:" + code + " reason:" + reason);
                 if (code.equals("0")) {
                     token = jsonrsp.getString(RtcConst.kcapabilityToken);
-                    Log.i(TAG, "获取token成功 token=" + token);
+                    Log.i(TAG, "天翼rtc获取token成功 token=" + token);
                     rtcRegister();
                 } else {
-                    Log.e(TAG, "获取token失败 [status:" + ret.getStatus() + "]" + ret.getErrorMsg());
+                    Log.e(TAG, "天翼rtc获取token失败 [status:" + ret.getStatus() + "]" + ret.getErrorMsg());
                     getTokenFromServer();
                 }
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
-                Log.e(TAG, "获取token失败 [status:" + e.getMessage() + "]");
+                Log.e(TAG, "天翼rtc获取token失败 [status:" + e.getMessage() + "]");
             }
         } else {
         }
     }
 
     private void rtcRegister() {
-        Log.i(TAG, "开始登陆rtc  mac:" + key + "token:" + token);
+        Log.i(TAG, "天翼rtc开始登陆rtc  mac:" + key + "token:" + token);
         if (token != null) {
             try {
                 JSONObject jargs = SdkSettings.defaultDeviceSetting();
@@ -2458,9 +2464,9 @@ public class MainService extends Service {
                 jargs.put(RtcConst.kAccRetry, 5);//设置重连时间
                 device = rtcClient.createDevice(jargs.toString(), deviceListener);
                 //登陆
-                Log.i(TAG, " 设置监听 deviceListener   ");
+                Log.i(TAG, " 天翼rtc设置监听 deviceListener   ");
             } catch (JSONException e) {
-                Log.i(TAG, "登陆rtc失败   e:" + e.toString());
+                Log.i(TAG, "天翼rtc登陆rtc失败   e:" + e.toString());
                 e.printStackTrace();
             }
         }
@@ -2472,7 +2478,7 @@ public class MainService extends Service {
     DeviceListener deviceListener = new DeviceListener() {
         @Override
         public void onDeviceStateChanged(int result) {
-            Log.i(TAG, "登陆状态 ,result=" + result);
+            Log.i(TAG, "天翼rtc登陆状态 ,result=" + result);
             if (result == RtcConst.CallCode_Success) { //注销也存在此处
                 Log.e(TAG, "-----------登陆成功-------------key=" + key + "------------");
                 sendMessageToMainAcitivity(START_FACE_CHECK1, null);
@@ -2485,12 +2491,12 @@ public class MainService extends Service {
                 Log.i(TAG, "网络差，自动重连接");
             } else if (result == RtcConst.ReLoginNetwork) {
                 Log.i(TAG, " 网络原因导致多次登陆不成功，由用户选择是否继续，如想继续尝试，可以重建device");
-                sendMessageToMainAcitivity(START_FACE_CHECK1, null);
             } else if (result == RtcConst.DeviceEvt_KickedOff) {
                 Log.i(TAG, "被另外一个终端踢下线，由用户选择是否继续，如果再次登录，需要重新获取token，重建device");
                 isRtcInit = false;
                 initTYSDK();
             } else if (result == RtcConst.DeviceEvt_MultiLogin) {
+                Log.i(TAG, "RTC密码错误 重新登陆啦 result=" + result);
             } else if (result == RtcConst.CallCode_Forbidden) {
                 Log.i(TAG, "密码错误 重新登陆啦 result=" + result);
                 isRtcInit = false;
@@ -2501,6 +2507,7 @@ public class MainService extends Service {
                 isRtcInit = false;
                 initTYSDK();
             } else {
+                sendMessageToMainAcitivity(START_FACE_CHECK1, null);
                 Log.i(TAG, "登陆失败 result=" + result);
             }
         }

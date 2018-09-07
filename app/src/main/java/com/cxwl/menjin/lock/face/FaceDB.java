@@ -91,7 +91,7 @@ public class FaceDB {
             if (version_saved != null) {
                 for (String name = bos.readString(); name != null; name = bos.readString()) {
                     if (new File(mDBPath + "/" + name + ".data").exists()) {
-                        Log.v("人脸识别", "loadInfo-->" + name);
+//                        Log.v("人脸识别", "loadInfo-->" + name);
                         mRegister.add(new FaceRegist(new String(name)));
                     }
                 }
@@ -153,7 +153,7 @@ public class FaceDB {
         if (loadInfo()) {
             try {
                 for (FaceRegist face : mRegister) {
-                    Log.v("人脸识别", "load name:" + face.mName + "'s face feature data.");
+//                    Log.v("人脸识别", "load name:" + face.mName + "'s face feature data.");
                     FileInputStream fs = new FileInputStream(mDBPath + "/" + face.mName + ".data");
                     ExtInputStream bos = new ExtInputStream(fs);
                     AFR_FSDKFace afr = null;

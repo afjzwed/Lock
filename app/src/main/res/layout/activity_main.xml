@@ -222,12 +222,14 @@
                     <com.guo.android_extend.widget.CameraSurfaceView
                         android:id="@+id/surfaceView"
                         android:layout_width="1dp"
-                        android:layout_height="1dp"/>
+                        android:layout_height="1dp"
+                        android:visibility="gone"/>
 
                     <com.guo.android_extend.widget.CameraGLSurfaceView
                         android:id="@+id/glsurfaceView"
                         android:layout_width="352dp"
-                        android:layout_height="200dp"/>
+                        android:layout_height="200dp"
+                        android:visibility="gone"/>
                 </LinearLayout>
             </RelativeLayout>
 
@@ -433,16 +435,17 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:background="@mipmap/bg_banner"
+            android:visibility="gone"
             app:banner_default_image="@mipmap/bg_banner"
             app:delay_time="10000"
-            android:visibility="gone"
             />
+
         <ImageView
             android:id="@+id/img_banner"
-            android:scaleType="fitXY"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:background="@mipmap/bg_banner"/>
+            android:background="@mipmap/bg_banner"
+            android:scaleType="fitXY"/>
 
 
     </RelativeLayout>

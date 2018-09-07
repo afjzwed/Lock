@@ -363,7 +363,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 开启通告更新线程
      */
     private void startTonggaoThread() {
-        // TODO: 2018/9/5 没测
         defaultNotice = new NoticeBean();
         defaultNotice.setBiaoti("暂无通知");
         defaultNotice.setNeirong("暂无通知");
@@ -396,7 +395,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 开启界面时间(本地)更新线程 之后放到MainService中
      */
     private void startClockRefresh() {
-        // TODO: 2018/9/5 没测
         clockRefreshThread = new Thread() {
             public void run() {
                 try {
@@ -420,7 +418,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 设置界面时间(本地)
      */
     private void setNewTime() {
-        // TODO: 2018/9/5 没测
         handler.post(new Runnable() {
             @Override
             public void run() {
@@ -444,7 +441,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private List<GuangGaoBean> isPlayingList = new ArrayList<>();
 
     private void startVedioThread() {
-        // TODO: 2018/9/5 没测
         if (null != videoThread) {
             videoThread.interrupt();
             videoThread = null;
@@ -468,7 +464,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setVideoInfo() {
-        // TODO: 2018/9/5 没测
         if (isVideoStart()) {
             isPlayingList.clear();
             //有开始播放的视频
@@ -529,7 +524,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public boolean isSaveOrUpdate(List<GuangGaoBean> oldList, List<GuangGaoBean> newList) {
-        // TODO: 2018/9/5 没测
         if (oldList.size() != newList.size()) {
             return true;
         } else {
@@ -548,7 +542,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private boolean isVideoStart() {
-        // TODO: 2018/9/5 没测
         Log.e(TAG, "开始视频广告判断");
         boolean b = false;
         if (null != videoList && videoList.size() > 0) {
@@ -707,7 +700,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private AdverTongJiCallBack adverTongJiCallBack;
 
     protected void initAdvertiseHandler() {
-        // TODO: 2018/9/5 没测
         if (advertiseHandler == null) {
             advertiseHandler = new AdvertiseHandler();
         }
@@ -734,7 +726,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 初始化七牛
      */
     private void initQiniu() {
-        // TODO: 2018/9/5 没测
         String fileurl = Environment.getExternalStorageDirectory() + "/" + LOCAL_IMG_PATH + "/" + System
                 .currentTimeMillis() + ".jpg";
         final File file = new File(fileurl);
@@ -779,7 +770,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 初始化音量设置
      */
     protected void initVoiceVolume() {
-        // TODO: 2018/9/5 没测
         AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         initVoiceVolume(audioManager, AudioManager.STREAM_MUSIC, DeviceConfig.VOLUME_STREAM_MUSIC);
         initVoiceVolume(audioManager, AudioManager.STREAM_RING, DeviceConfig.VOLUME_STREAM_RING);
@@ -795,7 +785,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @param value
      */
     protected void initVoiceVolume(AudioManager audioManager, int type, int value) {
-        // TODO: 2018/9/5 没测
         int thisValue = audioManager.getStreamMaxVolume(type);//得到最大音量
         thisValue = thisValue * value / 30;//具体音量值
         audioManager.setStreamVolume(type, thisValue, AudioManager.FLAG_PLAY_SOUND);//调整音量时播放声音
@@ -805,7 +794,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 初始化卡阅读器
      */
     private void initAexNfcReader() {
-        // TODO: 2018/9/5 没测 硬件不一样，参考newdoor项目
 
         control = new SerialHelper();
         control.setDataReceived(this);
@@ -839,7 +827,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 初始化视频通话布局(用于天翼rtc？)
      */
     protected void initScreen() {
-        // TODO: 2018/9/5 没测
         headPaneTextView = (TextView) findViewById(R.id.header_pane);//可视对讲设备状态
         videoLayout = (LinearLayout) findViewById(R.id.ll_video);//用于添加视频通话的根布局
         setTextView(R.id.tv_community, MainService.communityName);
@@ -850,7 +837,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 初始化照相机的surefaceview
      */
     protected void initAutoCamera() {
-        // TODO: 2018/9/5 没测
         Log.v("MainActivity", "initAutoCamera-->");
         autoCameraSurfaceView = (SurfaceView) findViewById(R.id.autoCameraSurfaceview);
         autoCameraHolder = autoCameraSurfaceView.getHolder();
@@ -895,7 +881,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 初始化handler
      */
     private void initHandle() {
-        // TODO: 2018/9/5 没测
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -1056,13 +1041,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case MSG_YIJIANKAIMEN_TAKEPIC1:
                         handler.sendEmptyMessage(START_FACE_CHECK);
-                        Log.e(TAG, "人脸96");
+//                        Log.e(TAG, "人脸96");
 //                        if (faceHandler != null) {
 //                            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 1000);
 //                        }
                         break;
                     case START_FACE_CHECK:
-                        Log.e(TAG, "人脸识别前的准备 " + "释放相机");
+                        Log.e(TAG, "人脸识别前的准备 释放相机");
                         if (faceHandler != null && mCamerarelease && mGLSurfaceView != null && mSurfaceView != null) {
                             HttpApi.i("相机释放成功，开启人脸识别");
                             handler.removeMessages(START_FACE_CHECK);
@@ -1072,9 +1057,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             handler.sendEmptyMessageDelayed(START_FACE_CHECK, 200);
                         }
                         break;
-
                     case START_FACE_CHECK1:
-                        Log.e(TAG, "登录天翼RTC之后再重新打开");
+                        Log.e(TAG, "登录天翼RTC之后再重新打开相机");
 //                        faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 2000);
                         handler.sendEmptyMessageDelayed(START_FACE_CHECK, 2000);
                         break;
@@ -1153,7 +1137,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 初始化服务
      */
     private void initMainService() {
-        // TODO: 2018/9/5 没测
         Intent intent = new Intent(this, MainService.class);
         bindService(intent, serviceConnection, Service.BIND_AUTO_CREATE);
 
@@ -1225,7 +1208,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @param msg
      */
     private void onLoginAfter(Message msg) {
-        // TODO: 2018/9/5 没测
         if (msg.obj != null) {
             NewDoorBean result = (NewDoorBean) msg.obj;
             sendMainMessager(MSG_RTC_REGISTER, null);
@@ -1244,7 +1226,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //            if (faceHandler != null) {
 //                faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 1000);
 //            }
-//            handler.sendEmptyMessage(START_FACE_CHECK);
 
             sendMainMessager(MainService.REGISTER_ACTIVITY_DIAL, null);//开始心跳包
         }
@@ -1254,6 +1235,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 每隔十秒检查一次网络是否可用
      */
     private void initNetListen() {
+//        这里在重新联网后有问题
         // TODO: 2018/9/5 没测
         netTimer.schedule(new TimerTask() {
             @Override
@@ -1339,7 +1321,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 通过ServiceMessenger将注册消息发送到Service中的Handler
      */
     private void sendMainMessager(int what, Object o) {
-        // TODO: 2018/9/5 没测
         Message message = Message.obtain();
         message.what = what;
         message.replyTo = mainMessage;
@@ -1356,7 +1337,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     @SuppressLint("WifiManagerLeak")
     private void initNet() {
-        // TODO: 2018/9/5 没测
         wifiManager = (WifiManager) MainApplication.getApplication().getSystemService(WIFI_SERVICE);//获得WifiManager
         Timer timer = new Timer();
         timer.scheduleAtFixedRate(new TimerTask() {
@@ -1849,7 +1829,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @param code
      */
     private void onPasswordCheck(ResponseBean code) {
-        // TODO: 2018/9/5 没测
         setCurrentStatus(PASSWORD_MODE);
         setTempkeyValue("");
 
@@ -1936,7 +1915,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /****************************天翼rtc****************************/
     public void onRtcDisconnect() {
-        // TODO: 2018/9/5 没测
         Log.i(TAG, "重置房号为空 设置为 呼叫模式状态");
         blockNo = "";
         setDialValue(blockNo);
@@ -1949,7 +1927,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void onRtcConnected() {
-        // TODO: 2018/9/5 没测
         setCurrentStatus(ONVIDEO_MODE);
         setDialValue("");
 //        暂时停止广告播放
@@ -2064,7 +2041,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     protected void takePicture1(final String imgUrl) {
-        // TODO: 2018/9/5 没测
         Log.v("MainActivity", "开始启动拍照");
         //启动人脸识别
         if (faceHandler != null) {
@@ -2452,7 +2428,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void clearImageUuidAvaible(String uuid) {
-        // TODO: 2018/9/5 没测
         Log.v("MainActivity", "清除UUID" + uuid);
         uuidMaps.remove(uuid);
     }
@@ -2466,7 +2441,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @param reason
      */
     protected void onCallMemberError(int reason) {
-        // TODO: 2018/9/5 没测
         blockNo = "";
         setDialValue("");
         setCurrentStatus(CALL_MODE);
@@ -2543,6 +2517,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
             return;
         }
+
+        if (blockNo.equals("9992") || blockNo.equals("99999992")) {
+//            startActivity(new Intent(this, PhotographActivity.class));
+            handler.sendEmptyMessageDelayed(START_FACE_CHECK, 3000);
+            return;
+        }
+
 
         if (blockNo.equals(("8888")) || blockNo.equals("88888888")) {
             if (faceHandler != null) {
@@ -2644,12 +2625,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /****************************设置一些状态start************************/
     synchronized void setCurrentStatus(int status) {
-        // TODO: 2018/9/5 没测
         currentStatus = status;
     }
 
     private void setDialStatus(String value) {
-        // TODO: 2018/9/5 没测
         final String thisValue = value;
         handler.post(new Runnable() {
             @Override
@@ -2661,7 +2640,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     //设置桌面会话的状态
     private void setDialValue(String value) {
-        // TODO: 2018/9/5 没测
         final String thisValue = value;
         handler.post(new Runnable() {
             @Override
@@ -2672,7 +2650,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setDialValue1(String value) {
-        // TODO: 2018/9/5 没测
         final String thisValue = value;
         handler.post(new Runnable() {
             @Override
@@ -2689,7 +2666,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @param state true 显示  false 隐藏
      */
     private void setStatusBarIcon(boolean state) {
-        // TODO: 2018/9/5 没测
         if (state) {
             //显示
             if (wifi_image.getVisibility() == View.INVISIBLE) {
@@ -2723,7 +2699,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setTempkeyValue(String value) {
-        // TODO: 2018/9/5 没测
         final String thisValue = value;
         handler.post(new Runnable() {
             @Override
@@ -2734,7 +2709,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setTextView(int id, String txt) {
-        // TODO: 2018/9/5 没测
         ((TextView) findViewById(id)).setText(txt);
     }
 
@@ -2744,7 +2718,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @param value
      */
     private void setCommunityName(String value) {
-        // TODO: 2018/9/5 没测
         final String thisValue = value;
         handler.post(new Runnable() {
             @Override
@@ -2761,7 +2734,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @param value
      */
     private void setLockName(String value) {
-        // TODO: 2018/9/5 没测
         final String thisValue = value;
         handler.post(new Runnable() {
             @Override
@@ -2773,7 +2745,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private void setTongGaoInfo() {
-        // TODO: 2018/9/5 没测
         if (isTongGaoStart()) {
             if (null != noticeBeanList && noticeBeanList.size() > 0) {//通告列表有数据
                 currentNoticeBean = noticeBeanList.get(tongGaoIndex);
@@ -2839,7 +2810,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private boolean isTongGaoStart() {
-        // TODO: 2018/9/5 没测
         Log.e(TAG, "开始通告判断");
         boolean b = false;
         if (null != noticeBeanList && noticeBeanList.size() > 0) {
@@ -2860,7 +2830,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @param mac
      */
     private void showMacaddress(String mac) {
-        // TODO: 2018/9/5 没测
         if (showMacText != null && mac != null && mac.length() > 0) {
             showMacText.setVisibility(View.VISIBLE);
             showMacText.setText("MAC地址未注册，请添加\nMac地址：" + mac);
@@ -2871,7 +2840,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 取消呼叫设置状态
      */
     protected void resetDial() {
-        // TODO: 2018/9/5 没测
         blockNo = "";
         setDialValue(blockNo);
         setCurrentStatus(CALL_MODE);
@@ -2883,7 +2851,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 开启nfc读卡模式
      */
     private void enableReaderMode() {
-        // TODO: 2018/9/5 没测 硬件设备不一样，这里参考newdoorlock项目
         Log.i(TAG, "开启读卡模式");
        /* NfcAdapter nfc = NfcAdapter.getDefaultAdapter(this);
         if (nfc != null) {
@@ -2901,7 +2868,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 禁用读卡
      */
     private void disableReaderMode() {
-        // TODO: 2018/9/5 没测 硬件设备不一样，这里参考newdoorlock项目
        /* Log.i(TAG, "禁用读卡模式");
         NfcAdapter nfc = NfcAdapter.getDefaultAdapter(this);
         if (nfc != null) {
@@ -3005,7 +2971,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case R.id.action_updateVersion:
                         Log.e(TAG, "menu 更新");
-                        // TODO: 2018/9/5 没测
                         onReStartVideo();
                         //点击，手动更新
 //                        Message message = Message.obtain();
@@ -3017,30 +2982,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                        }
                         break;
                     case R.id.action_settings3://上传日志
-                        // TODO: 2018/9/5 没测
                         clearMemory();
                         Log.e(TAG, "menu 上传日志");
                         break;
                     case R.id.action_settings7://重启
                         Log.e(TAG, "menu 重启");
-//                        Process proc = null;
-//                        try {
-//                            proc = Runtime.getRuntime().exec(new String[]{"su", "-c", "reboot "});
-//                            proc.waitFor();
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        }
-//                        PowerManager manager = (PowerManager) getSystemService(Context.POWER_SERVICE);
-//                        manager.reboot("restart");
-//
-//                        Process proc = null;
-//                        try {
-//                            proc =   Runtime.getRuntime().exec(new String[]{"su","-c","reboot -p"});
-//                            proc.waitFor();
-//                        } catch (Exception e) {
-//                            e.printStackTrace();
-//                        }
-                        // TODO: 2018/9/5 没测
                         Intent intent1 = new Intent(Intent.ACTION_REBOOT);
                         intent1.putExtra("nowait", 1);
                         intent1.putExtra("interval", 1);
@@ -3194,7 +3140,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                         break;
                     case MSG_FACE_DETECT_PAUSE://人脸识别暂停
-                        Log.e(TAG, "人脸识别暂停开始照相");
+                        Log.e(TAG, "人脸识别暂停开始照相机");
                         faceHandler.removeMessages(MSG_FACE_DETECT_CONTRAST);
                         handler.removeMessages(START_FACE_CHECK);
                         identification = false;
@@ -3450,7 +3396,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     @Override
     public void setData(ComBean comRecData) {
-        // TODO: 2018/9/6 卡数据或者按键数据来时走此方法
         Message message = Message.obtain();
         message.what = MSG_CARD_KEY_INCOM;
         message.obj = comRecData;
@@ -3777,8 +3722,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.v(TAG, "MainActivity/onResume-->");
         if (faceHandler != null) {
             Log.e(TAG, "人脸95");
-            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 3000);
-            faceHandler.sendEmptyMessageDelayed(MSG_ID_CARD_DETECT_RESTART, 1000);
+            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 4000);
+//            faceHandler.sendEmptyMessageDelayed(MSG_ID_CARD_DETECT_RESTART, 1000);
         }
     }
 

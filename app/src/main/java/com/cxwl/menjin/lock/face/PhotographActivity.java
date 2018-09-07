@@ -58,7 +58,7 @@ public class PhotographActivity extends AppCompatActivity implements CameraSurfa
 
     @Override
     public Camera setupCamera() {
-        mCamera = Camera.open();//打开硬件摄像头，这里导包得时候一定要注意是android.hardware.Camera
+        mCamera = Camera.open(1);//打开硬件摄像头，这里导包得时候一定要注意是android.hardware.Camera
 
         try {
             Camera.Parameters parameters = mCamera.getParameters();
