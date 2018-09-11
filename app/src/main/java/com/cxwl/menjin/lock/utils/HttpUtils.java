@@ -44,7 +44,7 @@ public class HttpUtils {
         String localFile = null;
         int lastIndex = url.lastIndexOf("/");
         String fileName = url.substring(lastIndex + 1);
-        //// TODO: 2018/5/18 //处理代点的问题
+        //处理带点的问题
         if (fileName.contains(".")){
             fileName = fileName.substring(0, fileName.lastIndexOf("."));
             Log.e("filename .", fileName);

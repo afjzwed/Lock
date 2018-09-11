@@ -120,7 +120,6 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_CARD_OPENLOCK;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CHECK_PASSWORD;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CHECK_PASSWORD_PICTURE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_DISCONNECT_VIEDO;
-import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_DOWNLOAD;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_INFO;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_INFO_FINISH;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_OPENLOCK;
@@ -499,13 +498,6 @@ public class MainService extends Service {
                     case REGISTER_ACTIVITY_DIAL:
                         initConnectReport();//心跳开始,根据心跳返回结果开启各更新程序
                         break;
-                    case MSG_FACE_DOWNLOAD: {
-                        // TODO: 2018/5/15 接收人脸URL,循环下载并录入
-//                        if (null != faceUrlList && faceUrlList.size() > 0) {
-//                            initFaceEngine();
-//                        }
-                        break;
-                    }
                     case MSG_FACE_OPENLOCK: { //脸开门
                         String[] parame = (String[]) msg.obj;
                         String phoneNum = parame[0];//手机号码
@@ -748,9 +740,9 @@ public class MainService extends Service {
                 List<LogDoor> list = new ArrayList<>();
                 LogDoor logDoor = new LogDoor();
                 logDoor.setMac(mac);
-                logDoor.setKa_id(""); //// TODO: 2018/6/2 离线密码1表示成功-1表示失败
+                logDoor.setKa_id("");
                 logDoor.setUuid("");
-                logDoor.setState(1);
+                logDoor.setState(1);//离线密码1表示成功-1表示失败
                 logDoor.setMima(tempKey);
                 logDoor.setKaimenjietu(imageUrl == null ? "" : imageUrl);
                 logDoor.setPhone("");
@@ -765,9 +757,9 @@ public class MainService extends Service {
                 List<LogDoor> list = new ArrayList<>();
                 LogDoor logDoor = new LogDoor();
                 logDoor.setMac(mac);
-                logDoor.setKa_id(""); //离线密码1表示成功-1表示失败
+                logDoor.setKa_id("");
                 logDoor.setUuid("");
-                logDoor.setState(-1);
+                logDoor.setState(-1);//离线密码1表示成功-1表示失败
                 logDoor.setMima(tempKey);
                 logDoor.setKaimenjietu(imageUrl == null ? "" : imageUrl);
                 logDoor.setPhone("");
@@ -2048,8 +2040,6 @@ public class MainService extends Service {
     }
 
     protected void init() {
-        initAexUtil(); //安卓工控设备控制器初始化
-        Log.i("MainService", "init AEX");
 
         initMonitor();
 
@@ -2151,21 +2141,6 @@ public class MainService extends Service {
     }
 
     /**
-     * 初始化安卓工控设备控制器
-     */
-    protected void initAexUtil() {
-        // TODO: 2018/9/5 没测 硬件不一样
-       /* aexUtil = new AexUtil(mHandler);
-        try {
-            aexUtil.open();
-        } catch (Exception e) {
-        }
-        Log.e("wh", "初始化控制设备");*/
-//            sendInitMessenger(InitActivity.MSG_INIT_AEX);
-
-    }
-
-    /**
      * 进入在线版本
      */
     protected void initWhenConnected() {
@@ -2209,18 +2184,6 @@ public class MainService extends Service {
         } else {
             key = mac.replace(":", "");
             Log.i(TAG, "初始化mac=" + mac + "key=" + key);
-            //// TODO: 2018/5/16 mac测试写死
-//            mac = "44:2c:05:e6:9c:c5";
-//            key = "442c05e69cc5";
-            //获取设备编号 用mainMessage发送信息给MainActivity显示
-//            Message message = Message.obtain();
-//            message.what = MainActivity.MSG_GET_MAC_ADDRESS;
-//            message.obj = mac;
-//            try {
-//                initMessenger.send(message);
-//            } catch (RemoteException e) {
-//                e.printStackTrace();
-//            }
             return true;
         }
     }
@@ -3182,7 +3145,7 @@ public class MainService extends Service {
 
 //        MainApplication.getRefWatcher(this).watch(this);
 
-        // TODO: 2018/8/8 正式版要打开这个方法 onReStartVideo();
+        //onReStartVideo();
 
         saveVisionInfo();
         // TODO: 2018/5/15 还有资源未释放
@@ -3206,10 +3169,6 @@ public class MainService extends Service {
             rtcClient.release();
             rtcClient = null;
         }
-
-//        if (aexUtil != null) {
-//            aexUtil.close();
-//        }
     }
 
     private void onReStartVideo() {
@@ -3272,30 +3231,8 @@ public class MainService extends Service {
 
     /****************************卡相关end************************/
     protected void openLock(int type) {
-        // TODO: 2018/9/5 没测 硬件不一样
-        openAexLock(type);
-
-      /*  int status = 2;
-        Intent ds_intent = new Intent();
-        ds_intent.setAction(DoorLock.DoorLockOpenDoor);
-        ds_intent.putExtra("index", 0);
-        ds_intent.putExtra("status", status);
-        sendBroadcast(ds_intent);*/
-
-//        Intent intent = new Intent();
-//        intent.setAction(DoorLock.DoorLockOpenDoor_BLE);
-//        sendBroadcast(intent);
-    }
-
-    private void openAexLock(int type) {
         sendMessageToMainAcitivity(MSG_LOCK_OPENED, type);//开锁
         SoundPoolUtil.getSoundPoolUtil().loadVoice(getBaseContext(), 011111);
-        // TODO: 2018/9/5 没测 硬件不一样
-       /* int result = aexUtil.openLock();
-        if (result > 0) {
-            sendMessageToMainAcitivity(MSG_LOCK_OPENED, type);//开锁
-            SoundPoolUtil.getSoundPoolUtil().loadVoice(getBaseContext(), 011111);
-        }*/
     }
 
     /**

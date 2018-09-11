@@ -17,13 +17,12 @@ public class DeviceConfig {
     public static final String LOCAL_IMG_PATH = "img_local";//所有照片
 
 
-
     public static String DEVICE_TYPE = "B"; //C：社区大门门禁 B:楼栋单元门禁
 
     public static String RFID_PORT = "/dev/ttyS1";//卡阅读器使用
 
-    // TODO: 2018/7/11 后期可能会控制，先注释  public static int OPENDOOR_TIME = 1000 * 5;//开门持续时间
-    // TODO: 2018/7/11 先注释 public static int OPENDOOR_STATE = 0;//开门状态 0为关闭门锁 1为打开门锁 默认关闭
+    public static int OPENDOOR_TIME = 1000 * 5;//开门持续时间
+    public static int OPENDOOR_STATE = 0;//开门状态 0为关闭门锁 1为打开门锁 默认关闭
     public static int CANCEL_CALL_WAIT_TIME = 1000 * 30;//自动取消呼叫等待时间
     public static int PASSWORD_WAIT_TIME = 1000 * 20;//密码验证线程等待时间
 
@@ -43,7 +42,6 @@ public class DeviceConfig {
 //    public static final int DEVICE_KEYCODE_POUND = 30;//确认键
 //    public static final int DEVICE_KEYCODE_STAR = 32;//删除键
 
-    // TODO: 2018/9/3 监听程序的包名还没确定
     public static final String Lockaxial_Monitor_PackageName = "com.cxwl.lock.monitor";
     public static final String Lockaxial_Monitor_SERVICE = "com.cxwl.lock.monitor.MonitorService";
     public static final String Lockaxial_PackageName = "com.cxwl.menjin.lock";

@@ -28,7 +28,6 @@ public class Constant {
     public static boolean identification = false;//人脸识别可以开始对比的标识
 
     public static final int MSG_FACE_INFO = 11106;//获取人脸照片URL
-    public static final int MSG_FACE_DOWNLOAD = 11107;//下载照片并录入人脸
     public static final int MSG_FACE_INFO_FINISH = 11108;//获取人脸照片信息录入完成
     public static final int MSG_DELETE_FACE = 11109;//删除人脸信息
 

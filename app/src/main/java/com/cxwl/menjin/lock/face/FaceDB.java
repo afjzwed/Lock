@@ -186,9 +186,6 @@ public class FaceDB {
     }
 
     public boolean addFace(String name, AFR_FSDKFace face) {
-        // TODO: 2018/5/25 后期用于物业存AFR_FSDKFace人脸信息数据
-//        String s = new Gson().toJson(face);
-//        AFR_FSDKFace afr_fsdkFace = new Gson().fromJson(s, AFR_FSDKFace.class);
 
         boolean bool = false;
         try {

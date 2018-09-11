@@ -597,7 +597,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private AdTongJiBean mAdTongJiBean;
 
     private void setPicInfo() {
-        // TODO: 2018/9/5 没测
         if (isPicStart()) {
             if (null != picList && picList.size() > 0) {//通告列表有数据
 
@@ -944,8 +943,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     case MSG_FACE_INFO://人脸识别暂停
                         Log.e(TAG, "人脸92");
                         faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 100);
-                        // TODO: 2018/6/19   sendMainMessager(MSG_FACE_DOWNLOAD, null);
-                        // TODO: 2018/6/19    faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_INPUT, 100);
                         break;
                     case MSG_FACE_INFO_FINISH://人脸录入完成，重新开始人脸识别
                         Log.e(TAG, "人脸91");
@@ -1082,7 +1079,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     protected void onAdvertiseImageChange(Object obj) {
-        // TODO: 2018/9/5 没测
         String source = (String) obj;
         source = HttpUtils.getLocalFileFromUrl(source);
         Bitmap bm = BitmapFactory.decodeFile(source);
@@ -1093,7 +1089,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 开门 :1卡2手机3人脸4邀请码5离线密码6临时密码'
      */
     private void onLockOpened(int typy) {
-        control.openDoor();
+        control.openDoor();//小钴的开门方法没有回调接口，只发指令给硬件，没有成功与否的概念
         blockNo = "";
         setDialValue("");
         setTempkeyValue("");
@@ -1162,7 +1158,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             Log.i(TAG, "连接MainService成功" + (serviceMessage != null));
             netWorkFlag = NetWorkUtils.isNetworkAvailable(MainActivity.this) ? 1 : 0;
             if (netWorkFlag == 0) {
-                enableReaderMode();//无网时打开读卡
+//                enableReaderMode();//无网时打开读卡  注释：永远读卡
                 mHandler.post(new Runnable() {
                     @Override
                     public void run() {
@@ -1175,8 +1171,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 setStatusBarIcon(true);
                 // TODO: 2018/9/7   initSystemtime();
             }
-            sendMainMessager(MainService.MAIN_ACTIVITY_INIT, NetWorkUtils.isNetworkAvailable(MainActivity
-                    .this));
+            sendMainMessager(MainService.MAIN_ACTIVITY_INIT, NetWorkUtils.isNetworkAvailable(MainActivity.this));
             initNetListen();
         }
 
@@ -1220,10 +1215,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 setDialStatus("请输入楼栋编号");
             }
             mac = result.getMac();
-            Log.e(TAG, "可以读卡");
-            enableReaderMode();//登录成功后开启读卡
+//            Log.e(TAG, "可以读卡");
+//            enableReaderMode();//登录成功后开启读卡 注释：永远读卡
 
-            Log.e(TAG, "人脸94");
+//            Log.e(TAG, "人脸94");
             //人脸识别开始  这里的人脸识别开始移到rtc登录成功以后
 //            if (faceHandler != null) {
 //                faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 1000);
@@ -1244,15 +1239,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void run() {
                 int s = NetWorkUtils.isNetworkAvailable(MainActivity.this) ? 1 : 0;
                 if (s != netWorkFlag) {//如果当前网络状态与之前不一致
-                    if (s == 1) {//当前有网，之前没网
+                   /* if (s == 1) {//当前有网，之前没网
                         //关闭读卡
-                        disableReaderMode();//没网时打开过一次
+//                        disableReaderMode();//没网时打开过一次 注释：永远读卡
                         //时间更新
                         HttpApi.e("网络监测线程");
                         // TODO: 2018/9/7   initSystemtime();
                     } else {//当前没网，之前有网
-                        enableReaderMode(); //打开读卡
-                    }
+//                        enableReaderMode(); //打开读卡 注释：永远读卡
+                    }*/
                     sendMainMessager(MSG_UPDATE_NETWORKSTATE, s == 1 ? true : false);
                     netWorkFlag = s;
                     mHandler.post(new Runnable() {
@@ -1394,6 +1389,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**********************************************按键相关start***************************/
+    //小钴按键响应由按键板响应，不走Android的按键响应方法
 
     /**
      * 初步处理卡和按键数据
@@ -1444,16 +1440,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             e.printStackTrace();
         }
     }
-
-    //        //没用了
-//    @Override
-//    public boolean dispatchKeyEvent(KeyEvent event) {
-//        if (event.getAction() == KeyEvent.ACTION_DOWN) {
-//            int keyCode = event.getKeyCode();
-//            onKeyDown(keyCode);
-//        }
-//        return false;
-//    }
 
     private int convertKeyCode(String keyCode) {
         int value = -1;
@@ -1529,7 +1515,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         } else {
 //            int key = convertKeyCode(keyCode);
             if (currentStatus == CALL_MODE || currentStatus == PASSWORD_MODE) {//处于呼叫模式或密码模式
-                // TODO: 2018/5/4 这里的判断得改成输入框是否有值,有值确认键走呼叫或密码,没值走切换模式
                 tv_input_text.setFilters(new InputFilter[]{new InputFilter.LengthFilter(11)});
                 str = tv_input_text.getText().toString();
                 if (key == DEVICE_KEYCODE_POUND) {//确认键
@@ -1690,31 +1675,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             blockNo = blockNo.substring(0, 11);
         }
         setDialValue(blockNo);
-        // TODO: 2018/5/4 这个判断交给确认键去做,暂时注释
-//        if (DeviceConfig.DEVICE_TYPE.equals("C")) {
-//            if (blockNo.length() == DeviceConfig.BLOCK_LENGTH) {
-//                startDialing(blockNo);
-//            }
-//        } else {
-//            if (blockNo.length() == DeviceConfig.UNIT_NO_LENGTH) {
-//                startDialing(blockNo);
-//            }
-//        }
-
-
-//         TODO: 2018/5/3 暂时注释 测试呼叫手机号
-//        if (DeviceConfig.DEVICE_TYPE.equals("C")) {
-//            if (blockNo.length() == DeviceConfig.BLOCK_LENGTH) {
-//                startDialing(blockNo);
-//            }
-//        } else {
-//            if (blockNo.equals("0101") || blockNo.equals("9999")) {
-//                startDialing(blockNo);
-//            } else if (blockNo.length() == 11) {
-//                startDialing(blockNo);
-//            }
-//        }
-
     }
 
     /**
@@ -1753,10 +1713,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             guestPassword = guestPassword.substring(0, 6);
         }
         setTempkeyValue(guestPassword);
-        // TODO: 2018/5/4 这个判断交给确认键去做,暂时注释
-//        if (guestPassword.length() == 6) {
-//            checkPassword();
-//        }
     }
 
     /**
@@ -1936,7 +1892,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void onRtcVideoOn() {
-        // TODO: 2018/9/5 没测
         setDialValue1("正在和" + blockNo + "视频通话");
         initVideoViews();
         Log.e(TAG, "开始创建remoteView");
@@ -1963,7 +1918,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 创建本地view和远端
      */
     void initVideoViews() {
-        // TODO: 2018/9/5 没测
         //创建本地view
         if (localView != null) {
             return;
@@ -1996,7 +1950,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @param visible
      */
     private void setVideoSurfaceVisibility(int visible) {
-        // TODO: 2018/9/5 没测
         if (localView != null) {
             localView.setVisibility(visible);
         }
@@ -2853,12 +2806,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /****************************设置一些状态end************************/
 
-    /**
+ /*   *//**
      * 开启nfc读卡模式
-     */
+     *//*
     private void enableReaderMode() {
         Log.i(TAG, "开启读卡模式");
-       /* NfcAdapter nfc = NfcAdapter.getDefaultAdapter(this);
+        NfcAdapter nfc = NfcAdapter.getDefaultAdapter(this);
         if (nfc != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                 if (this instanceof NfcAdapter.ReaderCallback) {
@@ -2867,14 +2820,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     }
                 }
             }
-        }*/
+        }
     }
 
-    /**
+    *//**
      * 禁用读卡
-     */
+     *//*
     private void disableReaderMode() {
-       /* Log.i(TAG, "禁用读卡模式");
+        Log.i(TAG, "禁用读卡模式");
         NfcAdapter nfc = NfcAdapter.getDefaultAdapter(this);
         if (nfc != null) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -2882,8 +2835,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     nfc.disableReaderMode(this);
                 }
             }
-        }*/
-    }
+        }
+    }*/
 
     /**
      * 使用Handler实现UI线程与Timer线程之间的信息传递,每5秒告诉UI线程获得wifi Info
@@ -3146,7 +3099,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                         break;
                     case MSG_FACE_DETECT_PAUSE://人脸识别暂停
-                        Log.e(TAG, "人脸识别暂停开始照相机");
+                        Log.e(TAG, "人脸识别暂停" + "开始照相机");
                         handler.removeMessages(START_FACE_CHECK);
 //                        faceHandler.removeMessages(MSG_FACE_DETECT_CONTRAST);
                         identification = false;
@@ -3414,7 +3367,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AFR_FSDKEngine engine = new AFR_FSDKEngine();
         AFR_FSDKFace result = new AFR_FSDKFace();
 
-        // TODO: 2018/5/14 这里拿到本地数据库脸信息表
+        //拿到本地数据库脸信息表
         List<FaceRegist> mResgist = ArcsoftManager.getInstance().mFaceDB.mRegister;
 
 //        List<Lian> mFaceList = new ArrayList<>();
@@ -3665,7 +3618,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             public void onError(Call call, Exception e, int id) {
                 Log.i(TAG, "获取七牛token失败 e" + e.toString());
                 DbUtils.getInstans().insertOneImg(imgFile);//获取token失败，图片存在本地
-                // TODO: 2018/6/6 注释  DeviceConfig.PRINTSCREEN_STATE = 0;//重置处理图片并上传日志的状态
             }
 
             @Override
@@ -3693,7 +3645,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     DbUtils.getInstans().insertOneImg(imgFile);//获取token失败，图片存在本地
                                 }
                                 Log.e("七牛", "七牛info" + info.toString());
-                                // TODO: 2018/6/6 注释   DeviceConfig.PRINTSCREEN_STATE = 0;//重置处理图片并上传日志的状态
                             }
                         }, null);
                     }
@@ -3773,9 +3724,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         unbindService(serviceConnection);
 //        unregisterReceiver(receive);
-        CloseComPort(control);
+        CloseComPort(control);//关闭串口
 
-        disableReaderMode();
+//        disableReaderMode();//注释：永远读卡
         if (netTimer != null) {
             netTimer.cancel();
             netTimer = null;

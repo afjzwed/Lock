@@ -48,7 +48,7 @@ public class MainApplication  extends Application {
                 .build();
         OkHttpUtils.initClient(okHttpClient);
 
-        LeakCanary.install(this);
+//        LeakCanary.install(this);
 
         Thread.setDefaultUncaughtExceptionHandler(restartHandler); // 程序崩溃时触发线程
 
