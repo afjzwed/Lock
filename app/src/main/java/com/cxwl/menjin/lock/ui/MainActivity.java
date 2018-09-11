@@ -942,18 +942,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         onCheckLixianPasswordAfter(msg.obj == null ? null : (boolean) msg.obj);
                         break;
                     case MSG_FACE_INFO://人脸识别暂停
+                        Log.e(TAG, "人脸92");
                         faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 100);
                         // TODO: 2018/6/19   sendMainMessager(MSG_FACE_DOWNLOAD, null);
                         // TODO: 2018/6/19    faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_INPUT, 100);
                         break;
                     case MSG_FACE_INFO_FINISH://人脸录入完成，重新开始人脸识别
                         Log.e(TAG, "人脸91");
-//                        faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 1000);
-                        handler.sendEmptyMessageDelayed(START_FACE_CHECK, 1000);
+                        faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 2000);
+//                        handler.sendEmptyMessageDelayed(START_FACE_CHECK, 3000);
                         break;
                     case MSG_LOCK_OPENED://开锁
                         Log.i(TAG, "开锁");
-
                         onLockOpened((int) msg.obj);
                         if (weituoDialog == null) {
                             weituoDialog = DialogUtil.showBottomDialog(MainActivity.this);
@@ -3147,8 +3147,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case MSG_FACE_DETECT_PAUSE://人脸识别暂停
                         Log.e(TAG, "人脸识别暂停开始照相机");
-                        faceHandler.removeMessages(MSG_FACE_DETECT_CONTRAST);
                         handler.removeMessages(START_FACE_CHECK);
+//                        faceHandler.removeMessages(MSG_FACE_DETECT_CONTRAST);
                         identification = false;
                         if (mFRAbsLoop != null) {
                             mFRAbsLoop.pauseThread();
@@ -3343,7 +3343,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (mImageNV21 == null) {
 //            Log.e(TAG, "人脸识别 " + "开始1");
             if (!result.isEmpty()) {
-                Log.e(TAG, "人脸识别 " + "开始2");
+//                Log.e(TAG, "人脸识别 " + "开始2");
                 mAFT_FSDKFace = result.get(0).clone();//保存集合中第一个人脸信息
                 mImageNV21 = data.clone();//保存图像数据
             } else {
@@ -3520,7 +3520,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
                     //遍历本地信息表
                     for (FaceRegist fr : mResgist) {
-                        Log.v("人脸识别", "loop:" + mResgist.size() + "/" + fr.mFaceList.size());
+//                        Log.v("人脸识别", "loop:" + mResgist.size() + "/" + fr.mFaceList.size());
                         if (fr.mName.length() > 11) {
                             continue;
                         }
@@ -3528,7 +3528,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             //比较两份人脸特征信息的匹配度(result 脸部特征信息对象,face 脸部特征信息对象,score 匹配度对象)
 //                            Log.e("人脸识别 比较值 ", "result " + result.toString() + " face " + face.toString());
                             error = engine.AFR_FSDK_FacePairMatching(result, face, score);
-                            Log.d("人脸识别", "Score:" + score.getScore() + " error " + error.getCode());
+//                            Log.d("人脸识别", "Score:" + score.getScore() + " error " + error.getCode());
                             if (max < score.getScore()) {
                                 max = score.getScore();//匹配度赋值
                                 name = fr.mName;
@@ -3540,7 +3540,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
 
-                    Log.v("人脸识别", "fit Score:" + max + ", NAME:" + name);
+//                    Log.v("人脸识别", "fit Score:" + max + ", NAME:" + name);
                     if (max > Constant.FACE_MAX) {//匹配度的值高于设定值,发出消息,开门
                         if (null != name && !cardRecord.checkLastCardNew(name)) {//判断距离上次刷脸时间是否超过10秒
                             //fr success.

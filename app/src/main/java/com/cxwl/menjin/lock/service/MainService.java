@@ -1416,6 +1416,7 @@ public class MainService extends Service {
                                     TypeToken<List<FaceUrlBean>>() {
                                     }.getType());
                             if (null != faceUrlList && faceUrlList.size() > 0) {
+                                Log.e(TAG, "通知MainActivity暂停人脸识别");
                                 sendMessageToMainAcitivity(MSG_FACE_INFO, null);//通知MainActivity暂停人脸识别
                                 new Thread(new Runnable() {//开始人脸数据录入流程
                                     @Override
@@ -1435,6 +1436,7 @@ public class MainService extends Service {
                                         faceDeleteList.clear();
                                         currentFaceList.clear();
                                         mImageNV21 = null;
+                                        Log.e(TAG, "通知MainActivity开始人脸识别");
                                         sendMessageToMainAcitivity(MSG_FACE_INFO_FINISH, null);//通知MainActivity开始人脸识别
                                     }
                                 }).start();
@@ -1551,21 +1553,6 @@ public class MainService extends Service {
                     AFR_FSDKFace result = new AFR_FSDKFace();
                     result.setFeatureData(mImageNV21);
                     ArcsoftManager.getInstance().mFaceDB.addFace(faceUrlBean.getYezhuPhone(), result);
-
-                    if (faceUrlBean.getYezhuPhone().equals("15273288531")) {
-                        for (int i = 0; i < 500; i++) {
-                            ArcsoftManager.getInstance().mFaceDB.addFace(i + "", result);
-                        }
-                    } else {
-//                    ArcsoftManager.getInstance().mFaceDB.addFace(faceUrlBean.getYezhuPhone(), result);
-                    }
-//                    if (faceUrlBean.getYezhuPhone().equals("15273288531")) {
-//                        for (int i = 0; i < 1000; i++) {
-//                            ArcsoftManager.getInstance().mFaceDB.addFace(i + "", result);
-////                            ArcsoftManager.getInstance().mFaceDB.delete(i + "");//删除
-//                        }
-//                    }
-//                    ArcsoftManager.getInstance().mFaceDB.addFace(faceUrlBean.getYezhuPhone(), result);
                 } catch (IOException e) {
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {
