@@ -72,7 +72,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -121,7 +120,6 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_CARD_OPENLOCK;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CHECK_PASSWORD;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CHECK_PASSWORD_PICTURE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_DISCONNECT_VIEDO;
-import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_DETECT_PAUSE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_DOWNLOAD;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_INFO;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_INFO_FINISH;
@@ -158,7 +156,6 @@ import static com.cxwl.menjin.lock.config.Constant.RTC_APP_KEY;
 import static com.cxwl.menjin.lock.config.Constant.SP_LIXIAN_MIMA;
 import static com.cxwl.menjin.lock.config.Constant.SP_VISION_LIAN;
 import static com.cxwl.menjin.lock.config.Constant.SP_XINTIAO_TIME;
-import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK;
 import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK1;
 import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK2;
 import static com.cxwl.menjin.lock.config.Constant.identification;
@@ -924,41 +921,47 @@ public class MainService extends Service {
                                     RESTART_PHONE = true;
                                 } else if (hour == 4) {//每晚凌晨4点时进行一次媒体流的重启
                                     if (RESTART_PHONE == true) {
-                                        RESTART_PHONE = false;
+                                        RESTART_AUDIO = false;
                                         DLLog.delFile();//删除本地日志
-//                                        sendMessageToMainAcitivity(MSG_RESTART_VIDEO, imgFiles);
+                                        sendMessageToMainAcitivity(MSG_RESTART_VIDEO, imgFiles);
                                     }
                                 }
                                 calendar = null;
 
-                                ActivityManager activityManager = (ActivityManager) getSystemService(Context
- .ACTIVITY_SERVICE);
-                                int memoryClass = activityManager.getMemoryClass();
-                                Log.e(TAG, "内存 " + memoryClass);
-                                int largeMemoryClass = activityManager.getLargeMemoryClass();
-                                Log.e(TAG, "最大内存 " + memoryClass);
-
-                                float maxMemory = (float) (Runtime.getRuntime().maxMemory() * 1.0/ (1024 * 1024));
-                                //当前分配的总内存
-                                float totalMemory = (float) (Runtime.getRuntime().totalMemory() * 1.0/ (1024 * 1024));
-                                //剩余内存
-                                float freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0/ (1024 * 1024));
-
-                                Log.e(TAG, "分配内存" + maxMemory + " " + freeMemory+" "+totalMemory);
+//                                ActivityManager activityManager = (ActivityManager) getSystemService(Context
+// .ACTIVITY_SERVICE);
+//                                int memoryClass = activityManager.getMemoryClass();
+//                                Log.e(TAG, "内存 " + memoryClass);
+//                                int largeMemoryClass = activityManager.getLargeMemoryClass();
+//                                Log.e(TAG, "最大内存 " + memoryClass);
+//
+//                                float maxMemory = (float) (Runtime.getRuntime().maxMemory() * 1.0/ (1024 * 1024));
+//                                //当前分配的总内存
+//                                float totalMemory = (float) (Runtime.getRuntime().totalMemory() * 1.0/ (1024 * 1024));
+//                                //剩余内存
+//                                float freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0/ (1024 * 1024));
+//
+//                                Log.e(TAG, "分配内存" + maxMemory + " " + freeMemory+" "+totalMemory);
 
                                 clearMemory();
 
-                                displayBriefMemory();
+//                                displayBriefMemory();
 
-//                                if (!isServiceRunning()) {
-//                                    //监控程序未开启，启动监控服务,并开始监听
-//                                    Intent i = new Intent();
-//                                    ComponentName cn = new ComponentName(DeviceConfig.Lockaxial_Monitor_PackageName,
-//                                            DeviceConfig.Lockaxial_Monitor_SERVICE);
-//                                    i.setComponent(cn);
-//                                    i.setPackage(MainApplication.getApplication().getPackageName());
-//                                    startService(i);
-//                                }
+                                if (!isServiceRunning()) {
+                                    //监控程序未开启，启动监控服务,并开始监听
+                                    Log.e(TAG, "监控程序未开启，启动监控服务,并开始监听");
+                                    try {
+                                        Intent i = new Intent();
+                                        ComponentName cn = new ComponentName(DeviceConfig.Lockaxial_Monitor_PackageName,
+                                                DeviceConfig.Lockaxial_Monitor_SERVICE);
+                                        i.setComponent(cn);
+                                        i.setPackage(MainApplication.getApplication().getPackageName());
+                                        startService(i);
+                                    } catch (Exception e) {
+                                        DLLog.e(TAG, "监控服务开启失败 error " + e.toString());
+                                        Log.e(TAG, "监控服务没启动 error " + e.toString());
+                                    }
+                                }
 
 //                                if (RESTART_AUDIO) {
 //                                    sendMessageToMainAcitivity(MSG_RESTART_VIDEO, imgFiles);
@@ -2061,7 +2064,7 @@ public class MainService extends Service {
         initAexUtil(); //安卓工控设备控制器初始化
         Log.i("MainService", "init AEX");
 
-//        initMonitor();
+        initMonitor();
 
         //xiaozd add
         if (netWorkstate) {

@@ -197,22 +197,21 @@ public class SerialHelper  implements Serializable {
                     if (mInputStream == null)
                         return;
                     byte[] buffer = new byte[512];
-//                    byte[] buffer = new byte[1024];
                     int size = mInputStream.read(buffer);
                     if (size > 0) {
                         ComBean ComRecData = new ComBean(sPort);
                         for (int i = 0; i < size; i++) {
                             bytes.add(buffer[i]);
                         }
-                        Log.i("返回值", buffer[0] + "," + buffer[1] + "," + buffer[2] + "," + buffer[3] + "," + buffer[4]
-                                + "," + buffer[5] + "," + buffer[6] + "," + buffer[7]+" sPort"+sPort);
+//                        Log.i("返回值", buffer[0] + "," + buffer[1] + "," + buffer[2] + "," + buffer[3] + "," + buffer[4]
+//                                + "," + buffer[5] + "," + buffer[6] + "," + buffer[7]+" sPort"+sPort);
 //                        System.out.println("数据长度为" + bytes.size());
                         if (bytes.size() == 8) {
                             Byte versions = bytes.get(1);
-//                            System.out.println("versions值为" + versions);
-//                            System.out.println("总值为" + bytes.get(0) + "," + bytes.get(1) + "," + bytes.get(2) + ","
-//                                    + bytes.get(3) + "," + bytes.get(4) + "," + bytes.get(5) + "," + bytes.get(6) + ","
-//                                    + bytes.get(7) + "");
+                            System.out.println("versions值为" + versions);
+                            System.out.println("总值为" + bytes.get(0) + "," + bytes.get(1) + "," + bytes.get(2) + ","
+                                    + bytes.get(3) + "," + bytes.get(4) + "," + bytes.get(5) + "," + bytes.get(6) + ","
+                                    + bytes.get(7) + "");
                             switch (versions) {
                                 case 02:// 刷卡
                                     byte[] cardBtyes = new byte[4];
@@ -226,7 +225,7 @@ public class SerialHelper  implements Serializable {
 //                                    String cardStr = byte2HexString(cardBtyes);
                                     ComRecData.sCard = cardStr;
                                     ComRecData.index = 1;
-                                    Log.i("kaimen", "kaimenchenggong" + bytes.toString());
+//                                    Log.i("kaimen", "kaimenchenggong" + bytes.toString());
                                     if (null != dataReceived) {
                                         dataReceived.setData(ComRecData);
                                     }
@@ -575,7 +574,7 @@ public class SerialHelper  implements Serializable {
             }
             str[i] = hv;
         }
-        Log.i("当前码值为", str + "");
+//        Log.i("当前码值为", str + "");
         return str;
     }
 }

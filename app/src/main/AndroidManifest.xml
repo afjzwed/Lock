@@ -148,6 +148,7 @@
                 <action android:name="rtc.sdk.service"/>
             </intent-filter>
         </service>
+
     </application>
 
 </manifest>

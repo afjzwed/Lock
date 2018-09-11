@@ -1,7 +1,9 @@
 package com.cxwl.menjin.lock;
 
+import android.app.AlarmManager;
 import android.app.Application;
 import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
@@ -48,12 +50,13 @@ public class MainApplication  extends Application {
 
         LeakCanary.install(this);
 
+        Thread.setDefaultUncaughtExceptionHandler(restartHandler); // 程序崩溃时触发线程
+
         Intent intent = new Intent();
         // 参数1：包名，参数2：程序入口的activity
-        intent.setClassName("com.cxwl.hurry.doorlock", "com.cxwl.hurry.doorlock.ui.activity.MainActivity");
+        intent.setClassName("com.cxwl.menjin.lock", "com.cxwl.menjin.lock.ui.MainActivity");
         restartIntent = PendingIntent.getActivity(getApplicationContext(), 0,
                 intent, Intent.FLAG_ACTIVITY_NEW_TASK);
-        Thread.setDefaultUncaughtExceptionHandler(restartHandler); // 程序崩溃时触发线程
     }
 
     public Thread.UncaughtExceptionHandler restartHandler = new Thread.UncaughtExceptionHandler() {
@@ -61,12 +64,12 @@ public class MainApplication  extends Application {
         public void uncaughtException(Thread thread, Throwable ex) {
             Log.e("崩溃重启", "错误 " + ex);
             DLLog.e("崩溃重启", "错误 " + ex);
-//            AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-//            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000,
-//                    restartIntent); // 1秒钟后重启应用
-//            android.os.Process.killProcess(android.os.Process.myPid()); // 自定义方法，关闭当前打开的所有avtivity
-//            System.exit(0);
-//            System.gc();
+            AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000,
+                    restartIntent); // 1秒钟后重启应用
+            android.os.Process.killProcess(android.os.Process.myPid()); // 自定义方法，关闭当前打开的所有avtivity
+            System.exit(0);
+            System.gc();
         }
     };
 

@@ -176,7 +176,6 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_START_DIAL_PICTURE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_TONGJI_VEDIO;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPDATE_NETWORKSTATE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPLOAD_LIXIAN_IMG;
-import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_OPENLOCK;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_TAKEPIC;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_TAKEPIC1;
 import static com.cxwl.menjin.lock.config.Constant.ONVIDEO_MODE;
@@ -330,6 +329,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
 
         setContentView(R.layout.activity_main);
+
+        DLLog.e(TAG, "应用开启");
 
         initView();//初始化View
         initQiniu();//初始化七牛
@@ -573,7 +574,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         sleep(10000);
                         setPicInfo();
                     }
-
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -953,6 +953,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case MSG_LOCK_OPENED://开锁
                         Log.i(TAG, "开锁");
+
                         onLockOpened((int) msg.obj);
                         if (weituoDialog == null) {
                             weituoDialog = DialogUtil.showBottomDialog(MainActivity.this);
@@ -1035,7 +1036,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             if (faceHandler != null) {
                                 Constant.RESTART_PHONE = false;
                                 faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 100);
-                                faceHandler.sendEmptyMessageDelayed(MSG_RESTART_VIDEO1, 100);
+                                onReStartVideo();
+//                                faceHandler.sendEmptyMessageDelayed(MSG_RESTART_VIDEO1, 100);
                             }
                         }
                         break;
@@ -1091,7 +1093,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 开门 :1卡2手机3人脸4邀请码5离线密码6临时密码'
      */
     private void onLockOpened(int typy) {
-        // TODO: 2018/9/5 没测
+        control.openDoor();
         blockNo = "";
         setDialValue("");
         setTempkeyValue("");
@@ -1476,9 +1478,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 value = 8;
             } else if (keyCode.equals("09")) {
                 value = 9;
-            }else if (keyCode.equals("0D")) {
+            } else if (keyCode.equals("0D")) {
                 value = DEVICE_KEYCODE_POUND;
-            }else if (keyCode.equals("0F")) {
+            } else if (keyCode.equals("0F")) {
                 value = DEVICE_KEYCODE_STAR;
             }
         }
@@ -2524,6 +2526,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             return;
         }
 
+        if (blockNo.equals("9991") || blockNo.equals("99999991")) {
+            onReStartVideo();
+            return;
+        }
 
         if (blockNo.equals(("8888")) || blockNo.equals("88888888")) {
             if (faceHandler != null) {
@@ -3804,9 +3810,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             DLLog.e("wh", "进行流媒体的重启");
             startActivity(new Intent(this, PhotographActivity.class));
         } else {
-            Intent intent = new Intent();
-            intent.setAction("com.androidex.action.reboot");
-            sendBroadcast(intent);
+            Intent intent1 = new Intent(Intent.ACTION_REBOOT);
+            intent1.putExtra("nowait", 1);
+            intent1.putExtra("interval", 1);
+            intent1.putExtra("window", 0);
+            sendBroadcast(intent1);
         }
     }
 
