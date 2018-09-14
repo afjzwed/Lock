@@ -133,6 +133,7 @@ import okhttp3.Call;
 import static com.cxwl.menjin.lock.config.Constant.CALLING_MODE;
 import static com.cxwl.menjin.lock.config.Constant.CALL_MODE;
 import static com.cxwl.menjin.lock.config.Constant.ERROR_MODE;
+import static com.cxwl.menjin.lock.config.Constant.FACE_MAX;
 import static com.cxwl.menjin.lock.config.Constant.MSG_ADVERTISE_REFRESH;
 import static com.cxwl.menjin.lock.config.Constant.MSG_ADVERTISE_REFRESH_PIC;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CALLMEMBER_ERROR;
@@ -166,7 +167,6 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_LOGIN_AFTER;
 import static com.cxwl.menjin.lock.config.Constant.MSG_LOGIN_FAILED;
 import static com.cxwl.menjin.lock.config.Constant.MSG_PASSWORD_CHECK;
 import static com.cxwl.menjin.lock.config.Constant.MSG_RESTART_VIDEO;
-import static com.cxwl.menjin.lock.config.Constant.MSG_RESTART_VIDEO1;
 import static com.cxwl.menjin.lock.config.Constant.MSG_RTC_DISCONNECT;
 import static com.cxwl.menjin.lock.config.Constant.MSG_RTC_NEWCALL;
 import static com.cxwl.menjin.lock.config.Constant.MSG_RTC_ONVIDEO;
@@ -258,6 +258,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private UploadManager uploadManager;//七牛上传
 
     private Thread clockRefreshThread = null;
+    private Timer timer = new Timer();
 
     private Thread passwordTimeoutThread = null;//访客密码线程
     private String guestPassword = "";//访客输入的密码值
@@ -946,8 +947,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         break;
                     case MSG_FACE_INFO_FINISH://人脸录入完成，重新开始人脸识别
                         Log.e(TAG, "人脸91");
-                        faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 2000);
-//                        handler.sendEmptyMessageDelayed(START_FACE_CHECK, 3000);
+                        timer.schedule(new TimerTask() {
+                            public void run() {
+                                //execute the task
+                                //删除单个人脸时处理速度可能过快，导致先人脸识别再人脸暂停，所以用定时器控制1秒后再人脸识别，保证在人脸暂停后
+                                handler.sendEmptyMessage(START_FACE_CHECK);
+                            }
+                        }, 1000);
                         break;
                     case MSG_LOCK_OPENED://开锁
                         Log.i(TAG, "开锁");
@@ -1105,8 +1111,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 msg = "手机一键开门成功";
                 break;
             case 3:
-                msg = "刷脸开门成功";
-                DLLog.e("人脸识别", "刷脸开门成功吐司显示");
+                msg = "人脸识别开门成功";
+//                DLLog.e("人脸识别", "刷脸开门成功吐司显示");
                 break;
             case 4:
                 //二维码暂无
@@ -2327,7 +2333,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             Log.e(TAG, "打开照相机 5" + e.toString());
                             e.printStackTrace();
                             if (camera != null) {
-                                camera.setPreviewCallback(null);
+//                                camera.setPreviewCallback(null);
                                 camera.stopPreview();
                                 camera.release();
                                 camera = null;
@@ -2339,7 +2345,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } catch (Exception e) {
                 // TODO: 2018/8/28 这里不知道要不要加 callback.afterTakePickture(thisValue, null, isCall, uuid);
                 if (camera != null) {
-                    camera.setPreviewCallback(null);
+//                    camera.setPreviewCallback(null);
                     camera.stopPreview();
                     camera.release();
                     camera = null;
@@ -2475,12 +2481,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         if (blockNo.equals("9992") || blockNo.equals("99999992")) {
 //            startActivity(new Intent(this, PhotographActivity.class));
-            handler.sendEmptyMessageDelayed(START_FACE_CHECK, 3000);
+//            handler.sendEmptyMessageDelayed(START_FACE_CHECK, 3000);
+            FACE_MAX = 0.63f;
             return;
         }
 
         if (blockNo.equals("9991") || blockNo.equals("99999991")) {
             onReStartVideo();
+            return;
+        }
+
+        if (blockNo.equals("9993") || blockNo.equals("99999993")) {
+            FACE_MAX = 0.68f;
             return;
         }
 
@@ -3101,7 +3113,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     case MSG_FACE_DETECT_PAUSE://人脸识别暂停
                         Log.e(TAG, "人脸识别暂停" + "开始照相机");
                         handler.removeMessages(START_FACE_CHECK);
-//                        faceHandler.removeMessages(MSG_FACE_DETECT_CONTRAST);
+                        faceHandler.removeMessages(MSG_FACE_DETECT_CONTRAST);//这个地方可能因为删除人脸的流程过快造成先人脸识别对比再人脸识别暂停，以至于无法进行人脸识别
                         identification = false;
                         if (mFRAbsLoop != null) {
                             mFRAbsLoop.pauseThread();
@@ -3111,9 +3123,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             mSurfaceView.setVisibility(View.GONE);
                         }
                         break;
-                    case MSG_RESTART_VIDEO1:
-                        onReStartVideo();
-                        break;
+//                    case MSG_RESTART_VIDEO1:
+//                        onReStartVideo();
+//                        break;
                     //身份证的都注释
                     case MSG_ID_CARD_DETECT_RESTART:
 //                        idOperation = true;
