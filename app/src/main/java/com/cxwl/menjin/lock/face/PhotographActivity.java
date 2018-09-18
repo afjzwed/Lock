@@ -56,6 +56,7 @@ public class PhotographActivity extends AppCompatActivity implements CameraSurfa
                 finish();
             }
         }).start();
+
     }
 
     @Override

@@ -190,26 +190,6 @@ public class PhotographActivity2 extends AppCompatActivity implements Camera.Pic
         return false;
     }
 
-//    private void deletePicture() {
-//        if (pictureFile != null && !pictureFile.exists()) {
-//            Toast.makeText(this, "图片不存在", Toast.LENGTH_LONG).show();
-//            LogDoor.v(FACE_TAG, "deletePicture1-->");
-//        }
-//        if (pictureFile.delete()) {
-//            Toast.makeText(this, "删除成功", Toast.LENGTH_LONG).show();
-//            mDeleteButton.post(new Runnable() {
-//                @Override
-//                public void run() {
-//                    mDeleteButton.setVisibility(View.GONE);
-//                    mCaptureButton.setVisibility(View.VISIBLE);
-//                }
-//            });
-//        } else {
-//            Toast.makeText(this, "删除失败", Toast.LENGTH_LONG).show();
-//        }
-//        LogDoor.v(FACE_TAG, "deletePicture2-->");
-//    }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();

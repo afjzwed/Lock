@@ -274,7 +274,6 @@ public class AdvertiseHandler implements SurfaceHolder.Callback {
     }
 
     public void showImage(GuangGaoBean item) {
-
         //     JSONObject image = imageList.getJSONObject(imageListIndex);
         String imageFile = item.getNeirong();
         if (dialMessenger != null) {

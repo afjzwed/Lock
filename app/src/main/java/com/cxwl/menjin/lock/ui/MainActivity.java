@@ -882,6 +882,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         sendBroadcast(new Intent("com.android.action.hide_navigationbar"));//隱藏底部導航
         container.setSystemUiVisibility(13063);//设置状态栏显示与否,禁止頂部下拉
 
+
     }
 
     /**
