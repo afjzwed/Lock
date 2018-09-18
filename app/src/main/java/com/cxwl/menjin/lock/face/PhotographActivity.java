@@ -1,5 +1,6 @@
 package com.cxwl.menjin.lock.face;
 
+import android.content.Intent;
 import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
@@ -11,6 +12,7 @@ import android.widget.ImageView;
 
 import com.cxwl.menjin.lock.R;
 import com.cxwl.menjin.lock.config.Constant;
+import com.cxwl.menjin.lock.utils.DLLog;
 import com.guo.android_extend.widget.CameraFrameData;
 import com.guo.android_extend.widget.CameraGLSurfaceView;
 import com.guo.android_extend.widget.CameraSurfaceView;
@@ -59,16 +61,33 @@ public class PhotographActivity extends AppCompatActivity implements CameraSurfa
     @Override
     public Camera setupCamera() {
         mCamera = Camera.open(1);//打开硬件摄像头，这里导包得时候一定要注意是android.hardware.Camera
-
-        try {
-            Camera.Parameters parameters = mCamera.getParameters();
-            parameters.setPreviewSize(640, 480);
-            parameters.setPreviewFormat(ImageFormat.NV21);
-            mCamera.setParameters(parameters);
-            mCamera.autoFocus(null);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.v("人脸识别", "setupCamera-->" + e.getMessage());
+        if (null == mCamera) {
+            mCamera = Camera.open(0);
+        }
+        if (null != mCamera) {
+            try {
+                Camera.Parameters parameters = mCamera.getParameters();
+                parameters.setPreviewSize(640, 480);
+                parameters.setPreviewFormat(ImageFormat.NV21);
+                mCamera.setParameters(parameters);
+                mCamera.autoFocus(null);
+            } catch (Exception e) {
+                DLLog.e("AdvertiseHandler", "摄像头错误 setupCamera-->" + e.getMessage());
+                Intent intent1 = new Intent(Intent.ACTION_REBOOT);
+                intent1.putExtra("nowait", 1);
+                intent1.putExtra("interval", 1);
+                intent1.putExtra("window", 0);
+                sendBroadcast(intent1);
+                e.printStackTrace();
+                Log.v("人脸识别", "setupCamera-->" + e.getMessage());
+            }
+        } else {
+            DLLog.e("AdvertiseHandler", "摄像头错误 setupCamera-->PhotographActivity");
+            Intent intent1 = new Intent(Intent.ACTION_REBOOT);
+            intent1.putExtra("nowait", 1);
+            intent1.putExtra("interval", 1);
+            intent1.putExtra("window", 0);
+            sendBroadcast(intent1);
         }
         return mCamera;
     }

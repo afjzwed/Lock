@@ -50,7 +50,7 @@ public class Constant {
     public static final int MSG_RTC_NEWCALL = 10000;//收到新的来电
     public static final int MSG_RTC_ONVIDEO = 10001;//视频通话连接
     public static final int MSG_RTC_DISCONNECT = 10002;//视频通话断开
-    public static final int MSG_DISCONNECT_VIEDO = 200010;//
+    public static final int MSG_DISCONNECT_VIEDO = 200010;//挂断正在通话的视频
 
     public static final int MSG_CALLMEMBER_SERVER_ERROR = 12105; //呼叫服务器没返回值错误
     public static final int MSG_CALLMEMBER_ERROR = 10005;//呼叫错误
@@ -87,6 +87,7 @@ public class Constant {
     public static final int MSG_CHECK_PASSWORD_PICTURE = 21006;//密码访客图片
 
     public static final int MSG_YIJIANKAIMEN_OPENLOCK = 21007;//手机一键开门后截图和上传日志
+    public static final int MSG_CANCEL_ONVIDEO = 21008;//一分钟定时挂断视频
     /********************天翼RTC相关******************/
 
     /********************卡相关*******************/
@@ -125,8 +126,10 @@ public class Constant {
 
 //    public static final int MSG_RESTART_VIDEO1 = 11110;//媒体流的重启
     public static final int MSG_RESTART_VIDEO = 100002;//媒体流的重启
+    public static final int MSG_UPLOAD_LOG  = 100003;//日志上传
     public static boolean RESTART_PHONE = false;//手机重启
     public static boolean RESTART_AUDIO = false;//媒体流重启
+    public static boolean UPLOAD_LOG = false;//上传日志
 
-
+    public static int RESTART_PHONE_OR_AUDIO = 0;//0正常 1重启设备 2重启媒体
 }

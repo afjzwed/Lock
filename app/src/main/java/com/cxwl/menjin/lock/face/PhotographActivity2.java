@@ -24,6 +24,7 @@ import com.arcsoft.facetracking.AFT_FSDKVersion;
 import com.cxwl.menjin.lock.R;
 import com.cxwl.menjin.lock.config.Constant;
 import com.cxwl.menjin.lock.config.DeviceConfig;
+import com.cxwl.menjin.lock.utils.DLLog;
 import com.guo.android_extend.widget.CameraFrameData;
 import com.guo.android_extend.widget.CameraGLSurfaceView;
 import com.guo.android_extend.widget.CameraSurfaceView;
@@ -260,43 +261,59 @@ public class PhotographActivity2 extends AppCompatActivity implements Camera.Pic
     public Camera setupCamera() {
         // TODO Auto-generated method stub
         mCamera = Camera.open(1);//打开硬件摄像头，这里导包得时候一定要注意是android.hardware.Camera
-        try {
-            Camera.Parameters parameters = mCamera.getParameters();
+
+        if (null != mCamera) {
+            try {
+                Camera.Parameters parameters = mCamera.getParameters();
 //            parameters.setPreviewSize(800, 600);
-            parameters.setPreviewSize(640, 480);
-            parameters.setPreviewFormat(ImageFormat.NV21);
+                parameters.setPreviewSize(640, 480);
+                parameters.setPreviewFormat(ImageFormat.NV21);
 
-            for (Camera.Size size : parameters.getSupportedPreviewSizes()) {
-                Log.v("人脸识别", "SIZE:" + size.width + "x" + size.height);
+//            for (Camera.Size size : parameters.getSupportedPreviewSizes()) {
+//                Log.v("人脸识别", "SIZE:" + size.width + "x" + size.height);
+//            }
+//            for (Integer format : parameters.getSupportedPreviewFormats()) {
+//                Log.v("人脸识别", "FORMAT:" + format);
+//            }
+//
+//            List<int[]> fps = parameters.getSupportedPreviewFpsRange();
+//            for (int[] count : fps) {
+//                Log.d(TAG, "T:");
+//                for (int data : count) {
+//                    Log.d(TAG, "V=" + data);
+//                }
+//            }
+                //parameters.setPreviewFpsRange(15000, 30000);
+                //parameters.setExposureCompensation(parameters.getMaxExposureCompensation());
+                //parameters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_AUTO);
+                //parameters.setAntibanding(Camera.Parameters.ANTIBANDING_AUTO);
+                //parmeters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
+                //parameters.setSceneMode(Camera.Parameters.SCENE_MODE_AUTO);
+                //parameters.setColorEffect(Camera.Parameters.EFFECT_NONE);
+                mCamera.setParameters(parameters);
+
+                mCamera.autoFocus(null);
+
+                int width = mCamera.getParameters().getPreviewSize().width;
+                int height = mCamera.getParameters().getPreviewSize().height;
+                Log.v("人脸识别", "setupCamera-->SIZE:" + width + "x" + height);
+            } catch (Exception e) {
+                DLLog.e("设备重启 PhotographActivity2", "摄像头错误 " + e.toString() + " setupCamera-->" + e.getMessage());
+                Intent intent1 = new Intent(Intent.ACTION_REBOOT);
+                intent1.putExtra("nowait", 1);
+                intent1.putExtra("interval", 1);
+                intent1.putExtra("window", 0);
+                sendBroadcast(intent1);
+                e.printStackTrace();
+                Log.v("人脸识别", "setupCamera-->" + e.getMessage());
             }
-            for (Integer format : parameters.getSupportedPreviewFormats()) {
-                Log.v("人脸识别", "FORMAT:" + format);
-            }
-
-            List<int[]> fps = parameters.getSupportedPreviewFpsRange();
-            for (int[] count : fps) {
-                Log.d(TAG, "T:");
-                for (int data : count) {
-                    Log.d(TAG, "V=" + data);
-                }
-            }
-            //parameters.setPreviewFpsRange(15000, 30000);
-            //parameters.setExposureCompensation(parameters.getMaxExposureCompensation());
-            //parameters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_AUTO);
-            //parameters.setAntibanding(Camera.Parameters.ANTIBANDING_AUTO);
-            //parmeters.setFocusMode(Camera.Parameters.FOCUS_MODE_AUTO);
-            //parameters.setSceneMode(Camera.Parameters.SCENE_MODE_AUTO);
-            //parameters.setColorEffect(Camera.Parameters.EFFECT_NONE);
-            mCamera.setParameters(parameters);
-
-            mCamera.autoFocus(null);
-
-            int width = mCamera.getParameters().getPreviewSize().width;
-            int height = mCamera.getParameters().getPreviewSize().height;
-            Log.v("人脸识别", "setupCamera-->SIZE:" + width + "x" + height);
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.v("人脸识别", "setupCamera-->" + e.getMessage());
+        } else {
+            DLLog.e("设备重启 PhotographActivity2", "摄像头错误 PhotographActivity2");
+            Intent intent1 = new Intent(Intent.ACTION_REBOOT);
+            intent1.putExtra("nowait", 1);
+            intent1.putExtra("interval", 1);
+            intent1.putExtra("window", 0);
+            sendBroadcast(intent1);
         }
 
         return mCamera;
