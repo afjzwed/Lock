@@ -184,4 +184,22 @@ public class DLLog {
         now.set(Calendar.DATE, now.get(Calendar.DATE) - 1);
         return now.getTime();
     }
+
+    public static File upLoadFile1() {
+        String needDelFiel = logfile.format(getDateBefore2());
+        File file = new File(LOG_PATH_SDCARD_DIR, needDelFiel + LOGFILENAME);
+        if (null != file && file.exists()) {
+            return file;
+        } else {
+            return null;
+        }
+    }
+
+    private static Date getDateBefore2() {
+        Date nowtime = new Date();
+        Calendar now = Calendar.getInstance();
+        now.setTime(nowtime);
+        now.set(Calendar.DATE, now.get(Calendar.DATE) - 3);
+        return now.getTime();
+    }
 }

@@ -52,7 +52,7 @@ public class ArcsoftManager {
             }
         } catch (IOException e) {
 //            path = application.getExternalCacheDir().getPath();
-            DLLog.e("ArcsoftManager", "e " + e.toString());
+            DLLog.e("ArcsoftManager", "错误 e " + e.toString());
             e.printStackTrace();
         }
 

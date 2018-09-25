@@ -346,11 +346,11 @@ public class MainService extends Service {
                             }
                         }
                     } else {
-                        DLLog.e(TAG, "离线统计  execute为空");
+                        DLLog.e(TAG, "错误 离线统计  execute为空");
                         Log.i(TAG, "离线统计 保存信息到数据库 execute为空");
                     }
                 } catch (IOException e) {
-                    DLLog.e(TAG, "离线统计  服务器无响应");
+                    DLLog.e(TAG, "错误 离线统计  服务器无响应");
                     e.printStackTrace();
                     Log.i(TAG, "离线统计 保存信息到数据库 服务器无响应 ");
                 }
@@ -688,7 +688,7 @@ public class MainService extends Service {
 
         } catch (Exception e) {
 //            Constant.RESTART_PHONE_OR_AUDIO = 1;
-            DLLog.e(TAG,"验证密码接口 catch-> "+e.toString());
+            DLLog.e(TAG,"错误 验证密码接口 catch-> "+e.toString());
             Message message = mHandler.obtainMessage();
             message.what = MSG_GUEST_PASSWORD_CHECK;
             mHandler.sendMessage(message);
@@ -916,13 +916,13 @@ public class MainService extends Service {
                                 int hour = calendar.get(Calendar.HOUR_OF_DAY);
                                 Log.e(TAG, "当前小时 " + hour + " " + RESTART_PHONE);
 
-                                if (hour == 1) {
-                                    Constant.UPLOAD_LOG = true;
-                                } else if (hour == 2) {//每晚凌晨2点时进行一次日志上传
-                                    if (Constant.UPLOAD_LOG == true) {
-                                        sendMessageToMainAcitivity(MSG_UPLOAD_LOG, null);
-                                    }
-                                }
+//                                if (hour == 1) {
+//                                    Constant.UPLOAD_LOG = true;
+//                                } else if (hour == 2) {//每晚凌晨2点时进行一次日志上传
+//                                    if (Constant.UPLOAD_LOG == true) {
+//                                        sendMessageToMainAcitivity(MSG_UPLOAD_LOG, null);
+//                                    }
+//                                }
 
                                 if (hour == 3) {
                                     RESTART_PHONE = true;
@@ -956,6 +956,9 @@ public class MainService extends Service {
                                     onReStartVideo();
                                 }
 
+                                if (RESTART_AUDIO) {//媒体流重启
+                                    sendMessageToMainAcitivity(MSG_RESTART_VIDEO, imgFiles);
+                                }
 //                                displayBriefMemory();
 
                                 if (!isServiceRunning()) {
@@ -974,9 +977,7 @@ public class MainService extends Service {
                                     }
                                 }
 
-                                if (RESTART_AUDIO) {//媒体流重启
-                                    sendMessageToMainAcitivity(MSG_RESTART_VIDEO, imgFiles);
-                                }
+
                             }
                         } else {
                             //服务器异常或没有网络
@@ -1058,15 +1059,12 @@ public class MainService extends Service {
                 if (appProcessInfo.importance > ActivityManager.RunningAppProcessInfo.IMPORTANCE_VISIBLE) {
                     String[] pkgList = appProcessInfo.pkgList;
                     for (int j = 0; j < pkgList.length; ++j) {//pkgList 得到该进程下运行的包名
-                        // TODO: 2018/9/5 这里的包名都要改
-                      /*  if ("com.cxwl.menjin.lock".equals(pkgList[j]) || "com.cxwl.lock.monitor".equals
-                                (pkgList[j]) || "com.android.providers.media".equals
-                                (pkgList[j]) || "com.cxwl.menjin.lock:leakcanary".equals
-                                (pkgList[j])) {
+                        if ("com.cxwl.menjin.lock".equals(pkgList[j]) || "com.cxwl.lock.monitor".equals(pkgList[j])) {
 
                         } else {
+                            am.killBackgroundProcesses(pkgList[j]);
                             Log.d("进程", "It will be killed, package name : " + pkgList[j]);
-                            if (null != method) {
+                            /*if (null != method) {
                                 try {
                                     //利用反射调用forceStopPackage来结束进程
                                     method.invoke(am, pkgList[j]);
@@ -1077,9 +1075,9 @@ public class MainService extends Service {
                                 }
                             } else {
                                 am.killBackgroundProcesses(pkgList[j]);
-                            }
+                            }*/
                         }
-                        count++;*/
+//                        count++;
                     }
                 }
             }
@@ -1088,7 +1086,7 @@ public class MainService extends Service {
         if (afterMem < 1000) {
             onReStartVideo();
         }
-        DLLog.e("进程", " ----------- after memory info : " + afterMem);
+        DLLog.w("进程", " after memory info : " + afterMem);
 //        Log.d("进程", "----------- after memory info : " + afterMem);
 //        DLLog.e("进程", "-----------before memory info : " + beforeMem + " ----------- after memory info : " + afterMem);
     }
@@ -1148,10 +1146,9 @@ public class MainService extends Service {
                             adpicInfoStatus = 0;
                             syncCallBack("3", v);
                         } catch (Exception e) {
-                            DLLog.e(TAG,"广告图片接口 catch-> "+e.toString());
+                            DLLog.e(TAG,"错误 广告图片接口 catch-> "+e.toString());
                             e.printStackTrace();
                         }
-
                     } else {
                         adpicInfoStatus = 0;
                     }
@@ -1256,7 +1253,7 @@ public class MainService extends Service {
             });
 
         } catch (Exception e) {
-            DLLog.e(TAG,"getVersionInfo catch-> "+e.toString());
+            DLLog.e(TAG,"错误 getVersionInfo catch-> "+e.toString());
             HttpApi.e("connectReportInfo()->服务器数据解析异常");
             e.printStackTrace();
             lastVersionStatus = "L";//等待下次心跳重新获取URL
@@ -1475,7 +1472,7 @@ public class MainService extends Service {
                 }
             });
         } catch (Exception e) {
-            DLLog.e(TAG,"getFaceUrlInfo catch-> "+e.toString());
+            DLLog.e(TAG,"错误 getFaceUrlInfo catch-> "+e.toString());
             HttpApi.e("人脸URL getClientInfo()->服务器数据解析异常");
             e.printStackTrace();
             faceStatus = 0;//等待下载数据
@@ -1571,10 +1568,10 @@ public class MainService extends Service {
                     result.setFeatureData(mImageNV21);
                     ArcsoftManager.getInstance().mFaceDB.addFace(faceUrlBean.getYezhuPhone(), result);
                 } catch (IOException e) {
-                    DLLog.e(TAG, "restartFace e " + e.toString());
+                    DLLog.e(TAG, "错误 restartFace e " + e.toString());
                     e.printStackTrace();
                 } catch (ClassNotFoundException e) {
-                    DLLog.e(TAG, "restartFace e " + e.toString());
+                    DLLog.e(TAG, "错误 restartFace e " + e.toString());
                     e.printStackTrace();
                 }
             }
@@ -1627,7 +1624,7 @@ public class MainService extends Service {
                     downLoadFace(urlBean);
                 }
             } catch (IOException e) {
-                DLLog.e(TAG, "downLoadFaceList e " + e.toString());
+                DLLog.e(TAG, "错误 downLoadFaceList e " + e.toString());
 //            path = application.getExternalCacheDir().getPath();
                 e.printStackTrace();
             }
@@ -1690,13 +1687,13 @@ public class MainService extends Service {
 
                                                 adInfoStatus = 0;//重置广告视频下载状态
                                             } catch (Exception e) {
-                                                DLLog.e(TAG, "视频广告下载出错 e " + e.toString());
+                                                DLLog.e(TAG, "视频广告下载错误 e " + e.toString());
                                                 e.printStackTrace();
                                             }
                                         }
                                     }).start();
                                 } catch (Exception e) {
-                                    DLLog.e(TAG, "视频广告下载出错 e " + e.toString());
+                                    DLLog.e(TAG, "视频广告下载错误 e " + e.toString());
                                     e.printStackTrace();
                                     adInfoStatus = 0;
                                     Log.e(TAG, "视频广告下载出错" + adInfoStatus);
@@ -1714,7 +1711,7 @@ public class MainService extends Service {
                     }
                 });
             } catch (JSONException e) {
-                DLLog.e(TAG, "视频广告下载出错 e " + e.toString());
+                DLLog.e(TAG, "视频广告下载错误 e " + e.toString());
                 e.printStackTrace();
                 adInfoStatus = 0;//重置广告视频下载状态
             }
@@ -1792,7 +1789,7 @@ public class MainService extends Service {
             try {
                 downloadAdvertisementFile(item.getNeirong());
             } catch (Exception e) {
-                DLLog.e(TAG, "downloadAdvertisementItemFiles e " + e.toString());
+                DLLog.e(TAG, "错误 downloadAdvertisementItemFiles e " + e.toString());
                 e.printStackTrace();
             }
         } else if ("2".equals(type)) {//判断类别为图片
@@ -1800,7 +1797,7 @@ public class MainService extends Service {
             try {
                 downloadAdvertisementFile(item.getNeirong());
             } catch (Exception e) {
-                DLLog.e(TAG, "downloadAdvertisementItemFiles e " + e.toString());
+                DLLog.e(TAG, "错误 downloadAdvertisementItemFiles e " + e.toString());
                 e.printStackTrace();
             }
         }
@@ -1896,7 +1893,7 @@ public class MainService extends Service {
             });
 
         } catch (Exception e) {
-            DLLog.e(TAG, "通告信息 getClientInfo()->服务器数据解析异常 e " + e.toString());
+            DLLog.e(TAG, "通告信息错误 getClientInfo()->服务器数据解析异常 e " + e.toString());
             noticesStatus = 0;//等待下载数据
             HttpApi.e("通告信息 getClientInfo()->服务器数据解析异常");
             e.printStackTrace();
@@ -1947,7 +1944,7 @@ public class MainService extends Service {
                                                 DbUtils.getInstans().addAllKa(kas);
                                             } catch (Exception e) {
                                                 Constant.RESTART_PHONE_OR_AUDIO = 1;
-                                                DLLog.e("数据库", "数据库插入出错 " + e.toString());
+                                                DLLog.e("数据库", "数据库插入错误 " + e.toString());
                                             }
                                             cardInfoStatus = 0;//修改状态，等待下次（新）数据
                                         }
@@ -1956,7 +1953,7 @@ public class MainService extends Service {
                                     syncCallBack("1", kaVison);
 //                                    cardInfoStatus = 0;//修改状态，等待下次（新）数据
                                 } catch (Exception e) {
-                                    DLLog.e(TAG, "getCardInfo catch-> " + e.toString());
+                                    DLLog.e(TAG, "错误 getCardInfo catch-> " + e.toString());
                                     e.printStackTrace();
                                     Log.i(TAG, "onResponse 卡信息接口getCardInfo  catch" + e.toString());
                                     cardInfoStatus = 0;//修改状态，等待下次（新）数据
@@ -1974,7 +1971,7 @@ public class MainService extends Service {
                     }
                 });
             } catch (Exception e) {
-                DLLog.e(TAG,"getCardInfo catch-> "+e.toString());
+                DLLog.e(TAG,"错误 getCardInfo catch-> "+e.toString());
                 Log.e(TAG, "catch 卡信息接口getCardInfo  Exception" + e.toString());
                 e.printStackTrace();
                 cardInfoStatus = 0;//等待下载数据
@@ -2044,7 +2041,7 @@ public class MainService extends Service {
                 }
             });
         } catch (Exception e) {
-            DLLog.e(TAG, "syncCallBack catch-> " + e.toString());
+            DLLog.e(TAG, "错误 syncCallBack catch-> " + e.toString());
             e.printStackTrace();
         }
 
@@ -2118,7 +2115,7 @@ public class MainService extends Service {
                 }
             }
         } catch (Exception e) {
-            DLLog.e(TAG, "initMonitor catch-> " + e.toString());
+            DLLog.e(TAG, "错误 initMonitor catch-> " + e.toString());
             e.printStackTrace();
         }
         if (apkName == null || apkName.length() <= 0) { //如果assets内没有监控程序则卸载
@@ -2181,7 +2178,7 @@ public class MainService extends Service {
                         ShellUtils.CommandResult result = InstallUtil.executeCmd(cmd);
                         HttpApi.i("安装结果：" + result.toString());
                     }catch (Exception e) {
-                        DLLog.e("Monitor_", "Monitor_ 安装出错 e " + e.toString());
+                        DLLog.e("Monitor_", "Monitor_ 安装错误 e " + e.toString());
                         Log.e(TAG, "Monitor_ 安装出错 e " + e.toString());
                         e.printStackTrace();
                     }
@@ -2208,7 +2205,7 @@ public class MainService extends Service {
             try {
                 initClientInfo();
             } catch (Exception e) {
-                DLLog.e(TAG,"initWhenConnected catch-> "+e.toString());
+                DLLog.e(TAG,"错误 initWhenConnected catch-> "+e.toString());
                 Log.v("MainService", "onDeviceStateChanged,result=" + e.getMessage());
             }
         }
@@ -2227,7 +2224,7 @@ public class MainService extends Service {
                 //startDialActivity(false);  //xiaozd add
                 //rtcConnectTimeout();
             } catch (Exception e) {
-                DLLog.e(TAG,"initWhenOffline catch-> "+e.toString());
+                DLLog.e(TAG,"错误 initWhenOffline catch-> "+e.toString());
                 e.printStackTrace();
                 Log.v("MainService", "onDeviceStateChanged,result=" + e.getMessage());
             }
@@ -2264,7 +2261,7 @@ public class MainService extends Service {
                         }
                     } while (!result);
                 } catch (Exception e) {
-                    DLLog.e(TAG,"initClientInfo catch-> "+e.toString());
+                    DLLog.e(TAG,"错误 initClientInfo catch-> "+e.toString());
                 }
             }
         }.start();
@@ -2315,7 +2312,7 @@ public class MainService extends Service {
                 }
             }
         } catch (Exception e) {
-            DLLog.e(TAG, "deviceLogin catch-> " + e.toString());
+            DLLog.e(TAG, "错误 deviceLogin catch-> " + e.toString());
             HttpApi.e("getClientInfo()->服务器数据解析异常");
             e.printStackTrace();
         }
@@ -2351,7 +2348,7 @@ public class MainService extends Service {
         try {
             mainMessage.send(message);
         } catch (RemoteException e) {
-            DLLog.e(TAG, "onLogin catch-> " + e.toString());
+            DLLog.e(TAG, "错误 onLogin catch-> " + e.toString());
             e.printStackTrace();
         }
     }
@@ -2461,7 +2458,7 @@ public class MainService extends Service {
                 }
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
-                DLLog.e(TAG,"onResponseGetToken 获取token失败 catch-> "+e.toString());
+                DLLog.e(TAG,"错误 onResponseGetToken 获取token失败 catch-> "+e.toString());
                 e.printStackTrace();
                 Log.e(TAG, "天翼rtc获取token失败 [status:" + e.getMessage() + "]");
             }
@@ -2484,7 +2481,7 @@ public class MainService extends Service {
                 //登陆
                 Log.i(TAG, " 天翼rtc设置监听 deviceListener   ");
             } catch (JSONException e) {
-                DLLog.e(TAG,"登陆rtc失败 catch-> "+e.toString());
+                DLLog.e(TAG,"错误 登陆rtc失败 catch-> "+e.toString());
                 Log.i(TAG, "天翼rtc登陆rtc失败   e:" + e.toString());
                 e.printStackTrace();
             }
@@ -2564,7 +2561,7 @@ public class MainService extends Service {
                 callInfo = new JSONObject(connection.info());
                 acceptMember = callInfo.getString("uri");
             } catch (JSONException e) {
-                DLLog.e(TAG, "onNewCall catch-> " + e.toString());
+                DLLog.e(TAG, "错误 onNewCall catch-> " + e.toString());
             }
             Log.i(TAG, "收到来电 call=" + connection.info());
             if (callConnection != null) {
@@ -2587,7 +2584,7 @@ public class MainService extends Service {
                 message.what = MSG_RTC_NEWCALL;
                 mainMessage.send(message);
             } catch (RemoteException e) {
-                DLLog.e(TAG,"onNewCall  catch-> "+e.toString());
+                DLLog.e(TAG,"错误 onNewCall  catch-> "+e.toString());
                 e.printStackTrace();
             }
 
@@ -2775,14 +2772,14 @@ public class MainService extends Service {
                         } else {
                             //服务器异常或没有网络
                             Log.e(TAG, "上传离线日志失败 不做保存操作");
-                            DLLog.e(TAG, "上传离线日志失败 response为null");
+                            DLLog.e(TAG, "错误 上传离线日志失败 response为null");
                         }
                     } else {
                         Log.e(TAG, "上传离线日志失败 不做保存操作");
-                        DLLog.e(TAG, "上传离线日志失败 execute为null");
+                        DLLog.e(TAG, "错误 上传离线日志失败 execute为null");
                     }
                 } catch (Exception e) {
-                    DLLog.e(TAG, "上传离线日志失败 e " + e.toString());
+                    DLLog.e(TAG, "错误 上传离线日志失败 e " + e.toString());
                     Log.e(TAG, "上传离线日志失败 不做保存操作");
                     e.printStackTrace();
                 }
@@ -2898,7 +2895,7 @@ public class MainService extends Service {
                         }
                     }
                 } catch (InterruptedException e) {
-                    DLLog.e(TAG,"启动是否超时线程  catch-> "+e.toString());
+                    DLLog.e(TAG,"错误 启动是否超时线程  catch-> "+e.toString());
                 }
                 timeoutCheckThread = null;
             }
@@ -2938,7 +2935,7 @@ public class MainService extends Service {
                 Log.v("MainService", "无其他在线设备" + acceptMember);
             }
         } catch (Exception e) {
-            DLLog.e(TAG,"cancelOtherMembers  catch-> "+e.toString());
+            DLLog.e(TAG,"错误 cancelOtherMembers  catch-> "+e.toString());
             e.printStackTrace();
             Log.v("MainService", "取消失败--" + acceptMember);
         }
@@ -2970,7 +2967,7 @@ public class MainService extends Service {
                 }
             }
         } catch (JSONException e) {
-            DLLog.e(TAG,"发送图片消息  catch-> "+e.toString());
+            DLLog.e(TAG,"错误 发送图片消息  catch-> "+e.toString());
         }
     }
 
@@ -3110,12 +3107,12 @@ public class MainService extends Service {
                 try {
                     mainMessage.send(message);
                 } catch (RemoteException e) {
-                    DLLog.e(TAG,"synchronized void onCallMember Message-> "+e.toString());
+                    DLLog.e(TAG,"错误 synchronized void onCallMember Message-> "+e.toString());
                     e.printStackTrace();
                 }
             }
         } catch (Exception e) {
-            DLLog.e(TAG,"synchronized void onCallMember catch-> "+e.toString());
+            DLLog.e(TAG,"错误 synchronized void onCallMember catch-> "+e.toString());
             e.printStackTrace();
         }
     }
@@ -3160,7 +3157,7 @@ public class MainService extends Service {
                     afterTryAllMembers();
                 }
             } catch (JSONException e) {
-                DLLog.e(TAG, "sendCallMessageParall catch-> " + e.toString());
+                DLLog.e(TAG, "错误 sendCallMessageParall catch-> " + e.toString());
             }
         }
     }
@@ -3193,7 +3190,7 @@ public class MainService extends Service {
             try {
                 mainMessage.send(message);
             } catch (RemoteException e) {
-                DLLog.e(TAG,"sendMessageToMainAcitivity catch-> "+e.toString());
+                DLLog.e(TAG,"错误 sendMessageToMainAcitivity catch-> "+e.toString());
                 e.printStackTrace();
             }
         }
@@ -3230,7 +3227,7 @@ public class MainService extends Service {
                 }
             }
         } catch (IOException e) {
-            DLLog.e(TAG, "downLoadFace catch-> " + e.toString());
+            DLLog.e(TAG, "错误 downLoadFace catch-> " + e.toString());
             e.printStackTrace();
         }
     }
@@ -3264,7 +3261,7 @@ public class MainService extends Service {
             try {
                 sendMessageToMainAcitivity(MSG_RTC_DISCONNECT, "");
             } catch (Exception e) {
-                DLLog.e(TAG, "onDestroy catch-> " + e.toString());
+                DLLog.e(TAG, "错误 onDestroy catch-> " + e.toString());
                 e.printStackTrace();
             }
         }

@@ -38,7 +38,7 @@ public class Constant {
     public static final int START_FACE_CHECK1 = 11111;//登录天翼RTC之后再重新打开人脸识别
     public static final int START_FACE_CHECK2 = 11112;//登录天翼RTC之前先释放相机
 
-    public static float FACE_MAX = 0.65f;
+    public static float FACE_MAX = 0.63f;
     /********************虹软相关*********************/
 
     /********************天翼RTC相关******************/
