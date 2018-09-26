@@ -107,6 +107,7 @@ import rtc.sdk.iface.RtcClient;
 
 import static com.cxwl.menjin.lock.config.Constant.CALL_VIDEO_CONNECTING;
 import static com.cxwl.menjin.lock.config.Constant.CALL_WAITING;
+import static com.cxwl.menjin.lock.config.Constant.MAIN_ACTIVITY_INIT;
 import static com.cxwl.menjin.lock.config.Constant.MSG_ADVERTISE_REFRESH;
 import static com.cxwl.menjin.lock.config.Constant.MSG_ADVERTISE_REFRESH_PIC;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CALLMEMBER;
@@ -149,6 +150,7 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_UPLOAD_LOG;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_OPENLOCK;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_TAKEPIC;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_TAKEPIC1;
+import static com.cxwl.menjin.lock.config.Constant.REGISTER_ACTIVITY_DIAL;
 import static com.cxwl.menjin.lock.config.Constant.RESTART_AUDIO;
 import static com.cxwl.menjin.lock.config.Constant.RESTART_PHONE;
 import static com.cxwl.menjin.lock.config.Constant.RTC_APP_ID;
@@ -169,8 +171,6 @@ public class MainService extends Service {
 
     private static final String TAG = "MainService";
     private static final String RTCTAG = "RTCTAG";
-    public static final int MAIN_ACTIVITY_INIT = 0;
-    public static final int REGISTER_ACTIVITY_DIAL = 3;
 
     public int callConnectState = CALL_WAITING;//视频通话链接状态  默认等待
 
@@ -916,13 +916,13 @@ public class MainService extends Service {
                                 int hour = calendar.get(Calendar.HOUR_OF_DAY);
                                 Log.e(TAG, "当前小时 " + hour + " " + RESTART_PHONE);
 
-//                                if (hour == 1) {
-//                                    Constant.UPLOAD_LOG = true;
-//                                } else if (hour == 2) {//每晚凌晨2点时进行一次日志上传
-//                                    if (Constant.UPLOAD_LOG == true) {
-//                                        sendMessageToMainAcitivity(MSG_UPLOAD_LOG, null);
-//                                    }
-//                                }
+                                if (hour == 1) {
+                                    Constant.UPLOAD_LOG = true;
+                                } else if (hour == 2) {//每晚凌晨2点时进行一次日志上传
+                                    if (Constant.UPLOAD_LOG == true) {
+                                        sendMessageToMainAcitivity(MSG_UPLOAD_LOG, null);
+                                    }
+                                }
 
                                 if (hour == 3) {
                                     RESTART_PHONE = true;
@@ -959,11 +959,13 @@ public class MainService extends Service {
                                 if (RESTART_AUDIO) {//媒体流重启
                                     sendMessageToMainAcitivity(MSG_RESTART_VIDEO, imgFiles);
                                 }
+
 //                                displayBriefMemory();
 
                                 if (!isServiceRunning()) {
                                     //监控程序未开启，启动监控服务,并开始监听
                                     Log.e(TAG, "监控程序未开启，启动监控服务,并开始监听");
+                                    DLLog.e(TAG, "错误 监控程序未开启，启动监控服务,并开始监听");
                                     try {
                                         Intent i = new Intent();
                                         ComponentName cn = new ComponentName(DeviceConfig.Lockaxial_Monitor_PackageName,
@@ -987,7 +989,8 @@ public class MainService extends Service {
                     }
                 }
             });
-        } catch (JSONException e) {
+        } catch (Exception e) {
+            DLLog.e(TAG, "错误 心跳 " + e.toString());
             e.printStackTrace();
         }
     }
@@ -1063,7 +1066,7 @@ public class MainService extends Service {
 
                         } else {
                             am.killBackgroundProcesses(pkgList[j]);
-                            Log.d("进程", "It will be killed, package name : " + pkgList[j]);
+//                            Log.d("进程", "It will be killed, package name : " + pkgList[j]);
                             /*if (null != method) {
                                 try {
                                     //利用反射调用forceStopPackage来结束进程
@@ -1083,9 +1086,9 @@ public class MainService extends Service {
             }
         }
         long afterMem = getAvailMemory(getApplication());
-        if (afterMem < 1000) {
-            onReStartVideo();
-        }
+//        if (afterMem < 1000) {
+//            onReStartVideo();
+//        }
         DLLog.w("进程", " after memory info : " + afterMem);
 //        Log.d("进程", "----------- after memory info : " + afterMem);
 //        DLLog.e("进程", "-----------before memory info : " + beforeMem + " ----------- after memory info : " + afterMem);
@@ -2523,6 +2526,7 @@ public class MainService extends Service {
                 isRtcInit = false;
                 initTYSDK();
             } else {
+                //天翼RTC登录失败还是要开启人脸识别
                 sendMessageToMainAcitivity(START_FACE_CHECK1, null);
                 Log.i(TAG, "登陆失败 result=" + result);
             }

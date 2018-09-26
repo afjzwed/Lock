@@ -75,6 +75,7 @@ public class Constant {
     public static final int MSG_CANCEL_CALL = 20010;//取消呼叫
     public static final int MSG_CALLMEMBER_TIMEOUT = 11005;//呼叫成员超时
     public static final int MSG_CALLMEMBER_NO_ONLINE = 12005;//呼叫成员不在线
+    public static final int MSG_RTC_ONVIDEO_IN = 10011;//接收到视频呼叫
 
     public static final int MSG_GUEST_PASSWORD_CHECK = 20007;//获取服务器返回的密码
     public static final int MSG_LIXIAN_PASSWORD_CHECK = 20009;//获取离线验证密码
@@ -82,6 +83,7 @@ public class Constant {
     public static final int MSG_PASSWORD_CHECK = 10003;//验证密码后
     public static final int MSG_TONGJI_VEDIO = 200091;//上传统计视频播放消息
     public static final int MSG_TONGJI_PIC = 200092;//上传统计广告图片播放消息
+    public static final int MSG_ADVERTISE_IMAGE = 200093;//跟新背景图片
 
     public static final int MSG_START_DIAL_PICTURE = 21005;//开始呼叫的访客图片
     public static final int MSG_CHECK_PASSWORD_PICTURE = 21006;//密码访客图片
@@ -111,6 +113,9 @@ public class Constant {
     public static final String SP_XINTIAO_TIME = "xintiao_time";//心跳间隔时间
     /*******************sp保存的心跳信息****************/
 
+    public static final int MAIN_ACTIVITY_INIT = 20031;
+    public static final int REGISTER_ACTIVITY_DIAL = 20032;
+
     public static final int MSG_LOADLOCAL_DATA = 20030;//离线模式
 
     public static final int MSG_GET_NOTICE = 20100;//获取通告成功
@@ -124,12 +129,12 @@ public class Constant {
     public static final int MSG_CHECK_PASSWORD = 20006;//检查密码
     public static final int MSG_UPDATE_NETWORKSTATE = 20028;//网络状态改变
 
-//    public static final int MSG_RESTART_VIDEO1 = 11110;//媒体流的重启
+    //    public static final int MSG_RESTART_VIDEO1 = 11110;//媒体流的重启
     public static final int MSG_RESTART_VIDEO = 100002;//媒体流的重启
-    public static final int MSG_UPLOAD_LOG  = 100003;//日志上传
+    public static final int MSG_UPLOAD_LOG = 100003;//日志上传
     public static boolean RESTART_PHONE = false;//手机重启
     public static boolean RESTART_AUDIO = false;//媒体流重启
     public static boolean UPLOAD_LOG = false;//上传日志
 
-    public static int RESTART_PHONE_OR_AUDIO = 0;//0正常 1重启设备 2重启媒体
+    public static  int RESTART_PHONE_OR_AUDIO = 0;//0正常 1重启设备 2重启媒体
 }

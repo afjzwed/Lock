@@ -135,6 +135,8 @@ import okhttp3.Call;
 import static com.cxwl.menjin.lock.config.Constant.CALLING_MODE;
 import static com.cxwl.menjin.lock.config.Constant.CALL_MODE;
 import static com.cxwl.menjin.lock.config.Constant.ERROR_MODE;
+import static com.cxwl.menjin.lock.config.Constant.MAIN_ACTIVITY_INIT;
+import static com.cxwl.menjin.lock.config.Constant.MSG_ADVERTISE_IMAGE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_ADVERTISE_REFRESH;
 import static com.cxwl.menjin.lock.config.Constant.MSG_ADVERTISE_REFRESH_PIC;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CALLMEMBER_ERROR;
@@ -184,6 +186,7 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_TAKEPIC1;
 import static com.cxwl.menjin.lock.config.Constant.ONVIDEO_MODE;
 import static com.cxwl.menjin.lock.config.Constant.PASSWORD_CHECKING_MODE;
 import static com.cxwl.menjin.lock.config.Constant.PASSWORD_MODE;
+import static com.cxwl.menjin.lock.config.Constant.REGISTER_ACTIVITY_DIAL;
 import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK;
 import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK1;
 import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK2;
@@ -204,8 +207,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         .OnCameraListener, TakePictureCallback, SerialHelper.onDataReceived {
 
     private static String TAG = "MainActivity";
-    public static final int MSG_RTC_ONVIDEO_IN = 10011;//接收到视频呼叫
-    public static final int MSG_ADVERTISE_IMAGE = 20001;//跟新背景图片
+
     public static int currentStatus = CALL_MODE;//当前状态
     public static final int INPUT_SYSTEMSET_REQUESTCODE = 0X03;
 
@@ -461,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         setVideoInfo();
                     }
                 } catch (InterruptedException e) {
-                    DLLog.e(TAG,"错误 startVedioThread catch-> "+e.toString());
+                    DLLog.e(TAG, "错误 startVedioThread catch-> " + e.toString());
                     e.printStackTrace();
                 }
             }
@@ -580,7 +582,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         setPicInfo();
                     }
                 } catch (InterruptedException e) {
-                    DLLog.e(TAG,"错误 startPicTread catch-> "+e.toString());
+                    DLLog.e(TAG, "错误 startPicTread catch-> " + e.toString());
                     e.printStackTrace();
                 }
             }
@@ -743,7 +745,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             recorder = new FileRecorder(dirPath);
         } catch (Exception e) {
-            DLLog.e(TAG,"错误 初始化七牛 catch-> "+e.toString());
+            DLLog.e(TAG, "错误 初始化七牛 catch-> " + e.toString());
         }
 //默认使用key的url_safe_base64编码字符串作为断点记录文件的文件名
 //避免记录文件冲突（特别是key指定为null时），也可自定义文件名(下方为默认实现)：
@@ -1060,7 +1062,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                     uploadLogToQiNiu(file);
 //                                    Log.e("上传日志七牛", "有日志" + file.getPath() + " " + file.getAbsolutePath());
                                 } else {
-                                    DLLog.d("上传日志七牛","没有日志");
+                                    DLLog.d("上传日志七牛", "没有日志");
 //                                    Log.e("上传日志七牛", "没有日志");
                                 }
                             }
@@ -1196,7 +1198,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 setStatusBarIcon(true);
                 // TODO: 2018/9/7   initSystemtime();
             }
-            sendMainMessager(MainService.MAIN_ACTIVITY_INIT, NetWorkUtils.isNetworkAvailable(MainActivity.this));
+            sendMainMessager(MAIN_ACTIVITY_INIT, NetWorkUtils.isNetworkAvailable(MainActivity.this));
             initNetListen();
         }
 
@@ -1249,7 +1251,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 1000);
 //            }
 
-            sendMainMessager(MainService.REGISTER_ACTIVITY_DIAL, null);//开始心跳包
+            sendMainMessager(REGISTER_ACTIVITY_DIAL, null);//开始心跳包
         }
     }
 
@@ -1350,7 +1352,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             serviceMessage.send(message);
         } catch (RemoteException e) {
-            DLLog.e(TAG,"错误 sendMainMessager catch-> "+e.toString());
+            DLLog.e(TAG, "错误 sendMainMessager catch-> " + e.toString());
             e.printStackTrace();
         }
     }
@@ -1878,7 +1880,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 } catch (InterruptedException e) {
-                    DLLog.e(TAG,"错误 startTimeoutChecking catch-> "+e.toString());
+                    DLLog.e(TAG, "错误 startTimeoutChecking catch-> " + e.toString());
                 }
                 passwordTimeoutThread = null;
             }
@@ -2147,7 +2149,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                         handler.sendEmptyMessage(START_FACE_CHECK);
                                     }
                                     Log.e(TAG, "打开照相机 5" + e.toString());
-                                    DLLog.e(TAG,"错误 打开照相机 5 catch-> "+e.toString());
+                                    DLLog.e(TAG, "错误 打开照相机 5 catch-> " + e.toString());
                                     e.printStackTrace();
                                 }
                             }
@@ -2162,7 +2164,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             handler.sendEmptyMessage(START_FACE_CHECK);
                         }
                         Log.v("MainActivity", "照相出异常清除UUID");
-                        DLLog.e(TAG,"错误 照相出异常清除UUID 5 catch-> "+e.toString());
+                        DLLog.e(TAG, "错误 照相出异常清除UUID 5 catch-> " + e.toString());
                     }
                 }
             }
@@ -2269,7 +2271,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.e(TAG, "打开照相机 3");
             } catch (Exception e) {
                 Log.e(TAG, "打开照相机 4" + e.toString());
-                DLLog.e(TAG,"错误 打开照相机 4 catch-> "+e.toString());
+                DLLog.e(TAG, "错误 打开照相机 4 catch-> " + e.toString());
             }
         }
         if (camera != null) {
@@ -2370,7 +2372,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 mCamerarelease = true;
                             }
                             Log.e(TAG, "打开照相机 5" + e.toString());
-                            DLLog.e(TAG,"错误 doTakePicture 5 catch-> "+e.toString());
+                            DLLog.e(TAG, "错误 doTakePicture 5 catch-> " + e.toString());
                             e.printStackTrace();
 
                         }
@@ -2385,7 +2387,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     camera = null;
                     mCamerarelease = true;
                 }
-                DLLog.e(TAG,"错误 doTakePicture 4 catch-> "+e.toString());
+                DLLog.e(TAG, "错误 doTakePicture 4 catch-> " + e.toString());
                 Log.v("MainActivity", "照相出异常清除UUID");
                 clearImageUuidAvaible(uuid);
             }
@@ -2540,7 +2542,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (null != file) {
                 uploadLogToQiNiu(file);
             } else {
-                DLLog.d("上传日志七牛","没有日志");
+                DLLog.d("上传日志七牛", "没有日志");
             }
             return;
         }
@@ -2549,22 +2551,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //            startActivity(new Intent(this, PhotographActivity.class));
 //            handler.sendEmptyMessageDelayed(START_FACE_CHECK, 3000);
 //            FACE_MAX = 0.65f;
-            File file = DLLog.upLoadFile1();
-            if (null != file) {
-                uploadLogToQiNiu(file);
-            } else {
-                DLLog.d("上传日志七牛","没有日志");
-            }
+//            File file = DLLog.upLoadFile1();
+//            if (null != file) {
+//                uploadLogToQiNiu(file);
+//            } else {
+//                DLLog.d("上传日志七牛","没有日志");
+//            }
+            Toast.makeText(MainActivity.this, "本机的IP：" + Intenet.getHostIP(), Toast.LENGTH_LONG).show();
             return;
         }
-
-        if (blockNo.equals("99999998")) {
-            if (videoList != null && videoList.size() > 0) {
-                videoList.clear();
-            }
-            return;
-        }
-
 
 
         //呼叫前，确认摄像头不被占用 虹软
@@ -2606,7 +2601,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             try {
                 serviceMessage.send(message);
             } catch (RemoteException er) {
-                DLLog.e(TAG,"错误 开始呼叫 catch-> "+er.toString());
+                DLLog.e(TAG, "错误 开始呼叫 catch-> " + er.toString());
                 er.printStackTrace();
             }
         }
@@ -2639,7 +2634,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {
             serviceMessage.send(message);
         } catch (RemoteException er) {
-            DLLog.e(TAG,"错误 发送访客图片地址 catch-> "+er.toString());
+            DLLog.e(TAG, "错误 发送访客图片地址 catch-> " + er.toString());
             er.printStackTrace();
         }
     }
@@ -3165,7 +3160,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     case MSG_FACE_DETECT_PAUSE://人脸识别暂停
                         Log.e(TAG, "人脸识别暂停" + "开始照相机");
                         handler.removeMessages(START_FACE_CHECK);
-                        faceHandler.removeMessages(MSG_FACE_DETECT_CONTRAST);//这个地方可能因为删除人脸的流程过快造成先人脸识别对比再人脸识别暂停，以至于无法进行人脸识别
+                        faceHandler.removeMessages(MSG_FACE_DETECT_CONTRAST);
+                        //这个地方可能因为删除人脸的流程过快造成先人脸识别对比再人脸识别暂停，以至于无法进行人脸识别
                         identification = false;
                         if (mFRAbsLoop != null) {
                             mFRAbsLoop.pauseThread();
@@ -3272,7 +3268,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 try {
                     mCamera = Camera.open(0);
                 } catch (Exception e) {
-                    DLLog.e("错误 摄像头 MainActivity", "主页面 相机打开失败"+ " setupCamera-->" + e.toString());
+                    DLLog.e("错误 摄像头 MainActivity", "主页面 相机打开失败" + " setupCamera-->" + e.toString());
                     Constant.RESTART_PHONE_OR_AUDIO = 1;
                     e.printStackTrace();
                 }
@@ -3286,7 +3282,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         mCamera.setParameters(parameters);
                     }
                 } catch (Exception e) {
-                    DLLog.e("摄像头 MainActivity", "错误 主页面 分辨率" + " setupCamera-->"+ e.toString() );
+                    DLLog.e("摄像头 MainActivity", "错误 主页面 分辨率" + " setupCamera-->" + e.toString());
                     Constant.RESTART_PHONE_OR_AUDIO = 1;
                     e.printStackTrace();
                 }
@@ -3504,7 +3500,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 try {
                     lock.wait();
                 } catch (InterruptedException e) {
-                    DLLog.e(TAG,"错误 FRAbsLoop onPause-> "+e.toString());
+                    DLLog.e(TAG, "错误 FRAbsLoop onPause-> " + e.toString());
                     e.printStackTrace();
                 }
             }
@@ -3569,9 +3565,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                        Log.d(TAG, "AFR_FSDK_ExtractFRFeature cost :" + (System.currentTimeMillis() - time) + "ms");
 //                        Log.d(TAG, "Face=" + result.getFeatureData()[0] + "," + result.getFeatureData()[1] + "," +
 //                                result.getFeatureData()[2] + "," + error.getCode());
-                    if (error.getCode() != 0) {
+                    if (error.getCode() != 0 && error.getCode() != 3) {
                         DLLog.e(TAG, "人脸信息提取error " + error.getCode());
-                        mImageNV21 = null;
+                        //如果mImageNV21置为null，就要加return，否则可能在后续流程mImageNV21.clone()中报空指针
+//                        mImageNV21 = null;
 //                        return;
                     }
 
@@ -3748,7 +3745,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                             file.delete();
                                         }
                                     } catch (Exception e) {
-                                        DLLog.e(TAG,"错误 uploadToQiNiu error-> "+e.toString());
+                                        DLLog.e(TAG, "错误 uploadToQiNiu error-> " + e.toString());
                                     }
                                 } else {
                                     Log.e(TAG, "七牛上传图片失败");

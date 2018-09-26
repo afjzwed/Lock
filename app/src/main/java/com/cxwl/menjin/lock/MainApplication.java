@@ -62,14 +62,14 @@ public class MainApplication  extends Application {
     public Thread.UncaughtExceptionHandler restartHandler = new Thread.UncaughtExceptionHandler() {
         @Override
         public void uncaughtException(Thread thread, Throwable ex) {
-            Log.e("崩溃重启", "错误 " + ex);
+//            Log.e("崩溃重启", "错误 " + ex);
             DLLog.e("崩溃重启", "错误 " + ex);
             AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000,
                     restartIntent); // 1秒钟后重启应用
             android.os.Process.killProcess(android.os.Process.myPid()); // 自定义方法，关闭当前打开的所有avtivity
-            System.exit(0);
-            System.gc();
+//            System.exit(0);
+//            System.gc();
         }
     };
 

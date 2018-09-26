@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static com.cxwl.menjin.lock.ui.MainActivity.MSG_ADVERTISE_IMAGE;
+import static com.cxwl.menjin.lock.config.Constant.MSG_ADVERTISE_IMAGE;
 
 /**
  * Created by simon on 2016/7/30.
@@ -82,17 +82,6 @@ public class AdvertiseHandler implements SurfaceHolder.Callback {
 
     }
 
-    /* public void init(SurfaceView videoView,ImageView imageView,LinearLayout videoPane,
-    LinearLayout imagePane){
- //    public void init(SurfaceView videoView,ImageView imageView,LinearLayout videoPane,
- LinearLayout imagePane){
- //        this.videoView=videoView;
- //        this.imageView=imageView;
- //        this.videoPane=videoPane;
- //        this.imagePane=imagePane;
- //        prepareMediaView();
- //    }
-     */
     public void init(TextView textView, SurfaceView videoView, ImageView imageView) {
         Log.d("AdvertiseHandler", "UpdateAdvertise: init");
         this.mTextView = textView;
@@ -248,8 +237,8 @@ public class AdvertiseHandler implements SurfaceHolder.Callback {
                         sleep(imagePeroid); //等待指定的一个并行时间
                     } catch (InterruptedException e) {
                         Constant.RESTART_PHONE_OR_AUDIO = 1;
-                        DLLog.e("AdvertiseHandler", "错误 ------>end image display thread<-------" + e.getMessage() + "  " +
-                                "err " + e.toString());
+                        DLLog.e("AdvertiseHandler", "错误 ------>end image display thread<-------" + e.getMessage() +
+                                " err " + e.toString());
                     }
                     if (isWorking) {
                         nextImage(item);
@@ -283,6 +272,7 @@ public class AdvertiseHandler implements SurfaceHolder.Callback {
     }
 
     protected void sendDialMessenger(int code, Object object) {
+        // TODO: 2018/9/25 这里可以发送消息到mainactivity，直接重启
         Message message = Message.obtain();
         message.what = code;
         message.obj = object;
@@ -290,7 +280,8 @@ public class AdvertiseHandler implements SurfaceHolder.Callback {
             dialMessenger.send(message);
         } catch (RemoteException e) {
             Constant.RESTART_PHONE_OR_AUDIO = 1;
-            DLLog.e("AdvertiseHandler", "错误 ------>sendDialMessenger<-------" + e.getMessage() + "  err " + e.toString());
+            DLLog.e("AdvertiseHandler", "错误 ------>sendDialMessenger<-------" + e.getMessage() + "  err " + e
+                    .toString());
             e.printStackTrace();
         }
     }
