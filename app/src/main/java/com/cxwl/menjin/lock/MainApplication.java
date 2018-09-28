@@ -68,7 +68,8 @@ public class MainApplication  extends Application {
             mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000,
                     restartIntent); // 1秒钟后重启应用
             android.os.Process.killProcess(android.os.Process.myPid()); // 自定义方法，关闭当前打开的所有avtivity
-//            System.exit(0);
+            System.exit(0);
+            // TODO: 2018/9/26 测试是否要加System.exit(0);才能在每次成功重启
 //            System.gc();
         }
     };

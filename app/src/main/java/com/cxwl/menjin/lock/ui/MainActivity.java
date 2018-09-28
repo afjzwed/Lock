@@ -1242,6 +1242,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 setDialStatus("请输入楼栋编号");
             }
             mac = result.getMac();
+
+            sendMainMessager(REGISTER_ACTIVITY_DIAL, null);//开始心跳包
+
 //            Log.e(TAG, "可以读卡");
 //            enableReaderMode();//登录成功后开启读卡 注释：永远读卡
 
@@ -1250,8 +1253,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //            if (faceHandler != null) {
 //                faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 1000);
 //            }
-
-            sendMainMessager(REGISTER_ACTIVITY_DIAL, null);//开始心跳包
         }
     }
 
