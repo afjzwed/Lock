@@ -1,7 +1,5 @@
 package android_serialport_api;
 
-import android.util.Log;
-
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -21,17 +19,18 @@ import android_serialport_api.utils.SysOptionCode;
  * Created by William on 2018/9/6.
  */
 
-public class SerialHelper  implements Serializable {
+public class SerialHelper implements Serializable {
     private SerialPort mSerialPort;
     private OutputStream mOutputStream;
     private InputStream mInputStream;
     private ReadThread mReadThread;
     private SendThread mSendThread;
-//    private String sPort = "/dev/s3c2410_serial0";
+    //    private String sPort = "/dev/s3c2410_serial0";
     private String sPort = "/dev/ttyS4";
+//    private String sPort = "/dev/ttyS1";
     private int iBaudRate = 9600;
     private boolean _isOpen = false;
-    private byte[] _bLoopData = new byte[] { 0x30 };
+    private byte[] _bLoopData = new byte[]{0x30};
     private int iDelay = 500;
     private onDataReceived dataReceived;
 
@@ -209,10 +208,11 @@ public class SerialHelper  implements Serializable {
 //                        System.out.println("数据长度为" + bytes.size());
                         if (bytes.size() == 8) {
                             Byte versions = bytes.get(1);
-                            System.out.println("versions值为" + versions);
-                            System.out.println("总值为" + bytes.get(0) + "," + bytes.get(1) + "," + bytes.get(2) + ","
-                                    + bytes.get(3) + "," + bytes.get(4) + "," + bytes.get(5) + "," + bytes.get(6) + ","
-                                    + bytes.get(7) + "");
+//                            System.out.println("versions值为" + versions);
+//                            System.out.println("总值为" + bytes.get(0) + "," + bytes.get(1) + "," + bytes.get(2) + ","
+//                                    + bytes.get(3) + "," + bytes.get(4) + "," + bytes.get(5) + "," + bytes.get(6) +
+// ","
+//                                    + bytes.get(7) + "");
                             switch (versions) {
                                 case 02:// 刷卡
                                     byte[] cardBtyes = new byte[4];
@@ -233,7 +233,7 @@ public class SerialHelper  implements Serializable {
                                     bytes.clear();
                                     break;
                                 case 01:// 按键
-                                    System.out.println("进来了3");
+//                                    System.out.println("进来了3");
                                     byte[] keyBtyes = new byte[1];
                                     keyBtyes[0] = bytes.get(6);
                                     String keyStr = ByteArrToHex(keyBtyes);
@@ -248,10 +248,10 @@ public class SerialHelper  implements Serializable {
                                 case 00: // 人体感应
 //                                    System.out.println("进来了人体感应");
                                     bytes.clear();
-//                                    ComRecData.index = 5;
-//                                    if (null != dataReceived) {
-//                                        dataReceived.setData(ComRecData);
-//                                    }
+                                    ComRecData.index = 5;
+                                    if (null != dataReceived) {
+                                        dataReceived.setData(ComRecData);
+                                    }
                                     sendXintiao();
                                     break;
                                 case 8:// 心跳

@@ -72,7 +72,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.OutputStream;
-import java.lang.reflect.Method;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -570,7 +569,12 @@ public class MainService extends Service {
                         connectReport();
                     }
                 } catch (InterruptedException e) {
+                    //这里在断网重连后会出现
 //                    Constant.RESTART_PHONE_OR_AUDIO = 1;
+                    // TODO: 2018/9/29 不要捕捉后只记录不处理，这样相当于生吞中断，应该保留中断发生的证据，以便调用栈中更高层的代码能知道中断，并对中断作出响应。该任务可以通过调用
+                    // interrupt() 以 “重新中断” 当前线程来完成
+                    e.printStackTrace();
+                    Log.e(TAG, "心跳开启错误 " + e.toString());
                     DLLog.e(TAG, "心跳开启错误 " + e.toString());
                 }
             }
@@ -876,74 +880,7 @@ public class MainService extends Service {
 
                                 lixianTongji();//上传离线统计日志
 
-//                                Calendar calendar = Calendar.getInstance();
-//                                int hour = calendar.get(Calendar.HOUR_OF_DAY);
-//                                Log.e(TAG, "当前小时 " + hour + " " + RESTART_PHONE);
-//
-//                                if (hour == 1) {
-//                                    Constant.UPLOAD_LOG = true;
-//                                } else if (hour == 2) {//每晚凌晨2点时进行一次日志上传
-//                                    if (Constant.UPLOAD_LOG == true) {
-//                                        sendMessageToMainAcitivity(MSG_UPLOAD_LOG, null);
-//                                    }
-//                                }
-//
-//                                if (hour == 3) {
-//                                    RESTART_PHONE = true;
-//                                } else if (hour == 4) {//每晚凌晨4点时进行一次媒体流的重启
-//                                    if (RESTART_PHONE == true) {
-//                                        RESTART_AUDIO = false;
-//                                        DLLog.delFile();//删除本地日志
-//                                        sendMessageToMainAcitivity(MSG_RESTART_VIDEO, imgFiles);
-//                                    }
-//                                }
-//                                calendar = null;
-//
-////                                ActivityManager activityManager = (ActivityManager) getSystemService(Context
-//// .ACTIVITY_SERVICE);
-////                                int memoryClass = activityManager.getMemoryClass();
-////                                Log.e(TAG, "内存 " + memoryClass);
-////                                int largeMemoryClass = activityManager.getLargeMemoryClass();
-////                                Log.e(TAG, "最大内存 " + memoryClass);
-////
-////                                float maxMemory = (float) (Runtime.getRuntime().maxMemory() * 1.0/ (1024 * 1024));
-////                                //当前分配的总内存
-////                                float totalMemory = (float) (Runtime.getRuntime().totalMemory() * 1.0/ (1024 *
-/// 1024));
-////                                //剩余内存
-////                                float freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0/ (1024 * 1024));
-////
-////                                Log.e(TAG, "分配内存" + maxMemory + " " + freeMemory+" "+totalMemory);
-//
-//                                clearMemory();
-//
-//                                if (Constant.RESTART_PHONE_OR_AUDIO == 1) {//设备是否重启
-//                                    onReStartVideo();
-//                                }
-//
-//                                if (RESTART_AUDIO) {//媒体流重启
-//                                    sendMessageToMainAcitivity(MSG_RESTART_VIDEO, imgFiles);
-//                                }
-//
-////                                displayBriefMemory();
-//
-//                                if (!isServiceRunning()) {
-//                                    //监控程序未开启，启动监控服务,并开始监听
-//                                    Log.e(TAG, "监控程序未开启，启动监控服务,并开始监听");
-//                                    DLLog.e(TAG, "错误 监控程序未开启，启动监控服务,并开始监听");
-//                                    try {
-//                                        Intent i = new Intent();
-//                                        ComponentName cn = new ComponentName(DeviceConfig
-// .Lockaxial_Monitor_PackageName,
-//                                                DeviceConfig.Lockaxial_Monitor_SERVICE);
-//                                        i.setComponent(cn);
-//                                        i.setPackage(MainApplication.getApplication().getPackageName());
-//                                        startService(i);
-//                                    } catch (Exception e) {
-//                                        DLLog.e(TAG, "监控服务开启失败 error " + e.toString());
-//                                        Log.e(TAG, "监控服务没启动 error " + e.toString());
-//                                    }
-//                                }
+                                Log.e(TAG, "心跳结束");
                             }
                         } else {
                             //服务器异常或没有网络
@@ -962,7 +899,6 @@ public class MainService extends Service {
             Calendar calendar = Calendar.getInstance();
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
 //            Log.e(TAG, "当前小时 " + hour + " " + RESTART_PHONE);
-
             if (hour == 1) {
                 Constant.UPLOAD_LOG = true;
             } else if (hour == 2) {//每晚凌晨2点时进行一次日志上传
@@ -982,21 +918,6 @@ public class MainService extends Service {
             }
             calendar = null;
 
-//                                ActivityManager activityManager = (ActivityManager) getSystemService(Context
-// .ACTIVITY_SERVICE);
-//                                int memoryClass = activityManager.getMemoryClass();
-//                                Log.e(TAG, "内存 " + memoryClass);
-//                                int largeMemoryClass = activityManager.getLargeMemoryClass();
-//                                Log.e(TAG, "最大内存 " + memoryClass);
-//
-//                                float maxMemory = (float) (Runtime.getRuntime().maxMemory() * 1.0/ (1024 * 1024));
-//                                //当前分配的总内存
-//                                float totalMemory = (float) (Runtime.getRuntime().totalMemory() * 1.0/ (1024 * 1024));
-//                                //剩余内存
-//                                float freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0/ (1024 * 1024));
-//
-//                                Log.e(TAG, "分配内存" + maxMemory + " " + freeMemory+" "+totalMemory);
-
             clearMemory();
 
             if (Constant.RESTART_PHONE_OR_AUDIO == 1) {//设备是否重启
@@ -1006,8 +927,6 @@ public class MainService extends Service {
             if (RESTART_AUDIO) {//媒体流重启
                 sendMessageToMainAcitivity(MSG_RESTART_VIDEO, null);
             }
-
-//                                displayBriefMemory();
 
             if (!isServiceRunning()) {
                 //监控程序未开启，启动监控服务,并开始监听
@@ -1029,15 +948,6 @@ public class MainService extends Service {
             DLLog.e(TAG, "错误 心跳线程错误 " + e.toString());
             e.printStackTrace();
         }
-    }
-
-    private void displayBriefMemory() {
-        ActivityManager activityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
-        ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
-        activityManager.getMemoryInfo(info);
-        Log.i(TAG, "系统剩余内存:" + (info.availMem >> 10) / 1024 + "M");
-        Log.i(TAG, "系统是否处于低内存运行：" + info.lowMemory);
-        Log.i(TAG, "当系统剩余内存低于" + (info.threshold) / 1024 + "时就看成低内存运行");
     }
 
     private boolean isServiceRunning() {
@@ -1123,7 +1033,7 @@ public class MainService extends Service {
         }
         long afterMem = getAvailMemory(getApplication());
 //        if (afterMem < 1000) {
-//            onReStartVideo();
+//            onReStartVideo();//如果长久开启的话这个要打开
 //        }
         DLLog.w("进程", " after memory info : " + afterMem);
 //        Log.d("进程", "----------- after memory info : " + afterMem);
@@ -1979,8 +1889,8 @@ public class MainService extends Service {
                                             for (Ka ka : kas) {
                                                 ka.setKa_id(ka.getKa_id().toLowerCase());
                                             }
-                                            //保存卡信息成功
                                             try {
+                                                //保存卡信息成功
                                                 DbUtils.getInstans().addAllKa(kas);
                                             } catch (Exception e) {
                                                 Constant.RESTART_PHONE_OR_AUDIO = 1;
@@ -2257,6 +2167,7 @@ public class MainService extends Service {
     protected void initWhenOffline() {
         //在离线模式中需要把心跳线程间隔时间延长
         HttpApi.i("进入离线模式");
+        rtcLogout();//退出RTC
         if (initMacKey()) {
             HttpApi.i("通过MAC地址验证");
             try {
@@ -2426,8 +2337,8 @@ public class MainService extends Service {
             sendMessageToMainAcitivity(START_FACE_CHECK2, null);
             Log.e(TAG, "天翼rtc初始化");
             rtcClient = new RtcClientImpl();
-            Log.i(TAG, getApplicationContext() == null ? "yes" : "no");
-            rtcClient.initialize(getApplicationContext(), new ClientListener() {
+            Log.i(TAG, this.getApplicationContext() == null ? "yes" : "no");
+            rtcClient.initialize(this.getApplicationContext(), new ClientListener() {
                 @Override   //初始化结果回调
                 public void onInit(int result) {
                     Log.v("MainService", "onInit,result=" + result);//常见错误9003:网络异常或系统时间差的太多
@@ -2440,6 +2351,8 @@ public class MainService extends Service {
                         isRtcInit = true;
                         startGetToken();
                     } else {
+                        // 是否需要一直初始化，或者开线程延时间隔
+                        //经测试，无限初始化并不会造成内存溢出
                         isRtcInit = false;
                         initTYSDK();
                     }
@@ -2456,7 +2369,7 @@ public class MainService extends Service {
      * 开启线程获取token
      */
     private void startGetToken() {
-        Log.i(TAG, "天翼开始获取Token ");
+        Log.i(TAG, "天翼开始获取Token");
         new Thread() {
             @Override
             public void run() {
@@ -2478,12 +2391,17 @@ public class MainService extends Service {
         onResponseGetToken(ret);
     }
 
+    private int countGetToken = 0;//获取天翼RTC的token的次数，超过10次就不再获取，防止死循环
+    private boolean rtcFreed = true;//rtc是否释放完毕的标志
+    public static boolean RTC_AVAILABLE = false;//rtc是否登录完成的标志，主页面可根据此变量提示用户能否呼叫
+
     /**
      * 获取TOKEN
      */
     private void onResponseGetToken(HttpResult ret) {
         Log.i(TAG, "天翼rtc平台获取token 的状态  status=" + ret.getStatus());
         JSONObject jsonrsp = (JSONObject) ret.getObject();
+        countGetToken++;
         if (jsonrsp != null && jsonrsp.isNull("code") == false) {
             try {
                 String code = jsonrsp.getString(RtcConst.kcode);
@@ -2494,16 +2412,46 @@ public class MainService extends Service {
                     Log.i(TAG, "天翼rtc获取token成功 token=" + token);
                     rtcRegister();
                 } else {
-                    Log.e(TAG, "天翼rtc获取token失败 [status:" + ret.getStatus() + "]" + ret.getErrorMsg());
-                    getTokenFromServer();
+                    //如果rtc重复登录导致死循环可能进而导致死机，暂时没法重现(初步解决方法，做登录计数，超过指定次数(比如10次)
+                    // 就不再登录，改为重启或者提示，因为rtc在登录之后，所以不考虑断网的情况)
+                    //经测试，无限获取token会造成错误 java.lang.StackOverflowError: stack size
+                    // 1036KB，死循环的情况要避免，可以尝试开线程发消息延时间隔避免在本方法中调用本方法
+                    // TODO: 2018/9/29 这里最好发消息，延时调用getTokenFromServer()
+                    DLLog.e(TAG, "错误 获取token失败 [status:" + ret.getStatus() + "]" + ret.getErrorMsg() + " " +
+                            countGetToken);
+                    Log.e(TAG, "天翼rtc获取token失败 [status:" + ret.getStatus() + "]" + ret.getErrorMsg() + " " +
+                            countGetToken);
+                    if (countGetToken < 10) {
+                        getTokenFromServer();
+                    } else {
+                        //在界面上显示无法呼叫，并开启人脸识别
+                        RTC_AVAILABLE = false;
+                        sendMessageToMainAcitivity(START_FACE_CHECK1, null);
+                    }
                 }
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
-                DLLog.e(TAG, "错误 onResponseGetToken 获取token失败 catch-> " + e.toString());
+                DLLog.e(TAG, "错误 获取token失败 catch-> " + e.toString() + " " + countGetToken);
+                if (countGetToken < 10) {
+                    getTokenFromServer();
+                } else {
+                    //在界面上显示无法呼叫，并开启人脸识别
+                    RTC_AVAILABLE = false;
+                    sendMessageToMainAcitivity(START_FACE_CHECK1, null);
+                }
                 e.printStackTrace();
-                Log.e(TAG, "天翼rtc获取token失败 [status:" + e.getMessage() + "]");
+                Log.e(TAG, "错误 获取token失败 catch-> " + e.getMessage() + "]" + " " + countGetToken);
             }
         } else {
+            DLLog.i(TAG, "错误 rtc获取token的状态不对 " + ret.getStatus() + " " + countGetToken);
+            Log.i(TAG, "错误 rtc获取token的状态不对 " + ret.getStatus() + " " + countGetToken);
+            if (countGetToken < 10) {
+                getTokenFromServer();
+            } else {
+                //在界面上显示无法呼叫，并开启人脸识别
+                RTC_AVAILABLE = false;
+                sendMessageToMainAcitivity(START_FACE_CHECK1, null);
+            }
         }
     }
 
@@ -2511,6 +2459,7 @@ public class MainService extends Service {
         Log.i(TAG, "天翼rtc开始登陆rtc  mac:" + key + "token:" + token);
         if (token != null) {
             try {
+//                countGetToken = 0;//这里是否要把计数归零
                 JSONObject jargs = SdkSettings.defaultDeviceSetting();
                 jargs.put(RtcConst.kAccPwd, token);
                 //账号格式形如“账号体系-号码~应用id~终端类型”，以下主要设置账号内各部分内容，其中账号体系的值要在获取token之前确定，默认为私有账号
@@ -2519,9 +2468,14 @@ public class MainService extends Service {
                 jargs.put(RtcConst.kAccType, RtcConst.UEType_Current);//终端类型
                 jargs.put(RtcConst.kAccRetry, 5);//设置重连时间
                 device = rtcClient.createDevice(jargs.toString(), deviceListener);
-                //登陆
+                // TODO: 2018/9/30 考虑是在这里开启人脸识别还是rtc登陆成功后再开启
+//                sendMessageToMainAcitivity(START_FACE_CHECK1, null);//开启人脸识别
                 Log.i(TAG, " 天翼rtc设置监听 deviceListener   ");
             } catch (JSONException e) {
+                // TODO: 2018/9/29  这里最好在界面上显示无法注册到可视对讲服务器，请重新启动APP，但是主页面上目前没有控件用来显示
+                //在界面上显示无法呼叫，并开启人脸识别
+                RTC_AVAILABLE = false;
+                sendMessageToMainAcitivity(START_FACE_CHECK1, null);
                 DLLog.e(TAG, "错误 登陆rtc失败 catch-> " + e.toString());
                 Log.i(TAG, "天翼rtc登陆rtc失败   e:" + e.toString());
                 e.printStackTrace();
@@ -2535,38 +2489,55 @@ public class MainService extends Service {
     DeviceListener deviceListener = new DeviceListener() {
         @Override
         public void onDeviceStateChanged(int result) {
+            //经测试，不能在此函数内无限初始化重连RTC，会造成系统的内存不够，还可能造成死循环
             Log.i(TAG, "天翼rtc登陆状态 ,result=" + result);
-            if (result == RtcConst.CallCode_Success) { //注销也存在此处
-                Log.e(TAG, "-----------登陆成功-------------key=" + key + "------------");
+            if (result == RtcConst.CallCode_Success) { //注销和后续刷新成功也存在此处
+                Log.e(TAG, "-----------天翼登陆成功-------------key=" + key + "------------");
+                RTC_AVAILABLE = true;//将界面上的无法呼叫提示隐藏，并开启人脸识别
                 sendMessageToMainAcitivity(START_FACE_CHECK1, null);
             } else if (result == RtcConst.NoNetwork || result == RtcConst.CallCode_Network) {
-                onNoNetWork();
-                Log.i(TAG, "断网销毁，自动重连接");
-            } else if (result == RtcConst.ChangeNetwork) {
-                Log.i(TAG, "网络状态改变，自动重连接");
-            } else if (result == RtcConst.PoorNetwork) {
-                Log.i(TAG, "网络差，自动重连接");
-            } else if (result == RtcConst.ReLoginNetwork) {
-                Log.i(TAG, "网络原因导致多次登陆不成功，由用户选择是否继续，如想继续尝试，可以重建device");
-                DLLog.e(TAG, "网络原因导致多次登陆不成功 不能自动重连rtc");
-            } else if (result == RtcConst.DeviceEvt_KickedOff) {
-                Log.i(TAG, "被另外一个终端踢下线，由用户选择是否继续，如果再次登录，需要重新获取token，重建device");
-                DLLog.e(TAG, "被另外一个终端踢下线，不能自动重连rtc");
-//                isRtcInit = false;
-//                initTYSDK();
-            } else if (result == RtcConst.DeviceEvt_MultiLogin) {
-                Log.i(TAG, "RTC密码错误 重新登陆啦 result=" + result);
-            } else if (result == RtcConst.CallCode_Forbidden) {
-                Log.i(TAG, "密码错误 重新登陆啦 result=" + result);
-                DLLog.e(TAG, "认证失效 需要重新获取token重新登录rtc 不能自动重连rtc");
-//                isRtcInit = false;
-//                initTYSDK();
-            } else if (result == RtcConst.CallCode_NotFound) {
-                Log.i(TAG, "被叫号码从未获取token登录过 result=" + result);
-            } else if (result == RtcConst.CallCode_Timeout) {
                 isRtcInit = false;
-                initTYSDK();
+                RTC_AVAILABLE = false;//界面提示无法呼叫，不用开启人脸(onNoNetWork会做)
+                onNoNetWork();
+                DLLog.e(TAG, "网络不可用或服务器错误，应限制呼叫");
+                Log.i(TAG, "网络不可用或服务器错误或网络断开，应限制呼叫，断网销毁");
+            } else if (result == RtcConst.ReLoginNetwork) {
+                //网络原因导致多次登陆不成功，由用户选择是否继续，如想继续尝试，可以重建device，不能自动重连rtc（因为可能死循环）
+                isRtcInit = false;
+                RTC_AVAILABLE = false; //界面提示无法呼叫
+                DLLog.e(TAG, "网络原因导致多次登陆不成功 不能自动重连rtc");
+                rtcLogout();
+                Log.i(TAG, "重连失败应用可以选择重新登录，应限制呼叫");
+            } else if (result == RtcConst.DeviceEvt_KickedOff) {
+                //被另外一个终端踢下线，由用户选择是否继续，如果再次登录，需要重新获取token，重建device，不能自动重连rtc（因为可能死循环）
+                RTC_AVAILABLE = false; //界面提示无法呼叫
+                DLLog.e(TAG, "被另外一个终端踢下线，不能自动重连rtc");
+                rtcLogout();
+                Log.i(TAG, "同一账号在另一同类型终端登录，被踢，应限制呼叫");
+            } else if (result == RtcConst.CallCode_Forbidden) {
+                //认证失效 需要重新获取token重新登录rtc，应限制呼叫，不能自动重连rtc（因为可能死循环）
+                RTC_AVAILABLE = false; //界面提示无法呼叫
+                rtcLogout();
+                DLLog.e(TAG, "认证失效 需要重新获取token重新登录rtc 不能自动重连rtc");
+                Log.i(TAG, "认证失效 需要重新获取token重新登录rtc，应限制呼叫 result=" + result);
+            } else if (result == RtcConst.CallCode_Timeout) {
+                Log.i(TAG, "登录超时，应限制呼叫 result=" + result);
+                DLLog.e(TAG, "登录超时，应限制呼叫");//天翼rtc的token过期时间为20天
+                isRtcInit = false;
+                RTC_AVAILABLE = false;//界面提示无法呼叫
+                rtcLogout();
+                // TODO: 2018/9/29  这里需要先退出RTC再重连，暂时只退出，不重连(是否需要重连还有疑问，因为demo中未处理)
+            } else if (result == RtcConst.DeviceEvt_MultiLogin) {
+                RTC_AVAILABLE = true;
+                Log.i(TAG, "同一账号在不同类型终端登录，不影响呼叫");
+            } else if (result == RtcConst.ChangeNetwork) {
+                RTC_AVAILABLE = true;
+                Log.i(TAG, "网络状态改变，自动重连接;连接上了网络，可以继续呼叫");
+            } else if (result == RtcConst.PoorNetwork) {
+                RTC_AVAILABLE = true;
+                Log.i(TAG, "网络差，自动重连接;网络闪断，可以忽略，不影响呼叫");
             } else {
+                RTC_AVAILABLE = false;
                 //天翼RTC登录失败还是要开启人脸识别
                 sendMessageToMainAcitivity(START_FACE_CHECK1, null);
                 Log.i(TAG, "登陆失败 result=" + result);
@@ -2583,6 +2554,7 @@ public class MainService extends Service {
                 callConnection = null;
                 sendMessageToMainAcitivity(MSG_RTC_DISCONNECT, "");
             }
+            rtcLogout();
         }
 
         @Override
@@ -2642,6 +2614,33 @@ public class MainService extends Service {
 
         }
     };
+
+    /**
+     * 天翼RTC登出
+     * 用异步是因为登出操作会耗时，可能造成阻塞引起ANR
+     */
+    private void rtcLogout() {
+//        Log.e(TAG, "退出天翼RTC " + rtcFreed);
+        DLLog.e(TAG, "退出天翼RTC " + rtcFreed);
+        if (rtcFreed) {
+            rtcFreed = false;
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    if (rtcClient != null) {
+                        rtcClient.release();
+                        rtcClient = null;
+                    }
+                    if (device != null) {
+                        device.release();
+                        device = null;
+                    }
+                    rtcFreed = true;
+                    isRtcInit = false;
+                }
+            }).start();
+        }
+    }
 
     /**
      * 收到消息
@@ -2841,7 +2840,7 @@ public class MainService extends Service {
      * @param callName
      */
     private void calling(String callName) {
-        try {
+        /*try {
             String remoteuri = RtcRules.UserToRemoteUri_new(callName, RtcConst.UEType_Any);
             JSONObject jinfo = new JSONObject();
             jinfo.put(RtcConst.kCallRemoteUri, remoteuri);
@@ -2849,7 +2848,7 @@ public class MainService extends Service {
             callConnection = device.connect(jinfo.toString(), connectionListener);
         } catch (JSONException e) {
             e.printStackTrace();
-        }
+        }*/
     }
 
     /**
@@ -2942,6 +2941,11 @@ public class MainService extends Service {
                         }
                     }
                 } catch (InterruptedException e) {
+                    // TODO: 2018/9/29 不要捕捉后只记录不处理，这样相当于生吞中断，应该保留中断发生的证据，以便调用栈中更高层的代码能知道中断，并对中断作出响应。该任务可以通过调用
+                    // interrupt() 以 “重新中断” 当前线程来完成
+                    // TODO: 2018/9/29 这个？ Thread.currentThread().interrupt();
+                    e.printStackTrace();
+                    Log.e(TAG, "错误 启动是否超时线程  catch-> " + e.toString());
                     DLLog.e(TAG, "错误 启动是否超时线程  catch-> " + e.toString());
                 }
                 timeoutCheckThread = null;
@@ -3015,6 +3019,7 @@ public class MainService extends Service {
             }
         } catch (JSONException e) {
             DLLog.e(TAG, "错误 发送图片消息  catch-> " + e.toString());
+            e.printStackTrace();
         }
     }
 
@@ -3205,6 +3210,7 @@ public class MainService extends Service {
                 }
             } catch (JSONException e) {
                 DLLog.e(TAG, "错误 sendCallMessageParall catch-> " + e.toString());
+                e.printStackTrace();
             }
         }
     }

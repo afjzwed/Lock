@@ -20,6 +20,7 @@ import android.media.AudioManager;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.os.Environment;
 import android.os.Handler;
 import android.os.IBinder;
@@ -351,6 +352,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initNet();
         initAdvertiseHandler();
 
+//        initLightTimer();//延时开关灯定时器初始化
+
         if ("C".equals(DeviceConfig.DEVICE_TYPE)) {//判断是否社区大门
             setDialStatus("请输入楼栋编号");
         }
@@ -392,7 +395,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         setTongGaoInfo();
                     }
                 } catch (InterruptedException e) {
+                    // TODO: 2018/9/29 不要捕捉后只记录不处理，这样相当于生吞中断，应该保留中断发生的证据，以便调用栈中更高层的代码能知道中断，并对中断作出响应。该任务可以通过调用
+                    // interrupt() 以 “重新中断” 当前线程来完成
                     DLLog.e(TAG, "错误 startTonggaoThread catch-> " + e.toString());
+                    Log.e(TAG, "错误 startTonggaoThread catch-> " + e.toString());
+                    e.printStackTrace();
                 }
             }
         };
@@ -414,7 +421,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 } catch (InterruptedException e) {
+                    // TODO: 2018/9/29 不要捕捉后只记录不处理，这样相当于生吞中断，应该保留中断发生的证据，以便调用栈中更高层的代码能知道中断，并对中断作出响应。该任务可以通过调用
+                    // interrupt() 以 “重新中断” 当前线程来完成
                     DLLog.e(TAG, "错误 startClockRefresh catch-> " + e.toString());
+                    Log.e(TAG, "错误 startClockRefresh catch-> " + e.toString());
+                    e.printStackTrace();
                 }
                 clockRefreshThread = null;
             }
@@ -463,7 +474,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         setVideoInfo();
                     }
                 } catch (InterruptedException e) {
+                    // TODO: 2018/9/29 不要捕捉后只记录不处理，这样相当于生吞中断，应该保留中断发生的证据，以便调用栈中更高层的代码能知道中断，并对中断作出响应。该任务可以通过调用
+                    // interrupt() 以 “重新中断” 当前线程来完成
                     DLLog.e(TAG, "错误 startVedioThread catch-> " + e.toString());
+                    Log.e(TAG, "错误 startVedioThread catch-> " + e.toString());
                     e.printStackTrace();
                 }
             }
@@ -582,7 +596,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         setPicInfo();
                     }
                 } catch (InterruptedException e) {
+                    // TODO: 2018/9/29 不要捕捉后只记录不处理，这样相当于生吞中断，应该保留中断发生的证据，以便调用栈中更高层的代码能知道中断，并对中断作出响应。该任务可以通过调用
+                    // interrupt() 以 “重新中断” 当前线程来完成
                     DLLog.e(TAG, "错误 startPicTread catch-> " + e.toString());
+                    Log.e(TAG, "错误 startPicTread catch-> " + e.toString());
                     e.printStackTrace();
                 }
             }
@@ -746,6 +763,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             recorder = new FileRecorder(dirPath);
         } catch (Exception e) {
             DLLog.e(TAG, "错误 初始化七牛 catch-> " + e.toString());
+            e.printStackTrace();
         }
 //默认使用key的url_safe_base64编码字符串作为断点记录文件的文件名
 //避免记录文件冲突（特别是key指定为null时），也可自定义文件名(下方为默认实现)：
@@ -806,6 +824,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         control = new SerialHelper();
         control.setDataReceived(this);
         control.setPort("/dev/ttyS4");
+        // TODO: 2018/9/28 两台设备不一样
+//        control.setPort("/dev/ttyS1");
         control.setBaudRate(9600);
         OpenComPort(control);
     }
@@ -832,7 +852,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
-     * 初始化视频通话布局(用于天翼rtc？)
+     * 初始化视频通话布局(用于天翼rtc网络呼叫状态显示)
      */
     protected void initScreen() {
         headPaneTextView = (TextView) findViewById(R.id.header_pane);//可视对讲设备状态
@@ -910,11 +930,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         onRtcVideoOn();
                         break;
                     case MSG_RTC_DISCONNECT:
-                        //视频通话断开
                         Log.i(TAG, "视频通话断开");
-                        onRtcDisconnect();
-                        //启动人脸识别
-                        handler.sendEmptyMessageDelayed(START_FACE_CHECK, 3000);
+                        onRtcDisconnect(); //视频通话断开
+                        handler.sendEmptyMessageDelayed(START_FACE_CHECK, 3000);//启动人脸识别
                         break;
                     case MSG_RTC_NEWCALL:
                         //收到新的来电
@@ -1080,13 +1098,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                         break;
                     case START_FACE_CHECK1:
-                        Log.e(TAG, "登录天翼RTC之后再重新打开相机");
+                        Log.e(TAG, "登录天翼RTC之后再重新打开相机 " + MainService.RTC_AVAILABLE);
 //                        faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 2000);
                         handler.sendEmptyMessageDelayed(START_FACE_CHECK, 2000);
                         break;
                     case START_FACE_CHECK2:
                         Log.e(TAG, "登录天翼RTC之前先释放相机");
-                        faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 100);//在登录天翼RTC之前先把人脸识别关掉
+                        faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 0);//在登录天翼RTC之前先把人脸识别关掉
                         break;
                     case MSG_CARD_KEY_INCOM://卡及按键回调
                         ComBean comBean = (ComBean) msg.obj;
@@ -1260,8 +1278,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * 每隔十秒检查一次网络是否可用
      */
     private void initNetListen() {
-//        这里在重新联网后有问题
-        // TODO: 2018/9/5 没测
         netTimer.schedule(new TimerTask() {
             @Override
             public void run() {
@@ -1401,7 +1417,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Message msg = new Message();
                         msg.what = 11;
                         mHandler.sendMessage(msg);
-                        Log.i(TAG, "NETWOKR_TYPE_ETHERNET");
+//                        Log.i(TAG, "NETWOKR_TYPE_ETHERNET");
                         break;
                     case NETWOKR_TYPE_MOBILE:
                         Log.i(TAG, "gprs");
@@ -1420,6 +1436,39 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     /**********************************************按键相关start***************************/
     //小钴按键响应由按键板响应，不走Android的按键响应方法
 
+    private int lightIndex = 0;//是否亮灯的标志
+    private CountDownTimer lightCloseTimer;
+    private CountDownTimer lightOpenTimer;
+
+    private void initLightTimer() {
+        lightCloseTimer = new CountDownTimer(5000, 500) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+//                Log.i("wh", "-------------------剩余" + millisUntilFinished / 1000);
+            }
+
+            @Override
+            public void onFinish() {
+                control.closeDeng();
+                lightIndex = 0;
+                Log.i("wh", "自动关灯 " + lightIndex);
+            }
+        };
+        lightOpenTimer = new CountDownTimer(500, 500) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+//                Log.i("wh", "-------------------剩余" + millisUntilFinished / 1000);
+            }
+
+            @Override
+            public void onFinish() {
+                control.openDeng();
+                lightIndex = 1;
+                Log.e("wh", "检测到有人,自动开灯 " + lightIndex);
+            }
+        };
+    }
+
     /**
      * 初步处理卡和按键数据
      *
@@ -1437,16 +1486,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 Log.i(TAG, "按键key=" + keyCode + "模式currentStatus" + currentStatus);
                 onKeyDown(keyCode);
                 break;
+            case 5:// 人体感应有人
+//                if (!cardRecord.checkLastBody("1") && lightIndex == 0) {
+//                    lightOpenTimer.cancel();
+//                    lightCloseTimer.cancel();
+//                    lightOpenTimer.start();
+//                    lightCloseTimer.start();
+//                }
+                break;
             case 3:// 开门成功
 //                sMsg.append("开门成功");
                 break;
             case 4:// 继电器时间设置成功
 //                sMsg.append("继电器时间设置成功");
-                break;
-            case 5:// 人体感应有人
-//                sMsg.append("人体感应有人");
-//                sMsg.append("\r\n");
-//                editText.append(sMsg);
                 return;
         }
     }
@@ -1558,22 +1610,26 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     } else {//输入框有值走呼叫或密码
                         if (currentStatus == CALL_MODE) {//呼叫
-                            if ("C".equals(DeviceConfig.DEVICE_TYPE)) {//大门
-                                if (blockNo.length() == DeviceConfig.BLOCK_LENGTH) {
-                                    startDialing(blockNo);
-                                } else if (blockNo.length() == DeviceConfig.MOBILE_NO_LENGTH) {//手机号
-                                    if (true) {//正则判断
+                            if (MainService.RTC_AVAILABLE) {
+                                if ("C".equals(DeviceConfig.DEVICE_TYPE)) {//大门
+                                    if (blockNo.length() == DeviceConfig.BLOCK_LENGTH) {
                                         startDialing(blockNo);
+                                    } else if (blockNo.length() == DeviceConfig.MOBILE_NO_LENGTH) {//手机号
+                                        if (true) {//正则判断
+                                            startDialing(blockNo);
+                                        }
+                                    }
+                                } else {//单元
+                                    if (blockNo.length() == DeviceConfig.UNIT_NO_LENGTH) {
+                                        startDialing(blockNo);
+                                    } else if (blockNo.length() == DeviceConfig.MOBILE_NO_LENGTH) {//手机号
+                                        if (true) {//正则判断
+                                            startDialing(blockNo);
+                                        }
                                     }
                                 }
-                            } else {//单元
-                                if (blockNo.length() == DeviceConfig.UNIT_NO_LENGTH) {
-                                    startDialing(blockNo);
-                                } else if (blockNo.length() == DeviceConfig.MOBILE_NO_LENGTH) {//手机号
-                                    if (true) {//正则判断
-                                        startDialing(blockNo);
-                                    }
-                                }
+                            } else {
+                                Utils.DisplayToast(MainActivity.this, "可视对讲设备未登录，请稍后重试或重启应用");
                             }
                         } else {//密码开门
                             if (guestPassword.length() == 6) {
@@ -1881,7 +1937,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     }
                 } catch (InterruptedException e) {
+                    // TODO: 2018/9/29 不要捕捉后只记录不处理，这样相当于生吞中断，应该保留中断发生的证据，以便调用栈中更高层的代码能知道中断，并对中断作出响应。该任务可以通过调用
+                    // interrupt() 以 “重新中断” 当前线程来完成
                     DLLog.e(TAG, "错误 startTimeoutChecking catch-> " + e.toString());
+                    Log.e(TAG, "错误 startTimeoutChecking catch-> " + e.toString());
+                    e.printStackTrace();
                 }
                 passwordTimeoutThread = null;
             }
@@ -2018,7 +2078,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     try {
                         sleep(300);
                     } catch (InterruptedException e) {
+                        // TODO: 2018/9/29 不要捕捉后只记录不处理，这样相当于生吞中断，应该保留中断发生的证据，以便调用栈中更高层的代码能知道中断，并对中断作出响应。该任务可以通过调用
+                        // interrupt() 以 “重新中断” 当前线程来完成
                         DLLog.e(TAG, "错误 takePicture catch-> " + e.toString());
+                        Log.e(TAG, "错误 takePicture catch-> " + e.toString());
                         e.printStackTrace();
                     }
                     final String thisUuid = uuid;
@@ -2045,6 +2108,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 try {
                     sleep(1000);
                 } catch (InterruptedException e) {
+                    // TODO: 2018/9/29 不要捕捉后只记录不处理，这样相当于生吞中断，应该保留中断发生的证据，以便调用栈中更高层的代码能知道中断，并对中断作出响应。该任务可以通过调用
+                    // interrupt() 以 “重新中断” 当前线程来完成
                     DLLog.e(TAG, "错误 takePicture1 catch-> " + e.toString());
                     e.printStackTrace();
                 }
@@ -2478,9 +2543,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 //  stopCallCamera();
                 try {
                     sleep(1000);
-                } catch (Exception e) {
+                } catch (InterruptedException e) {
+                    // TODO: 2018/9/29 不要捕捉后只记录不处理，这样相当于生吞中断，应该保留中断发生的证据，以便调用栈中更高层的代码能知道中断，并对中断作出响应。该任务可以通过调用
+                    // interrupt() 以 “重新中断” 当前线程来完成
                     DLLog.e(TAG, "错误 startCancelCall catch-> " + e.toString());
+                    Log.e(TAG, "错误 startCancelCall catch-> " + e.toString());
+                    e.printStackTrace();
                 }
+
                 sendMainMessager(MSG_CANCEL_CALL, "");
 //                if (faceHandler != null) {
 //                    faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 1000);
@@ -2488,8 +2558,11 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 handler.sendEmptyMessageDelayed(START_FACE_CHECK, 1000);
                 try {
                     sleep(1000);
-                } catch (Exception e) {
+                } catch (InterruptedException e) {
+                    // TODO: 2018/9/29 不要捕捉后只记录不处理，这样相当于生吞中断，应该保留中断发生的证据，以便调用栈中更高层的代码能知道中断，并对中断作出响应。该任务可以通过调用
+                    // interrupt() 以 “重新中断” 当前线程来完成
                     DLLog.e(TAG, "错误 startCancelCall catch-> " + e.toString());
+                    e.printStackTrace();
                 }
                 toast("您已经取消拨号");
                 resetDial();
@@ -2866,38 +2939,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /****************************设置一些状态end************************/
 
- /*   *//**
-     * 开启nfc读卡模式
-     *//*
-    private void enableReaderMode() {
-        Log.i(TAG, "开启读卡模式");
-        NfcAdapter nfc = NfcAdapter.getDefaultAdapter(this);
-        if (nfc != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                if (this instanceof NfcAdapter.ReaderCallback) {
-                    if (!this.isDestroyed()) {
-                        nfc.enableReaderMode(this, this, NfcReader.READER_FLAGS, null);
-                    }
-                }
-            }
-        }
-    }
-
-    *//**
-     * 禁用读卡
-     *//*
-    private void disableReaderMode() {
-        Log.i(TAG, "禁用读卡模式");
-        NfcAdapter nfc = NfcAdapter.getDefaultAdapter(this);
-        if (nfc != null) {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                if (!this.isDestroyed()) {
-                    nfc.disableReaderMode(this);
-                }
-            }
-        }
-    }*/
-
     /**
      * 使用Handler实现UI线程与Timer线程之间的信息传递,每5秒告诉UI线程获得wifi Info
      */
@@ -3260,7 +3301,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         try {//这里其实不用捕捉错误
             try {
                 mCamera = Camera.open(1);//打开前置相机
-//                Log.e(TAG, "相机 ID为1");
+                Log.e(TAG, "相机 ID为1");
             } catch (Exception e) {
                 mCamera = null;
             }
@@ -3268,6 +3309,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             if (mCamera == null) {
                 try {
                     mCamera = Camera.open(0);
+                    Log.e(TAG, "相机 ID为0");
                 } catch (Exception e) {
                     DLLog.e("错误 摄像头 MainActivity", "主页面 相机打开失败" + " setupCamera-->" + e.toString());
                     Constant.RESTART_PHONE_OR_AUDIO = 1;
@@ -3944,5 +3986,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         Log.i(TAG, "系统剩余内存:" + (info.availMem >> 10) / 1024 + "M");
         Log.i(TAG, "系统是否处于低内存运行：" + info.lowMemory);
         Log.i(TAG, "当系统剩余内存低于" + (info.threshold) / 1024 + "时就看成低内存运行");
+
+        ActivityManager activityManager1 = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
+        int memoryClass = activityManager1.getMemoryClass();
+        Log.e(TAG, "内存 " + memoryClass);
+        int largeMemoryClass = activityManager1.getLargeMemoryClass();
+        Log.e(TAG, "最大内存 " + largeMemoryClass);
+
+        float maxMemory = (float) (Runtime.getRuntime().maxMemory() * 1.0 / (1024 * 1024));
+        //当前分配的总内存
+        float totalMemory = (float) (Runtime.getRuntime().totalMemory() * 1.0 / (1024 * 1024));
+        //剩余内存
+        float freeMemory = (float) (Runtime.getRuntime().freeMemory() * 1.0 / (1024 * 1024));
+        Log.e(TAG, "分配内存" + maxMemory + " " + freeMemory + " " + totalMemory);
     }
 }
