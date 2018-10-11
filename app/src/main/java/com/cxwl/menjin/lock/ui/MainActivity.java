@@ -285,8 +285,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Handler faceHandler;//人脸识别handler
 
     private FRAbsLoop mFRAbsLoop = null;//人脸对比线程
-    private boolean hasFaceInfo = false;//是否有本地脸数据的标识
-    private String phone_face = "";
     private Thread picThread = null;//图片更新线程
     private boolean isPicThreadStart = false;//图片更新线程是否开启的标志
     protected CardRecord cardRecord = new CardRecord();
@@ -1043,7 +1041,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         rl_nfc.setVisibility(View.GONE);
                         nfcFlag = false;
                         isFlag = false;
-                        phone_face = "";
                         if (delete) {//删除成功
                             Toast.makeText(MainActivity.this, "删除成功", Toast.LENGTH_SHORT).show();
                         } else {//没有此人脸信息或删除失败
@@ -2344,6 +2341,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             try {
                 Camera.Parameters parameters = camera.getParameters();
                 parameters.setPreviewSize(320, 240);
+                // TODO: 2018/10/9 这里要设置图片分辨率吗？摄像头支持吗？
+//                parameters.setPictureSize(1280, 720);
                 camera.setParameters(parameters);
                 camera.setPreviewDisplay(autoCameraHolder);
                 camera.startPreview();
@@ -3259,17 +3258,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void run() {
 //                        //在子线程给handler发送数据
 //                        faceHandler.sendEmptyMessage(2);
-                        Log.v("人脸识别", "initFaceDetect-->" + 222);
+//                        Log.v("人脸识别", "initFaceDetect-->" + 222);
 //                        mProgressDialog.cancel();
                         if (ArcsoftManager.getInstance().mFaceDB.mRegister.isEmpty()) {
-                            Log.v("人脸识别", "initFaceDetect-->" + 333);
-                            hasFaceInfo = false;
-                            Utils.DisplayToast(MainActivity.this, "没有注册人脸，请先注册");
+//                            Log.v("人脸识别", "initFaceDetect-->" + 333);
+//                            Utils.DisplayToast(MainActivity.this, "没有注册人脸，请先注册");
                             return;
                         }
-                        hasFaceInfo = true;//有注册人脸
                         identification = true;
-                        Utils.DisplayToast(MainActivity.this, "人脸数据加载完成");
+//                        Utils.DisplayToast(MainActivity.this, "人脸数据加载完成");
                     }
                 });
             }
@@ -3299,6 +3296,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //        Log.e(TAG, "相机" + "setupCamera");
 
         try {//这里其实不用捕捉错误
+            // TODO: 2018/10/9 打开摄像头可以用Camera.CameraInfo.CAMERA_FACING_BACK来判断，但是双目的直接用前置相机
             try {
                 mCamera = Camera.open(1);//打开前置相机
                 Log.e(TAG, "相机 ID为1");
@@ -3317,8 +3315,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
             }
 
+            // TODO: 2018/10/9 设置尺寸和指定图像的格式用下面两个方法试试
+            // setPreviewSizes(); //设置预览分辨率
+            //setPreviewFormat(); //设置NV21
+            
             if (null != mCamera) {
                 try {
+                    // TODO: 2018/10/9  有最优尺寸？
                     Camera.Parameters parameters = mCamera.getParameters();
                     if (null != parameters) {
                         parameters.setPreviewSize(640, 480);//设置尺寸
@@ -3678,6 +3681,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             }
                         }
                     }
+//                    result = null;
+//                    result = new AFR_FSDKFace();
                     mAFT_FSDKFace = null;
                     mImageNV21 = null;
                 }

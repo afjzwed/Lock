@@ -207,7 +207,7 @@ public class AdvertiseHandler implements SurfaceHolder.Callback {
             }
         } catch (Exception e) {
             Constant.RESTART_PHONE_OR_AUDIO = 1;
-            DLLog.e("AdvertiseHandler", "错误 playVideo error " + e.getMessage() + "  err " + e.toString());
+            DLLog.e("AdvertiseHandler", "错误 playVideo error " + e.toString());
         }
     }
 
@@ -237,8 +237,7 @@ public class AdvertiseHandler implements SurfaceHolder.Callback {
                         sleep(imagePeroid); //等待指定的一个并行时间
                     } catch (InterruptedException e) {
                         Constant.RESTART_PHONE_OR_AUDIO = 1;
-                        DLLog.e("AdvertiseHandler", "错误 ------>end image display thread<-------" + e.getMessage() +
-                                " err " + e.toString());
+                        DLLog.e("AdvertiseHandler", "错误 ------>end image display thread<-------" + e.toString());
                     }
                     if (isWorking) {
                         nextImage(item);
@@ -280,8 +279,7 @@ public class AdvertiseHandler implements SurfaceHolder.Callback {
             dialMessenger.send(message);
         } catch (RemoteException e) {
             Constant.RESTART_PHONE_OR_AUDIO = 1;
-            DLLog.e("AdvertiseHandler", "错误 ------>sendDialMessenger<-------" + e.getMessage() + "  err " + e
-                    .toString());
+            DLLog.e("AdvertiseHandler", "错误 ------>sendDialMessenger<-------" + e.toString());
             e.printStackTrace();
         }
     }
@@ -391,7 +389,7 @@ public class AdvertiseHandler implements SurfaceHolder.Callback {
                 }
             });
         } catch (Exception e) {
-            DLLog.e("AdvertiseHandler", "错误 UpdateAdvertise: startMediaPlay error " + e.getMessage());
+            DLLog.e("AdvertiseHandler", "错误 UpdateAdvertise: startMediaPlay error " + e.toString());
             Constant.RESTART_PHONE_OR_AUDIO = 1;
             Log.e("AdvertiseHandler", "UpdateAdvertise: startMediaPlay error");
         }
@@ -405,7 +403,7 @@ public class AdvertiseHandler implements SurfaceHolder.Callback {
             voicePlayer.start();
         } catch (Exception e) {
             Constant.RESTART_PHONE_OR_AUDIO = 1;
-            DLLog.e("AdvertiseHandler", "错误 startVoicePlay error " + e.toString() + " message " + e.getMessage());
+            DLLog.e("AdvertiseHandler", "错误 startVoicePlay error " + e.toString());
             e.printStackTrace();
         }
     }
@@ -430,8 +428,7 @@ public class AdvertiseHandler implements SurfaceHolder.Callback {
         } catch (IllegalStateException e) {
             Log.d("AdvertiseHandler", "UpdateAdvertise: onDestroy error=" + e.toString());
             Constant.RESTART_PHONE_OR_AUDIO = 1;
-            DLLog.e("AdvertiseHandler", "错误 UpdateAdvertise: onDestroy error " + e.toString() + " message " + e
-                    .getMessage());
+            DLLog.e("AdvertiseHandler", "错误 UpdateAdvertise: onDestroy error " + e.toString());
         } finally {
             Log.e("AdvertiseHandler", "显示背景图");
             if (videoView != null && imageView != null) {
@@ -512,8 +509,7 @@ public class AdvertiseHandler implements SurfaceHolder.Callback {
             }
         } catch (Exception e) {
             Constant.RESTART_PHONE_OR_AUDIO = 1;
-            DLLog.e("AdvertiseHandler", "错误 UpdateAdvertise: handlerStart error " + e.toString() + " message " + e
-                    .getMessage());
+            DLLog.e("AdvertiseHandler", "错误 UpdateAdvertise: handlerStart error " + e.toString());
             e.printStackTrace();
             Log.d("AdvertiseHandler", "UpdateAdvertise: start error");
             errorCallBack.ErrorAdver();
@@ -534,7 +530,7 @@ public class AdvertiseHandler implements SurfaceHolder.Callback {
             }
         } catch (IllegalStateException e) {
             Constant.RESTART_PHONE_OR_AUDIO = 1;
-            DLLog.e("AdvertiseHandler", "错误 pause error " + e.toString() + " message " + e.getMessage());
+            DLLog.e("AdvertiseHandler", "错误 pause error " + e.toString());
             errorCallBack.ErrorAdver();
         }
     }

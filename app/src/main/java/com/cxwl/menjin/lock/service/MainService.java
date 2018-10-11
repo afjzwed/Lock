@@ -768,6 +768,7 @@ public class MainService extends Service {
                 @Override
                 public void onError(Call call, Exception e, int id) {
                     Log.e(TAG, "onError 心跳接口 connectReport " + e.toString());
+                    DLLog.e(TAG, "错误 心跳接口返回 " + e.toString());
                 }
 
                 @Override
@@ -880,10 +881,12 @@ public class MainService extends Service {
 
                                 lixianTongji();//上传离线统计日志
 
+                                // TODO: 2018/10/8  心跳中查询本地数据如数据库或其它大数据量数据时，要做一个提醒或删除的最大阀值
                                 Log.e(TAG, "心跳结束");
                             }
                         } else {
                             //服务器异常或没有网络
+                            DLLog.e(TAG, "错误 心跳接口返回 " + response);
                             HttpApi.e("getClientInfo()->服务器无响应");
                             Log.e(TAG, "onResponse 心跳接口 connectReport " + response);
                         }
@@ -2259,6 +2262,7 @@ public class MainService extends Service {
                         sendMessageToMainAcitivity(MSG_LOGIN_FAILED, mac);
                     }
                 } else {
+                    DLLog.e(TAG, "错误 deviceLogin catch-> 登录返回为空");
                     //服务器异常或没有网络
                     HttpApi.e("getClientInfo()->服务器无响应");
                 }
@@ -2443,7 +2447,7 @@ public class MainService extends Service {
                 Log.e(TAG, "错误 获取token失败 catch-> " + e.getMessage() + "]" + " " + countGetToken);
             }
         } else {
-            DLLog.i(TAG, "错误 rtc获取token的状态不对 " + ret.getStatus() + " " + countGetToken);
+            DLLog.e(TAG, "错误 rtc获取token的状态不对 " + ret.getStatus() + " " + countGetToken);
             Log.i(TAG, "错误 rtc获取token的状态不对 " + ret.getStatus() + " " + countGetToken);
             if (countGetToken < 10) {
                 getTokenFromServer();
@@ -2468,7 +2472,7 @@ public class MainService extends Service {
                 jargs.put(RtcConst.kAccType, RtcConst.UEType_Current);//终端类型
                 jargs.put(RtcConst.kAccRetry, 5);//设置重连时间
                 device = rtcClient.createDevice(jargs.toString(), deviceListener);
-                // TODO: 2018/9/30 考虑是在这里开启人脸识别还是rtc登陆成功后再开启
+                // TODO: 2018/9/30 考虑是在这里开启人脸识别还是rtc登陆成功后再开启，可以尝试在这里开启人脸识别，因为RTC后续刷新成功也会开启(可能造成过多的人脸识别打开？)
 //                sendMessageToMainAcitivity(START_FACE_CHECK1, null);//开启人脸识别
                 Log.i(TAG, " 天翼rtc设置监听 deviceListener   ");
             } catch (JSONException e) {
@@ -2495,52 +2499,53 @@ public class MainService extends Service {
                 Log.e(TAG, "-----------天翼登陆成功-------------key=" + key + "------------");
                 RTC_AVAILABLE = true;//将界面上的无法呼叫提示隐藏，并开启人脸识别
                 sendMessageToMainAcitivity(START_FACE_CHECK1, null);
+                DLLog.e(TAG, "天翼登陆成功");
             } else if (result == RtcConst.NoNetwork || result == RtcConst.CallCode_Network) {
                 isRtcInit = false;
                 RTC_AVAILABLE = false;//界面提示无法呼叫，不用开启人脸(onNoNetWork会做)
                 onNoNetWork();
-                DLLog.e(TAG, "网络不可用或服务器错误，应限制呼叫");
-                Log.i(TAG, "网络不可用或服务器错误或网络断开，应限制呼叫，断网销毁");
+                DLLog.e(TAG, "天翼网络不可用或服务器错误，应限制呼叫");
+                Log.i(TAG, "天翼网络不可用或服务器错误或网络断开，应限制呼叫，断网销毁");
             } else if (result == RtcConst.ReLoginNetwork) {
                 //网络原因导致多次登陆不成功，由用户选择是否继续，如想继续尝试，可以重建device，不能自动重连rtc（因为可能死循环）
                 isRtcInit = false;
                 RTC_AVAILABLE = false; //界面提示无法呼叫
-                DLLog.e(TAG, "网络原因导致多次登陆不成功 不能自动重连rtc");
+                DLLog.e(TAG, "天翼网络原因导致多次登陆不成功 不能自动重连rtc");
                 rtcLogout();
-                Log.i(TAG, "重连失败应用可以选择重新登录，应限制呼叫");
+                Log.i(TAG, "天翼重连失败应用可以选择重新登录，应限制呼叫");
             } else if (result == RtcConst.DeviceEvt_KickedOff) {
                 //被另外一个终端踢下线，由用户选择是否继续，如果再次登录，需要重新获取token，重建device，不能自动重连rtc（因为可能死循环）
                 RTC_AVAILABLE = false; //界面提示无法呼叫
-                DLLog.e(TAG, "被另外一个终端踢下线，不能自动重连rtc");
+                DLLog.e(TAG, "天翼被另外一个终端踢下线，不能自动重连rtc");
                 rtcLogout();
-                Log.i(TAG, "同一账号在另一同类型终端登录，被踢，应限制呼叫");
+                Log.i(TAG, "天翼同一账号在另一同类型终端登录，被踢，应限制呼叫");
             } else if (result == RtcConst.CallCode_Forbidden) {
                 //认证失效 需要重新获取token重新登录rtc，应限制呼叫，不能自动重连rtc（因为可能死循环）
                 RTC_AVAILABLE = false; //界面提示无法呼叫
                 rtcLogout();
-                DLLog.e(TAG, "认证失效 需要重新获取token重新登录rtc 不能自动重连rtc");
-                Log.i(TAG, "认证失效 需要重新获取token重新登录rtc，应限制呼叫 result=" + result);
+                DLLog.e(TAG, "天翼认证失效 需要重新获取token重新登录rtc 不能自动重连rtc");
+                Log.i(TAG, "天翼认证失效 需要重新获取token重新登录rtc，应限制呼叫 result=" + result);
             } else if (result == RtcConst.CallCode_Timeout) {
-                Log.i(TAG, "登录超时，应限制呼叫 result=" + result);
-                DLLog.e(TAG, "登录超时，应限制呼叫");//天翼rtc的token过期时间为20天
+                Log.i(TAG, "天翼登录超时，应限制呼叫 result=" + result);
+                DLLog.e(TAG, "天翼登录超时，应限制呼叫");//天翼rtc的token过期时间为20天
                 isRtcInit = false;
                 RTC_AVAILABLE = false;//界面提示无法呼叫
                 rtcLogout();
                 // TODO: 2018/9/29  这里需要先退出RTC再重连，暂时只退出，不重连(是否需要重连还有疑问，因为demo中未处理)
             } else if (result == RtcConst.DeviceEvt_MultiLogin) {
                 RTC_AVAILABLE = true;
-                Log.i(TAG, "同一账号在不同类型终端登录，不影响呼叫");
+                Log.i(TAG, "天翼同一账号在不同类型终端登录，不影响呼叫");
             } else if (result == RtcConst.ChangeNetwork) {
                 RTC_AVAILABLE = true;
-                Log.i(TAG, "网络状态改变，自动重连接;连接上了网络，可以继续呼叫");
+                Log.i(TAG, "天翼网络状态改变，自动重连接;连接上了网络，可以继续呼叫");
             } else if (result == RtcConst.PoorNetwork) {
                 RTC_AVAILABLE = true;
-                Log.i(TAG, "网络差，自动重连接;网络闪断，可以忽略，不影响呼叫");
+                Log.i(TAG, "天翼网络差，自动重连接;网络闪断，可以忽略，不影响呼叫");
             } else {
                 RTC_AVAILABLE = false;
                 //天翼RTC登录失败还是要开启人脸识别
                 sendMessageToMainAcitivity(START_FACE_CHECK1, null);
-                Log.i(TAG, "登陆失败 result=" + result);
+                Log.i(TAG, "天翼登陆失败 result=" + result);
                 DLLog.e(TAG, "天翼RTC登陆失败");
             }
         }
