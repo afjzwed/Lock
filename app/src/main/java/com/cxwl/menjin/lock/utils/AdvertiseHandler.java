@@ -313,16 +313,17 @@ public class AdvertiseHandler implements SurfaceHolder.Callback {
                 DLLog.d("AdvertiseHandler", "多媒体报错 " + what + " extra " + extra);
                 Log.e("AdvertiseHandler", "OnErrorListener");
                 imageView.setVisibility(View.VISIBLE);
-                if (what != 100) {
-                    Constant.RESTART_PHONE_OR_AUDIO = 1;
-                }
-                switch (what) {
-                    case 100:
-                        Log.d("AdvertiseHandler", "多媒体死亡 MEDIA_ERROR_SERVER_DIED");
-                        DLLog.d("AdvertiseHandler", "多媒体死亡 MEDIA_ERROR_SERVER_DIED");
-                        Constant.RESTART_AUDIO = true;
-                        break;
-                }
+//                if (what != 100) {
+//                    Constant.RESTART_PHONE_OR_AUDIO = 1;
+//                }
+//                switch (what) {
+//                    case 100:
+//                        Log.d("AdvertiseHandler", "多媒体死亡 MEDIA_ERROR_SERVER_DIED");
+//                        DLLog.d("AdvertiseHandler", "多媒体死亡 MEDIA_ERROR_SERVER_DIED");
+//                        Constant.RESTART_AUDIO = true;
+//                        break;
+//                }
+                Constant.RESTART_PHONE_OR_AUDIO = 1;
                 return false;
             }
         });

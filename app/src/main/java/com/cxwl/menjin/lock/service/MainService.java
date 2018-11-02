@@ -104,6 +104,7 @@ import rtc.sdk.iface.Device;
 import rtc.sdk.iface.DeviceListener;
 import rtc.sdk.iface.RtcClient;
 
+import static com.cxwl.menjin.lock.config.Constant.CALL_MODE;
 import static com.cxwl.menjin.lock.config.Constant.CALL_VIDEO_CONNECTING;
 import static com.cxwl.menjin.lock.config.Constant.CALL_WAITING;
 import static com.cxwl.menjin.lock.config.Constant.MAIN_ACTIVITY_INIT;
@@ -149,8 +150,8 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_UPLOAD_LOG;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_OPENLOCK;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_TAKEPIC;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_TAKEPIC1;
+import static com.cxwl.menjin.lock.config.Constant.PASSWORD_MODE;
 import static com.cxwl.menjin.lock.config.Constant.REGISTER_ACTIVITY_DIAL;
-import static com.cxwl.menjin.lock.config.Constant.RESTART_AUDIO;
 import static com.cxwl.menjin.lock.config.Constant.RESTART_PHONE;
 import static com.cxwl.menjin.lock.config.Constant.RTC_APP_ID;
 import static com.cxwl.menjin.lock.config.Constant.RTC_APP_KEY;
@@ -159,8 +160,10 @@ import static com.cxwl.menjin.lock.config.Constant.SP_VISION_LIAN;
 import static com.cxwl.menjin.lock.config.Constant.SP_XINTIAO_TIME;
 import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK1;
 import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK2;
+import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK3;
 import static com.cxwl.menjin.lock.config.Constant.identification;
 import static com.cxwl.menjin.lock.config.DeviceConfig.LOCAL_APK_PATH;
+import static com.cxwl.menjin.lock.ui.MainActivity.currentStatus;
 
 /**
  * Created by William on 2018/9/4.
@@ -182,7 +185,7 @@ public class MainService extends Service {
     private Messenger mainMessage;
     public static String httpServerToken = "";//服务器拿到的token
     RtcClient rtcClient;
-    boolean isRtcInit = false; //RtcSDK初始化状态
+    private boolean isRtcInit = false; //RtcSDK初始化状态
     //天翼登陆参数
     private String token;//天翼登陆所需的token；
     private Device device;//天翼登陆连接成功 发消息的类
@@ -807,8 +810,14 @@ public class MainService extends Service {
                                             .getLian()));
                                     if (Long.parseLong(banbenBean.getLian()) > lianVision) {
                                         Log.i(TAG, "心跳中有人脸信息更新");
-                                        if (faceStatus == 0) {//判断是否正在下载
-                                            getFaceUrlInfo(Long.parseLong(banbenBean.getLian()));
+//                                        if (faceStatus == 0) {//判断是否正在下载
+//                                            getFaceUrlInfo(Long.parseLong(banbenBean.getLian()));
+//                                        }
+                                        if (currentStatus == CALL_MODE || currentStatus == PASSWORD_MODE)
+                                        {//如果当前是呼叫或密码模式（即人脸识别模式）才下载
+                                            if (faceStatus == 0) {//判断是否正在下载
+                                                getFaceUrlInfo(Long.parseLong(banbenBean.getLian()));
+                                            }
                                         }
                                     }
                                 }
@@ -906,29 +915,29 @@ public class MainService extends Service {
                 Constant.UPLOAD_LOG = true;
             } else if (hour == 2) {//每晚凌晨2点时进行一次日志上传
                 if (Constant.UPLOAD_LOG == true) {
+                    DLLog.delFile();//删除本地日志
                     sendMessageToMainAcitivity(MSG_UPLOAD_LOG, null);
                 }
             }
 
-            if (hour == 3) {
-                RESTART_PHONE = true;
-            } else if (hour == 4) {//每晚凌晨4点时进行一次媒体流的重启
-                if (RESTART_PHONE == true) {
-                    RESTART_AUDIO = false;
-                    DLLog.delFile();//删除本地日志
-                    sendMessageToMainAcitivity(MSG_RESTART_VIDEO, null);
-                }
-            }
+//            if (hour == 3) {
+//                RESTART_PHONE = true;
+//            } else if (hour == 4) {//每晚凌晨4点时进行一次媒体流的重启
+////                if (afterMem < 1000) {
+////                    sendMessageToMainAcitivity(MSG_RESTART_VIDEO, null);
+////                } else {
+////                    RESTART_PHONE = false;
+////                }
+//                if (RESTART_PHONE == true) {
+//                    sendMessageToMainAcitivity(MSG_RESTART_VIDEO, null);
+//                }
+//            }
             calendar = null;
 
             clearMemory();
 
             if (Constant.RESTART_PHONE_OR_AUDIO == 1) {//设备是否重启
                 onReStartVideo();
-            }
-
-            if (RESTART_AUDIO) {//媒体流重启
-                sendMessageToMainAcitivity(MSG_RESTART_VIDEO, null);
             }
 
             if (!isServiceRunning()) {
@@ -968,6 +977,7 @@ public class MainService extends Service {
         return false;
     }
 
+    //    private long afterMem = 1500;
     private void clearMemory() {
         //To change body of implemented methods use File | Settings | File Templates.
         ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -1035,9 +1045,9 @@ public class MainService extends Service {
             }
         }
         long afterMem = getAvailMemory(getApplication());
-//        if (afterMem < 1000) {
-//            onReStartVideo();//如果长久开启的话这个要打开
-//        }
+        if (afterMem < 1000) {
+            onReStartVideo();//如果长久开启的话这个要打开
+        }
         DLLog.w("进程", " after memory info : " + afterMem);
 //        Log.d("进程", "----------- after memory info : " + afterMem);
 //        DLLog.e("进程", "-----------before memory info : " + beforeMem + " ----------- after memory info : " +
@@ -1406,7 +1416,6 @@ public class MainService extends Service {
                                         sendMessageToMainAcitivity(MSG_FACE_INFO_FINISH, null);//通知MainActivity开始人脸识别
                                     }
                                 }).start();
-//                                initFaceEngine(); //开始人脸录入流程
                             } else {
                                 syncCallBack("2", version);//同步人脸回调通知
                                 faceStatus = 0;//重置人脸信息下载状态
@@ -2363,10 +2372,6 @@ public class MainService extends Service {
                 }
             });
         }
-//        else {
-//            Log.e(TAG, "相机天翼已经rtc初始化完成了");
-//            sendMessageToMainAcitivity(START_FACE_CHECK, null);
-//        }
     }
 
     /**
@@ -2395,7 +2400,7 @@ public class MainService extends Service {
         onResponseGetToken(ret);
     }
 
-    private int countGetToken = 0;//获取天翼RTC的token的次数，超过10次就不再获取，防止死循环
+    private int countReGetRtc = 0;//重连天翼RTC次数，超过10次就不再获取，防止死循环
     private boolean rtcFreed = true;//rtc是否释放完毕的标志
     public static boolean RTC_AVAILABLE = false;//rtc是否登录完成的标志，主页面可根据此变量提示用户能否呼叫
 
@@ -2405,7 +2410,6 @@ public class MainService extends Service {
     private void onResponseGetToken(HttpResult ret) {
         Log.i(TAG, "天翼rtc平台获取token 的状态  status=" + ret.getStatus());
         JSONObject jsonrsp = (JSONObject) ret.getObject();
-        countGetToken++;
         if (jsonrsp != null && jsonrsp.isNull("code") == false) {
             try {
                 String code = jsonrsp.getString(RtcConst.kcode);
@@ -2420,42 +2424,35 @@ public class MainService extends Service {
                     // 就不再登录，改为重启或者提示，因为rtc在登录之后，所以不考虑断网的情况)
                     //经测试，无限获取token会造成错误 java.lang.StackOverflowError: stack size
                     // 1036KB，死循环的情况要避免，可以尝试开线程发消息延时间隔避免在本方法中调用本方法
+//                    在界面上显示无法呼叫，并开启人脸识别
+                    RTC_AVAILABLE = false;
+                    sendMessageToMainAcitivity(START_FACE_CHECK1, null);
+                    DLLog.e(TAG, "错误 获取token失败 [status:" + ret.getStatus() + "]" + ret.getErrorMsg() + " ");
+                    Log.e(TAG, "天翼rtc获取token失败 [status:" + ret.getStatus() + "]" + ret.getErrorMsg() + " ");
                     // TODO: 2018/9/29 这里最好发消息，延时调用getTokenFromServer()
-                    DLLog.e(TAG, "错误 获取token失败 [status:" + ret.getStatus() + "]" + ret.getErrorMsg() + " " +
-                            countGetToken);
-                    Log.e(TAG, "天翼rtc获取token失败 [status:" + ret.getStatus() + "]" + ret.getErrorMsg() + " " +
-                            countGetToken);
-                    if (countGetToken < 10) {
-                        getTokenFromServer();
-                    } else {
-                        //在界面上显示无法呼叫，并开启人脸识别
-                        RTC_AVAILABLE = false;
-                        sendMessageToMainAcitivity(START_FACE_CHECK1, null);
-                    }
+//                    if (countGetToken < 10) {
+//                        getTokenFromServer();
+//                    } else {
+                    //在界面上显示无法呼叫，并开启人脸识别
+//                        RTC_AVAILABLE = false;
+//                        sendMessageToMainAcitivity(START_FACE_CHECK1, null);
+//                    }
                 }
             } catch (JSONException e) {
                 // TODO Auto-generated catch block
-                DLLog.e(TAG, "错误 获取token失败 catch-> " + e.toString() + " " + countGetToken);
-                if (countGetToken < 10) {
-                    getTokenFromServer();
-                } else {
-                    //在界面上显示无法呼叫，并开启人脸识别
-                    RTC_AVAILABLE = false;
-                    sendMessageToMainAcitivity(START_FACE_CHECK1, null);
-                }
-                e.printStackTrace();
-                Log.e(TAG, "错误 获取token失败 catch-> " + e.getMessage() + "]" + " " + countGetToken);
-            }
-        } else {
-            DLLog.e(TAG, "错误 rtc获取token的状态不对 " + ret.getStatus() + " " + countGetToken);
-            Log.i(TAG, "错误 rtc获取token的状态不对 " + ret.getStatus() + " " + countGetToken);
-            if (countGetToken < 10) {
-                getTokenFromServer();
-            } else {
+                DLLog.e(TAG, "错误 获取token失败 catch-> " + e.toString() + " ");
                 //在界面上显示无法呼叫，并开启人脸识别
                 RTC_AVAILABLE = false;
                 sendMessageToMainAcitivity(START_FACE_CHECK1, null);
+                e.printStackTrace();
+                Log.e(TAG, "错误 获取token失败 catch-> " + e.getMessage() + "]" + " ");
             }
+        } else {
+            //在界面上显示无法呼叫，并开启人脸识别
+            RTC_AVAILABLE = false;
+            sendMessageToMainAcitivity(START_FACE_CHECK1, null);
+            DLLog.e(TAG, "错误 rtc获取token的状态不对 " + ret.getStatus() + " ");
+            Log.i(TAG, "错误 rtc获取token的状态不对 " + ret.getStatus() + " ");
         }
     }
 
@@ -2463,28 +2460,27 @@ public class MainService extends Service {
         Log.i(TAG, "天翼rtc开始登陆rtc  mac:" + key + "token:" + token);
         if (token != null) {
             try {
-//                countGetToken = 0;//这里是否要把计数归零
                 JSONObject jargs = SdkSettings.defaultDeviceSetting();
                 jargs.put(RtcConst.kAccPwd, token);
                 //账号格式形如“账号体系-号码~应用id~终端类型”，以下主要设置账号内各部分内容，其中账号体系的值要在获取token之前确定，默认为私有账号
                 jargs.put(RtcConst.kAccAppID, RTC_APP_ID);//应用id
                 jargs.put(RtcConst.kAccUser, key); //号码
                 jargs.put(RtcConst.kAccType, RtcConst.UEType_Current);//终端类型
-                jargs.put(RtcConst.kAccRetry, 5);//设置重连时间
+                jargs.put(RtcConst.kAccRetry, 20);//设置重连时间
                 device = rtcClient.createDevice(jargs.toString(), deviceListener);
-                // TODO: 2018/9/30 考虑是在这里开启人脸识别还是rtc登陆成功后再开启，可以尝试在这里开启人脸识别，因为RTC后续刷新成功也会开启(可能造成过多的人脸识别打开？)
-//                sendMessageToMainAcitivity(START_FACE_CHECK1, null);//开启人脸识别
                 Log.i(TAG, " 天翼rtc设置监听 deviceListener   ");
             } catch (JSONException e) {
-                // TODO: 2018/9/29  这里最好在界面上显示无法注册到可视对讲服务器，请重新启动APP，但是主页面上目前没有控件用来显示
                 //在界面上显示无法呼叫，并开启人脸识别
                 RTC_AVAILABLE = false;
-                sendMessageToMainAcitivity(START_FACE_CHECK1, null);
                 DLLog.e(TAG, "错误 登陆rtc失败 catch-> " + e.toString());
                 Log.i(TAG, "天翼rtc登陆rtc失败   e:" + e.toString());
                 e.printStackTrace();
             }
+        } else {
+            DLLog.e(TAG, "错误 登陆rtc失败 catch-> token为null");
+
         }
+        sendMessageToMainAcitivity(START_FACE_CHECK1, null);//开启人脸识别
     }
 
     /**
@@ -2497,74 +2493,98 @@ public class MainService extends Service {
             Log.i(TAG, "天翼rtc登陆状态 ,result=" + result);
             if (result == RtcConst.CallCode_Success) { //注销和后续刷新成功也存在此处
                 Log.e(TAG, "-----------天翼登陆成功-------------key=" + key + "------------");
-                RTC_AVAILABLE = true;//将界面上的无法呼叫提示隐藏，并开启人脸识别
-                sendMessageToMainAcitivity(START_FACE_CHECK1, null);
-                DLLog.e(TAG, "天翼登陆成功");
+                if (!RTC_AVAILABLE) {
+                    DLLog.d(TAG, "天翼rtc登陆状态成功");
+                }
+                RTC_AVAILABLE = true;//将界面上的无法呼叫提示隐藏
+                countReGetRtc = 0;
+                //RTC后续刷新成功可能会造成过多的人脸识别打开
             } else if (result == RtcConst.NoNetwork || result == RtcConst.CallCode_Network) {
+                if (RTC_AVAILABLE) {
+                    DLLog.e(TAG, "天翼网络不可用或服务器错误，应限制呼叫");
+                }
                 isRtcInit = false;
                 RTC_AVAILABLE = false;//界面提示无法呼叫，不用开启人脸(onNoNetWork会做)
                 onNoNetWork();
-                DLLog.e(TAG, "天翼网络不可用或服务器错误，应限制呼叫");
                 Log.i(TAG, "天翼网络不可用或服务器错误或网络断开，应限制呼叫，断网销毁");
+                if (countReGetRtc < 10) {
+                    countReGetRtc++;
+                } else {
+                    rtcLogout();
+                }
+            } else if (result == RtcConst.CallCode_Timeout) {
+                if (RTC_AVAILABLE) {
+                    DLLog.e(TAG, "天翼登录超时，应限制呼叫");//天翼rtc的token过期时间为20天
+                }
+                Log.i(TAG, "天翼登录超时，应限制呼叫 result=" + result);
+                isRtcInit = false;
+                RTC_AVAILABLE = false;//界面提示无法呼叫
+                if (countReGetRtc < 10) {
+                    countReGetRtc++;
+                } else {
+                    rtcLogout();
+                }
             } else if (result == RtcConst.ReLoginNetwork) {
                 //网络原因导致多次登陆不成功，由用户选择是否继续，如想继续尝试，可以重建device，不能自动重连rtc（因为可能死循环）
                 isRtcInit = false;
                 RTC_AVAILABLE = false; //界面提示无法呼叫
+                Constant.RESTART_PHONE_OR_AUDIO = 1;
+                sendMessageToMainAcitivity(START_FACE_CHECK3, null);//开启人脸识别
                 DLLog.e(TAG, "天翼网络原因导致多次登陆不成功 不能自动重连rtc");
-                rtcLogout();
                 Log.i(TAG, "天翼重连失败应用可以选择重新登录，应限制呼叫");
             } else if (result == RtcConst.DeviceEvt_KickedOff) {
                 //被另外一个终端踢下线，由用户选择是否继续，如果再次登录，需要重新获取token，重建device，不能自动重连rtc（因为可能死循环）
+                isRtcInit = false;
                 RTC_AVAILABLE = false; //界面提示无法呼叫
+                Constant.RESTART_PHONE_OR_AUDIO = 1;
+                sendMessageToMainAcitivity(START_FACE_CHECK3, null);//开启人脸识别
                 DLLog.e(TAG, "天翼被另外一个终端踢下线，不能自动重连rtc");
-                rtcLogout();
                 Log.i(TAG, "天翼同一账号在另一同类型终端登录，被踢，应限制呼叫");
             } else if (result == RtcConst.CallCode_Forbidden) {
                 //认证失效 需要重新获取token重新登录rtc，应限制呼叫，不能自动重连rtc（因为可能死循环）
+                isRtcInit = false;
                 RTC_AVAILABLE = false; //界面提示无法呼叫
-                rtcLogout();
+                Constant.RESTART_PHONE_OR_AUDIO = 1;
+                sendMessageToMainAcitivity(START_FACE_CHECK3, null);//开启人脸识别
                 DLLog.e(TAG, "天翼认证失效 需要重新获取token重新登录rtc 不能自动重连rtc");
                 Log.i(TAG, "天翼认证失效 需要重新获取token重新登录rtc，应限制呼叫 result=" + result);
-            } else if (result == RtcConst.CallCode_Timeout) {
-                Log.i(TAG, "天翼登录超时，应限制呼叫 result=" + result);
-                DLLog.e(TAG, "天翼登录超时，应限制呼叫");//天翼rtc的token过期时间为20天
-                isRtcInit = false;
-                RTC_AVAILABLE = false;//界面提示无法呼叫
-                rtcLogout();
-                // TODO: 2018/9/29  这里需要先退出RTC再重连，暂时只退出，不重连(是否需要重连还有疑问，因为demo中未处理)
             } else if (result == RtcConst.DeviceEvt_MultiLogin) {
                 RTC_AVAILABLE = true;
+                DLLog.e(TAG, "天翼同一账号在不同类型终端登录，不影响呼叫");
                 Log.i(TAG, "天翼同一账号在不同类型终端登录，不影响呼叫");
             } else if (result == RtcConst.ChangeNetwork) {
                 RTC_AVAILABLE = true;
+                DLLog.e(TAG, "天翼网络状态改变，自动重连接;连接上了网络，可以继续呼叫");
                 Log.i(TAG, "天翼网络状态改变，自动重连接;连接上了网络，可以继续呼叫");
             } else if (result == RtcConst.PoorNetwork) {
                 RTC_AVAILABLE = true;
+                DLLog.e(TAG, "天翼网络差，自动重连接;网络闪断，可以忽略，不影响呼叫");
                 Log.i(TAG, "天翼网络差，自动重连接;网络闪断，可以忽略，不影响呼叫");
             } else {
+                isRtcInit = false;
                 RTC_AVAILABLE = false;
                 //天翼RTC登录失败还是要开启人脸识别
-                sendMessageToMainAcitivity(START_FACE_CHECK1, null);
+//                sendMessageToMainAcitivity(START_FACE_CHECK1, null);//开启人脸识别
                 Log.i(TAG, "天翼登陆失败 result=" + result);
                 DLLog.e(TAG, "天翼RTC登陆失败");
             }
         }
 
-
         private void onNoNetWork() {
-            Log.v("MainService", "onNoNetWork");
+            Log.v(TAG, "天翼 onNoNetWork");
             //断网销毁
             if (callConnection != null) {
                 callConnection.disconnect();
                 callConnection = null;
                 sendMessageToMainAcitivity(MSG_RTC_DISCONNECT, "");
             }
-            rtcLogout();
+//            rtcLogout();
         }
 
         @Override
         public void onSendIm(int i) {
-            Log.e(RTCTAG, "onSendIm()" + (i == 0 ? "成功" : "失败"));
+//            Log.e(RTCTAG, "onSendIm()" + (i == 0 ? "成功" : "失败"));
+            Log.e(RTCTAG, "天翼 onSendIm() " + i);//200为成功
             if (callConnectState == CALL_VIDEO_CONNECTING) {
                 checkSendCallMessageParall(i);
             }
@@ -2610,8 +2630,6 @@ public class MainService extends Service {
                 DLLog.e(TAG, "错误 onNewCall  catch-> " + e.toString());
                 e.printStackTrace();
             }
-
-
         }
 
         @Override
@@ -2625,23 +2643,24 @@ public class MainService extends Service {
      * 用异步是因为登出操作会耗时，可能造成阻塞引起ANR
      */
     private void rtcLogout() {
-//        Log.e(TAG, "退出天翼RTC " + rtcFreed);
+        Log.e(TAG, "退出天翼RTC " + rtcFreed);
         DLLog.e(TAG, "退出天翼RTC " + rtcFreed);
         if (rtcFreed) {
             rtcFreed = false;
             new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    if (rtcClient != null) {
-                        rtcClient.release();
-                        rtcClient = null;
-                    }
                     if (device != null) {
                         device.release();
                         device = null;
                     }
+                    if (rtcClient != null) {
+                        rtcClient.release();
+                        rtcClient = null;
+                    }
                     rtcFreed = true;
                     isRtcInit = false;
+                    sendMessageToMainAcitivity(START_FACE_CHECK3, null);
                 }
             }).start();
         }
@@ -2845,7 +2864,7 @@ public class MainService extends Service {
      * @param callName
      */
     private void calling(String callName) {
-        /*try {
+        try {
             String remoteuri = RtcRules.UserToRemoteUri_new(callName, RtcConst.UEType_Any);
             JSONObject jinfo = new JSONObject();
             jinfo.put(RtcConst.kCallRemoteUri, remoteuri);
@@ -2853,7 +2872,7 @@ public class MainService extends Service {
             callConnection = device.connect(jinfo.toString(), connectionListener);
         } catch (JSONException e) {
             e.printStackTrace();
-        }*/
+        }
     }
 
     /**
@@ -3208,7 +3227,6 @@ public class MainService extends Service {
                     Log.v("MainService", "sendIm(): " + sendResult);
                     HttpApi.i("拨号中->sendIm()" + sendResult);
                     triedUserList.add(userObject);
-
                 } else {
                     HttpApi.i("拨号中->没有人在线");
                     afterTryAllMembers();
@@ -3379,7 +3397,7 @@ public class MainService extends Service {
                 Log.e(TAG, "数据库中不存在这个卡 刷卡开门失败" + card);
                 cardId = card;
                 kaInfo = null;//卡信息置为空
-                if (identification) {
+                if (identification) {//只有在人脸线程开启时才能卡开门并截图
                     if (DeviceConfig.PRINTSCREEN_STATE == 0) {//只有在人脸线程开启时才能截图
                         DeviceConfig.PRINTSCREEN_STATE = 2;
                         Log.e(TAG, "刷卡开门失败，开始截图" + DeviceConfig.PRINTSCREEN_STATE);
