@@ -144,6 +144,7 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_START_DIAL;
 import static com.cxwl.menjin.lock.config.Constant.MSG_START_DIAL_PICTURE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_TONGJI_PIC;
 import static com.cxwl.menjin.lock.config.Constant.MSG_TONGJI_VEDIO;
+import static com.cxwl.menjin.lock.config.Constant.MSG_TONGJI_VEDIO1;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPDATE_NETWORKSTATE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPLOAD_LIXIAN_IMG;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPLOAD_LOG;
@@ -401,6 +402,10 @@ public class MainService extends Service {
                     case MSG_TONGJI_VEDIO:
                         Log.i(TAG, "统计广告视频消息");
                         tongjiVedio(msg.obj);
+                        break;
+                    case MSG_TONGJI_VEDIO1:
+                        Log.i(TAG, "统计广告视频消息");
+                        rtcLogout();
                         break;
                     case MSG_TONGJI_PIC:
                         Log.i(TAG, "统计广告图片消息");
@@ -920,18 +925,13 @@ public class MainService extends Service {
                 }
             }
 
-//            if (hour == 3) {
-//                RESTART_PHONE = true;
-//            } else if (hour == 4) {//每晚凌晨4点时进行一次媒体流的重启
-////                if (afterMem < 1000) {
-////                    sendMessageToMainAcitivity(MSG_RESTART_VIDEO, null);
-////                } else {
-////                    RESTART_PHONE = false;
-////                }
-//                if (RESTART_PHONE == true) {
-//                    sendMessageToMainAcitivity(MSG_RESTART_VIDEO, null);
-//                }
-//            }
+            if (hour == 3) {
+                RESTART_PHONE = true;
+            } else if (hour == 4) {//每晚凌晨4点时进行一次媒体流的重启
+                if (RESTART_PHONE == true) {
+                    sendMessageToMainAcitivity(MSG_RESTART_VIDEO, null);
+                }
+            }
             calendar = null;
 
             clearMemory();
@@ -977,7 +977,6 @@ public class MainService extends Service {
         return false;
     }
 
-    //    private long afterMem = 1500;
     private void clearMemory() {
         //To change body of implemented methods use File | Settings | File Templates.
         ActivityManager am = (ActivityManager) getSystemService(Context.ACTIVITY_SERVICE);
@@ -2466,7 +2465,7 @@ public class MainService extends Service {
                 jargs.put(RtcConst.kAccAppID, RTC_APP_ID);//应用id
                 jargs.put(RtcConst.kAccUser, key); //号码
                 jargs.put(RtcConst.kAccType, RtcConst.UEType_Current);//终端类型
-                jargs.put(RtcConst.kAccRetry, 20);//设置重连时间
+                jargs.put(RtcConst.kAccRetry, 30);//设置重连时间
                 device = rtcClient.createDevice(jargs.toString(), deviceListener);
                 Log.i(TAG, " 天翼rtc设置监听 deviceListener   ");
             } catch (JSONException e) {
@@ -2507,6 +2506,8 @@ public class MainService extends Service {
                 RTC_AVAILABLE = false;//界面提示无法呼叫，不用开启人脸(onNoNetWork会做)
                 onNoNetWork();
                 Log.i(TAG, "天翼网络不可用或服务器错误或网络断开，应限制呼叫，断网销毁");
+
+                // TODO: 2018/9/28 两台设备不一样
                 if (countReGetRtc < 10) {
                     countReGetRtc++;
                 } else {
@@ -2519,9 +2520,11 @@ public class MainService extends Service {
                 Log.i(TAG, "天翼登录超时，应限制呼叫 result=" + result);
                 isRtcInit = false;
                 RTC_AVAILABLE = false;//界面提示无法呼叫
+                // TODO: 2018/9/28 两台设备不一样
                 if (countReGetRtc < 10) {
                     countReGetRtc++;
                 } else {
+//                    Constant.RESTART_PHONE_OR_AUDIO = 1;
                     rtcLogout();
                 }
             } else if (result == RtcConst.ReLoginNetwork) {
@@ -2529,24 +2532,24 @@ public class MainService extends Service {
                 isRtcInit = false;
                 RTC_AVAILABLE = false; //界面提示无法呼叫
                 Constant.RESTART_PHONE_OR_AUDIO = 1;
-                sendMessageToMainAcitivity(START_FACE_CHECK3, null);//开启人脸识别
                 DLLog.e(TAG, "天翼网络原因导致多次登陆不成功 不能自动重连rtc");
+                sendMessageToMainAcitivity(START_FACE_CHECK3, null);//开启人脸识别
                 Log.i(TAG, "天翼重连失败应用可以选择重新登录，应限制呼叫");
             } else if (result == RtcConst.DeviceEvt_KickedOff) {
                 //被另外一个终端踢下线，由用户选择是否继续，如果再次登录，需要重新获取token，重建device，不能自动重连rtc（因为可能死循环）
                 isRtcInit = false;
                 RTC_AVAILABLE = false; //界面提示无法呼叫
                 Constant.RESTART_PHONE_OR_AUDIO = 1;
-                sendMessageToMainAcitivity(START_FACE_CHECK3, null);//开启人脸识别
                 DLLog.e(TAG, "天翼被另外一个终端踢下线，不能自动重连rtc");
+                sendMessageToMainAcitivity(START_FACE_CHECK3, null);//开启人脸识别
                 Log.i(TAG, "天翼同一账号在另一同类型终端登录，被踢，应限制呼叫");
             } else if (result == RtcConst.CallCode_Forbidden) {
                 //认证失效 需要重新获取token重新登录rtc，应限制呼叫，不能自动重连rtc（因为可能死循环）
                 isRtcInit = false;
                 RTC_AVAILABLE = false; //界面提示无法呼叫
                 Constant.RESTART_PHONE_OR_AUDIO = 1;
-                sendMessageToMainAcitivity(START_FACE_CHECK3, null);//开启人脸识别
                 DLLog.e(TAG, "天翼认证失效 需要重新获取token重新登录rtc 不能自动重连rtc");
+                sendMessageToMainAcitivity(START_FACE_CHECK3, null);//开启人脸识别
                 Log.i(TAG, "天翼认证失效 需要重新获取token重新登录rtc，应限制呼叫 result=" + result);
             } else if (result == RtcConst.DeviceEvt_MultiLogin) {
                 RTC_AVAILABLE = true;
@@ -2768,8 +2771,8 @@ public class MainService extends Service {
         String json = JsonUtil.parseBeanToJson(logListBean);
         Log.e(TAG, "开门日志上传 参数" + json);
 
-        OkHttpUtils.postString().url(url).content(json).mediaType(MediaType.parse("application/json;" + "" + "" + " "
-                + "charset=utf-8")).addHeader("Authorization", httpServerToken).tag(this).build().execute(new StringCallback() {
+        OkHttpUtils.postString().url(url).content(json).mediaType(MediaType.parse("application/json; charset=utf-8"))
+                .addHeader("Authorization", httpServerToken).tag(this).build().execute(new StringCallback() {
             @Override
             public void onError(Call call, Exception e, int id) {
                 Log.e(TAG, "onError rtc上传日志接口createAccessLog oner " + e.toString());

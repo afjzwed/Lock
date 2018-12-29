@@ -29,6 +29,8 @@ public class MacUtils {
         } else {
             return mac;
         }
+//        return "28:ed:e0:77:81:ee";
+//        return "28:ed:e0:77:e4:6a";
     }
 
     @SuppressLint("WifiManagerLeak")

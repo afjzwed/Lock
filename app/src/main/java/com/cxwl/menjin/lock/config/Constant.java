@@ -39,7 +39,7 @@ public class Constant {
     public static final int START_FACE_CHECK2 = 11112;//登录天翼RTC之前先释放相机
     public static final int START_FACE_CHECK3 = 11115;//延时2秒打开人脸识别
 
-    public static float FACE_MAX = 0.63f;
+    public static float FACE_MAX = 0.62f;
     /********************虹软相关*********************/
 
     /********************天翼RTC相关******************/
@@ -83,6 +83,7 @@ public class Constant {
     public static final int MSG_LIXIAN_PASSWORD_CHECK_AFTER = 200090;//获取离线验证密码
     public static final int MSG_PASSWORD_CHECK = 10003;//验证密码后
     public static final int MSG_TONGJI_VEDIO = 200091;//上传统计视频播放消息
+    public static final int MSG_TONGJI_VEDIO1 = 200099;//按键测试
     public static final int MSG_TONGJI_PIC = 200092;//上传统计广告图片播放消息
     public static final int MSG_ADVERTISE_IMAGE = 200093;//跟新背景图片
 
