@@ -815,9 +815,6 @@ public class MainService extends Service {
                                             .getLian()));
                                     if (Long.parseLong(banbenBean.getLian()) > lianVision) {
                                         Log.i(TAG, "心跳中有人脸信息更新");
-//                                        if (faceStatus == 0) {//判断是否正在下载
-//                                            getFaceUrlInfo(Long.parseLong(banbenBean.getLian()));
-//                                        }
                                         if (currentStatus == CALL_MODE || currentStatus == PASSWORD_MODE)
                                         {//如果当前是呼叫或密码模式（即人脸识别模式）才下载
                                             if (faceStatus == 0) {//判断是否正在下载

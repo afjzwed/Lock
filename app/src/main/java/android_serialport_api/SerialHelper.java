@@ -26,8 +26,8 @@ public class SerialHelper implements Serializable {
     private ReadThread mReadThread;
     private SendThread mSendThread;
     //    private String sPort = "/dev/s3c2410_serial0";
-    private String sPort = "/dev/ttyS4";
-//    private String sPort = "/dev/ttyS1";
+//    private String sPort = "/dev/ttyS4";//门口机才能用ttyS4
+    private String sPort = "/dev/ttyS1";
     private int iBaudRate = 9600;
     private boolean _isOpen = false;
     private byte[] _bLoopData = new byte[]{0x30};

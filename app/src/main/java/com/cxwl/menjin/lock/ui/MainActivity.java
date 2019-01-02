@@ -192,6 +192,7 @@ import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK;
 import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK1;
 import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK2;
 import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK3;
+import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK5;
 import static com.cxwl.menjin.lock.config.Constant.arc_appid;
 import static com.cxwl.menjin.lock.config.Constant.fr_key;
 import static com.cxwl.menjin.lock.config.Constant.ft_key;
@@ -361,6 +362,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         //初始化人脸相关与身份证识别
         initFaceDetectAndIDCard();
+        // TODO: 2018/12/29 测试
+//        initFaceDetectAndIDCard1();
 
         isTongGaoThreadStart = false;//每次初始化都重启一次通告更新线程
         isPicThreadStart = false;//每次初始化都重启一次图片更新线程
@@ -824,7 +827,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         control = new SerialHelper();
         control.setDataReceived(this);
-//        control.setPort("/dev/ttyS4");
+//        control.setPort("/dev/ttyS4");//门口机才能用ttyS4
         // TODO: 2018/9/28 两台设备不一样
         control.setPort("/dev/ttyS1");
         control.setBaudRate(9600);
@@ -1100,23 +1103,14 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Log.e(TAG, "登录天翼RTC之后再重新打开人脸相机 " + RTC_AVAILABLE);
 //                        faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_CONTRAST, 2000);
                         handler.sendEmptyMessageDelayed(START_FACE_CHECK, 2000);
+                        // TODO: 2018/12/29 测试 隔段时间重开一次摄像头试试
+//                        startClockRefresh1();
                         break;
                     case START_FACE_CHECK2:
                         Log.e(TAG, "登录天翼RTC之前先释放相机");
                         faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 0);//在登录天翼RTC之前先把人脸识别关掉
                         break;
                     case START_FACE_CHECK3:
-//                        DLLog.e(TAG, "人脸天翼登录状态有问题");
-//                        if (identification == false) {
-//                            handler.sendEmptyMessage(START_FACE_CHECK);
-//                            facetimer.schedule(new TimerTask() {
-//                                public void run() {
-//                                    //execute the task
-//                                    //删除单个人脸时处理速度可能过快，导致先人脸识别再人脸暂停，所以用定时器控制1秒后再人脸识别，保证在人脸暂停后
-//                                    handler.sendEmptyMessage(START_FACE_CHECK);
-//                                }
-//                            }, 1000);
-//                        }
                         Log.e(TAG, "登录天翼RTC之前先释放相机");
                         faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 0);//在登录天翼RTC之前先把人脸识别关掉
                         rtcTimer.schedule(new TimerTask() {
@@ -1125,6 +1119,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 Log.e(TAG, "人脸天翼登录状态有问题");
                                 handler.sendEmptyMessage(START_FACE_CHECK);
                                 DLLog.e(TAG, "人脸天翼登录状态有问题");
+                            }
+                        }, 3000);
+                        break;
+                    case START_FACE_CHECK5:
+                        Log.e(TAG, "隔段时间开关人脸之前先释放相机");
+                        faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 0);//在登录天翼RTC之前先把人脸识别关掉
+                        rtcTimer.schedule(new TimerTask() {
+                            public void run() {
+                                //用定时器控制2秒后再人脸识别，保证在人脸暂停后
+                                Log.e(TAG, "隔段时间开关人脸");
+                                handler.sendEmptyMessage(START_FACE_CHECK);
+                                DLLog.e(TAG, "隔段时间开关人脸");
                             }
                         }, 3000);
                         break;
@@ -2639,7 +2645,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (blockNo.equals("9991") || blockNo.equals("99999991")) {
             DLLog.e(TAG, "手动重启");
             onReStartVideo();
-//            startClockRefresh1();// TODO: 2018/12/29 测试 隔段时间重开一次摄像头试试
+//            startClockRefresh1();
             return;
         }
 
@@ -4115,33 +4121,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         clockRefreshThread1 = new Thread() {
             public void run() {
                 try {
-                    faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 0);//在登录天翼RTC之前先把人脸识别关掉
-                    rtcTimer.schedule(new TimerTask() {
-                        public void run() {
-                            //用定时器控制2秒后再人脸识别，保证在人脸暂停后
-                            Log.e(TAG, "测试 人脸天翼登录状态有问题");
-                            handler.sendEmptyMessage(START_FACE_CHECK);
-                            DLLog.e(TAG, "人脸天翼登录状态有问题");
-                        }
-                    }, 3000);
                     while (true) {
-                        sleep(1000 * 600); //等待指定的一个时间(一分钟显示一次)
+                        sleep(1000 * 60 * 60); //等待指定的一个时间
                         if (!isInterrupted()) { //检查线程没有被停止
-                            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 0);//在登录天翼RTC之前先把人脸识别关掉
-                            rtcTimer.schedule(new TimerTask() {
-                                public void run() {
-                                    //用定时器控制2秒后再人脸识别，保证在人脸暂停后
-                                    Log.e(TAG, "测试 人脸天翼登录状态有问题");
-                                    handler.sendEmptyMessage(START_FACE_CHECK);
-                                    DLLog.e(TAG, "人脸天翼登录状态有问题");
-                                }
-                            }, 3000);
+                            if (currentStatus == CALL_MODE && identification && faceHandler != null && mCamerarelease
+                                    && mGLSurfaceView != null && mSurfaceView != null) {
+                                handler.sendEmptyMessageDelayed(START_FACE_CHECK5, 200);
+                            }
                         }
                     }
                 } catch (InterruptedException e) {
                     // TODO: 2018/9/29 不要捕捉后只记录不处理，这样相当于生吞中断，应该保留中断发生的证据，以便调用栈中更高层的代码能知道中断，并对中断作出响应。该任务可以通过调用
                     // interrupt() 以 “重新中断” 当前线程来完成
-//                    DLLog.e(TAG, "错误 startClockRefresh catch-> " + e.toString());
+                    DLLog.e(TAG, "错误 startClockRefresh1 catch-> " + e.toString());
                     Log.e(TAG, "错误 startClockRefresh1 catch-> " + e.toString());
                     e.printStackTrace();
                 }

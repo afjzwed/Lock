@@ -231,6 +231,29 @@
                         android:layout_height="200dp"
                         android:visibility="gone"/>
                 </LinearLayout>
+
+                <!--<FrameLayout-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_alignParentBottom="true"-->
+                    <!--android:layout_alignParentRight="true">-->
+
+                    <!--<SurfaceView-->
+                        <!--android:layout_marginBottom="10dp"-->
+                        <!--android:layout_marginRight="5dp"-->
+                        <!--android:id="@+id/face_faceview"-->
+                        <!--android:layout_width="352dp"-->
+                        <!--android:layout_height="200dp"-->
+                        <!--android:visibility="gone"/>-->
+
+                    <!--<SurfaceView-->
+                        <!--android:layout_marginBottom="10dp"-->
+                        <!--android:layout_marginRight="5dp"-->
+                        <!--android:id="@+id/camera_faceview"-->
+                        <!--android:layout_width="352dp"-->
+                        <!--android:layout_height="200dp"-->
+                        <!--android:visibility="gone"/>-->
+                <!--</FrameLayout>-->
             </RelativeLayout>
 
             <!--QQ物联相关删除-->
@@ -446,7 +469,6 @@
             android:layout_height="match_parent"
             android:background="@mipmap/bg_banner"
             android:scaleType="fitXY"/>
-
 
     </RelativeLayout>
 </LinearLayout>
