@@ -2175,6 +2175,7 @@ public class MainService extends Service {
     protected void initWhenOffline() {
         //在离线模式中需要把心跳线程间隔时间延长
         HttpApi.i("进入离线模式");
+        DLLog.e(TAG, "进入离线模式");
         rtcLogout();//退出RTC
         if (initMacKey()) {
             HttpApi.i("通过MAC地址验证");

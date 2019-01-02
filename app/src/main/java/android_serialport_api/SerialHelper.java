@@ -250,7 +250,8 @@ public class SerialHelper implements Serializable {
                                     bytes.clear();
                                     ComRecData.index = 5;
                                     if (null != dataReceived) {
-                                        dataReceived.setData(ComRecData);
+//                                        dataReceived.setData(ComRecData);
+                                        closeDeng();
                                     }
                                     sendXintiao();
                                     break;
