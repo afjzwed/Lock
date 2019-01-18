@@ -30,8 +30,9 @@ public class MacUtils {
 //            return mac;
 //        }
 //        return "28:ed:e0:77:81:ee";
-//        return "28:ed:e0:77:e4:6a";
-        return "cc:cc:cc:cc:cc:18";
+        return "28:ed:e0:77:e4:6a";
+//        return "cc:cc:cc:cc:cc:18";
+//        return "28:ed:e0:77:e4:6b";
     }
 
     @SuppressLint("WifiManagerLeak")

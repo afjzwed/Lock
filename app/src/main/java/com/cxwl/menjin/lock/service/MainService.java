@@ -404,7 +404,7 @@ public class MainService extends Service {
                         tongjiVedio(msg.obj);
                         break;
                     case MSG_TONGJI_VEDIO1:
-                        Log.i(TAG, "统计广告视频消息");
+                        Log.i(TAG, "按键测试");
                         rtcLogout();
                         break;
                     case MSG_TONGJI_PIC:
@@ -1041,9 +1041,11 @@ public class MainService extends Service {
             }
         }
         long afterMem = getAvailMemory(getApplication());
+
         if (afterMem < 1000) {
             onReStartVideo();//如果长久开启的话这个要打开
         }
+
         DLLog.w("进程", " after memory info : " + afterMem);
 //        Log.d("进程", "----------- after memory info : " + afterMem);
 //        DLLog.e("进程", "-----------before memory info : " + beforeMem + " ----------- after memory info : " +
@@ -2522,7 +2524,6 @@ public class MainService extends Service {
                 if (countReGetRtc < 10) {
                     countReGetRtc++;
                 } else {
-//                    Constant.RESTART_PHONE_OR_AUDIO = 1;
                     rtcLogout();
                 }
             } else if (result == RtcConst.ReLoginNetwork) {
@@ -3129,7 +3130,6 @@ public class MainService extends Service {
             mHandler.sendMessage(message);
             e.printStackTrace();
         }
-
     }
 
     /**
@@ -3325,7 +3325,7 @@ public class MainService extends Service {
 
 //        MainApplication.getRefWatcher(this).watch(this);
 
-        //onReStartVideo();
+        //onReSt
 
         saveVisionInfo();
         // TODO: 2018/5/15 还有资源未释放
@@ -3379,7 +3379,7 @@ public class MainService extends Service {
     private void onCardIncome(String card) {
         if (!this.cardRecord.checkLastCard(card)) {//判断距离上次刷卡时间是否超过2秒
             Log.v("MainService", "onCard====卡信息：" + card);
-            DbUtils.getInstans().quaryAllKa();
+//            DbUtils.getInstans().quaryAllKa();
             kaInfo = DbUtils.getInstans().getKaInfo(card);
             if (kaInfo != null && System.currentTimeMillis() < Long.parseLong(kaInfo.getGuoqi_time())) {//判断数据库中是否有卡
                 Log.v("MainService", "onCard====当前时间：" + System.currentTimeMillis() + "卡过期时间：" + kaInfo.getGuoqi_time
@@ -3423,8 +3423,7 @@ public class MainService extends Service {
     private String getVersionName() {
         String verName = "";
         try {
-            verName = this.getPackageManager().
-                    getPackageInfo(this.getPackageName(), 0).versionName;
+            verName = this.getPackageManager().getPackageInfo(this.getPackageName(), 0).versionName;
         } catch (Exception e) {
             e.printStackTrace();
         }

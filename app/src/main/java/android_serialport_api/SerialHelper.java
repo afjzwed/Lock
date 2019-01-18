@@ -211,8 +211,7 @@ public class SerialHelper implements Serializable {
 //                            System.out.println("versions值为" + versions);
 //                            System.out.println("总值为" + bytes.get(0) + "," + bytes.get(1) + "," + bytes.get(2) + ","
 //                                    + bytes.get(3) + "," + bytes.get(4) + "," + bytes.get(5) + "," + bytes.get(6) +
-// ","
-//                                    + bytes.get(7) + "");
+// ","+ bytes.get(7) + "");
                             switch (versions) {
                                 case 02:// 刷卡
                                     byte[] cardBtyes = new byte[4];
@@ -250,8 +249,8 @@ public class SerialHelper implements Serializable {
                                     bytes.clear();
                                     ComRecData.index = 5;
                                     if (null != dataReceived) {
-//                                        dataReceived.setData(ComRecData);
-                                        closeDeng();
+                                        dataReceived.setData(ComRecData);
+//                                        closeDeng();
                                     }
                                     sendXintiao();
                                     break;

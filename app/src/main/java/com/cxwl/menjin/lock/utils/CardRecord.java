@@ -55,6 +55,13 @@ public class CardRecord {
             this.nameDate = new Date();
         }
         return result;
+//        long offset = new Date().getTime() - this.nameDate.getTime();
+//        if (offset > 1000 * 8) {
+//            this.nameDate = new Date();
+//            return false;
+//        } else {
+//            return true;
+//        }
     }
 
     public boolean checkLastBody(String body) {
