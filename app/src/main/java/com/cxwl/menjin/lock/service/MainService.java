@@ -164,6 +164,7 @@ import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK2;
 import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK3;
 import static com.cxwl.menjin.lock.config.Constant.identification;
 import static com.cxwl.menjin.lock.config.DeviceConfig.LOCAL_APK_PATH;
+import static com.cxwl.menjin.lock.config.DeviceConfig.RTC_RELOAD_COUNT;
 import static com.cxwl.menjin.lock.ui.MainActivity.currentStatus;
 
 /**
@@ -2400,8 +2401,10 @@ public class MainService extends Service {
     }
 
     private int countReGetRtc = 0;//重连天翼RTC次数，超过10次就不再获取，防止死循环
+    // TODO: 2019/2/12 尝试用volatile关键字修饰,避免并发错误?
     private boolean rtcFreed = true;//rtc是否释放完毕的标志
-    public static boolean RTC_AVAILABLE = false;//rtc是否登录完成的标志，主页面可根据此变量提示用户能否呼叫
+    // TODO: 2019/2/12 尝试用volatile关键字修饰,避免并发错误?
+    public  static boolean RTC_AVAILABLE = false;//rtc是否登录完成的标志，主页面可根据此变量提示用户能否呼叫
 
     /**
      * 获取TOKEN
@@ -2506,9 +2509,8 @@ public class MainService extends Service {
                 RTC_AVAILABLE = false;//界面提示无法呼叫，不用开启人脸(onNoNetWork会做)
                 onNoNetWork();
                 Log.i(TAG, "天翼网络不可用或服务器错误或网络断开，应限制呼叫，断网销毁");
-
                 // TODO: 2018/9/28 两台设备不一样
-                if (countReGetRtc < 10) {
+                if (countReGetRtc < RTC_RELOAD_COUNT) {
                     countReGetRtc++;
                 } else {
                     rtcLogout();
@@ -2521,7 +2523,7 @@ public class MainService extends Service {
                 isRtcInit = false;
                 RTC_AVAILABLE = false;//界面提示无法呼叫
                 // TODO: 2018/9/28 两台设备不一样
-                if (countReGetRtc < 10) {
+                if (countReGetRtc < RTC_RELOAD_COUNT) {
                     countReGetRtc++;
                 } else {
                     rtcLogout();
@@ -2647,6 +2649,7 @@ public class MainService extends Service {
     private void rtcLogout() {
         Log.e(TAG, "退出天翼RTC " + rtcFreed);
         DLLog.e(TAG, "退出天翼RTC " + rtcFreed);
+        RTC_AVAILABLE = false;//界面提示无法呼叫
         if (rtcFreed) {
             rtcFreed = false;
             new Thread(new Runnable() {
@@ -2720,29 +2723,6 @@ public class MainService extends Service {
                 createAccessLog(list);
             }
 
-//            openLock(2);
-//            //分为手机开门和视屏开门 1和2 进行区分 上传日志统一传2；
-//            if (logDoor.getKaimenfangshi() == 1) {
-//                logDoor.setKaimenfangshi(2);
-//                //一键开门拍照
-//                if (StringUtils.isFastClick()) {
-//                    String imgurl = "door/img/" + System.currentTimeMillis() + ".jpg";
-//                    sendMessageToMainAcitivity(MSG_YIJIANKAIMEN_TAKEPIC, imgurl);
-//                    logDoor.setKaimenjietu(imgurl);
-//                }
-//            } else {
-//                sendMessageToMainAcitivity(MSG_YIJIANKAIMEN_TAKEPIC1, null);
-//            }
-//            logDoor.setState(1);
-//            List<LogDoor> list = new ArrayList<>();
-//            //拼接图片地址
-//            logDoor.setKaimenjietu(logDoor.getKaimenjietu());
-//            logDoor.setKaimenshijian(StringUtils.transferLongToDate("yyyy-MM-dd HH:mm:ss", System.currentTimeMillis
-// ()));
-//            Log.e(TAG, "图片imageUrl" + logDoor.getKaimenjietu());
-//            list.add(logDoor);
-//            //上传日志
-//            createAccessLog(list);
         } else if (content.startsWith("refuse call")) { //拒绝接听
 //            if (!rejectUserList.contains(from)) {
 //                rejectUserList.add(from);

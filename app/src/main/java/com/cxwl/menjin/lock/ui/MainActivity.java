@@ -263,7 +263,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private Thread clockRefreshThread = null;
     private Timer facetimer = new Timer();
     private Timer rtcTimer = new Timer();
-    private Timer rtcTimer1 = new Timer();
 
     private Thread passwordTimeoutThread = null;//访客密码线程
     private String guestPassword = "";//访客输入的密码值
@@ -343,6 +342,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initAexNfcReader();//初始化nfc本地广播
         initMainService();
         initVoiceVolume();//初始化音量设置
+
+//        initLightVolume();//初始化屏幕亮度设置
+
         initAutoCamera();
         startClockRefresh();//时间更新线程,在有心跳包后用心跳包代替
         // TODO: 2018/12/29 测试 隔段时间重开一次摄像头试试
@@ -822,6 +824,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     /**
+     * 初始化屏幕亮度设置
+     */
+    private void initLightVolume() {
+        int systemBrightness = getSystemBrightness();
+        Log.e(TAG, "屏幕亮度 systemBrightness " + systemBrightness);
+    }
+
+    /**
+     * 获取当前设备Window系统亮度
+     *
+     * @return
+     */
+    private int getSystemBrightness() {
+        int systemBrightness = 0;
+        try {
+            systemBrightness = Settings.System.getInt(getContentResolver(), Settings.System.SCREEN_BRIGHTNESS);
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
+        return systemBrightness;
+    }
+
+    /**
+     * 改变当前Window亮度
+     * @param brightness
+     */
+    public void changeAppBrightness(int brightness) {
+        Window window = this.getWindow();
+        WindowManager.LayoutParams lp = window.getAttributes();
+        if (brightness == -1) {
+            lp.screenBrightness = WindowManager.LayoutParams.BRIGHTNESS_OVERRIDE_NONE;
+        } else {
+            lp.screenBrightness = (brightness <= 0 ? 1 : brightness) / 255f;
+        }
+        window.setAttributes(lp);
+    }
+
+    /**
      * 初始化卡阅读器
      */
     private void initAexNfcReader() {
@@ -1056,7 +1096,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Log.e(TAG, "人脸信息删除" + " delete " + delete);
                         break;
                     case MSG_YIJIANKAIMEN_TAKEPIC:
-                        takePicture1((String) msg.obj);
+                        takePictureFromPhone((String) msg.obj);
                         break;
                     case MSG_UPLOAD_LIXIAN_IMG:
                         uploadImgs((List<ImgFile>) msg.obj);
@@ -1119,6 +1159,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 DLLog.e(TAG, "人脸天翼登录状态有问题");
                             }
                         }, 3000);
+                        if (showMacText != null) {
+                            showMacText.setVisibility(View.VISIBLE);
+                            showMacText.setText("可视对讲设备未登录，请联系管理员");
+                        }
                         break;
                     case MSG_CARD_KEY_INCOM://卡及按键回调
                         ComBean comBean = (ComBean) msg.obj;
@@ -1447,7 +1491,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 }
 
             }
-
         }, 1000, 5000);
     }
 
@@ -1629,26 +1672,44 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         }
                     } else {//输入框有值走呼叫或密码
                         if (currentStatus == CALL_MODE) {//呼叫
-                            if (RTC_AVAILABLE) {
-                                if ("C".equals(DeviceConfig.DEVICE_TYPE)) {//大门
-                                    if (blockNo.length() == DeviceConfig.BLOCK_LENGTH) {
+//                            if (RTC_AVAILABLE) {
+//                                if ("C".equals(DeviceConfig.DEVICE_TYPE)) {//大门
+//                                    if (blockNo.length() == DeviceConfig.BLOCK_LENGTH) {
+//                                        startDialing(blockNo);
+//                                    } else if (blockNo.length() == DeviceConfig.MOBILE_NO_LENGTH) {//手机号
+//                                        if (true) {//正则判断
+//                                            startDialing(blockNo);
+//                                        }
+//                                    }
+//                                } else {//单元
+//                                    if (blockNo.length() == DeviceConfig.UNIT_NO_LENGTH) {
+//                                        startDialing(blockNo);
+//                                    } else if (blockNo.length() == DeviceConfig.MOBILE_NO_LENGTH) {//手机号
+//                                        if (true) {//正则判断
+//                                            startDialing(blockNo);
+//                                        }
+//                                    }
+//                                }
+//                            } else {
+//                                Utils.DisplayToast(MainActivity.this, "可视对讲设备未登录，请稍后重试或重启应用");
+//                            }
+
+                            if ("C".equals(DeviceConfig.DEVICE_TYPE)) {//大门
+                                if (blockNo.length() == DeviceConfig.BLOCK_LENGTH) {
+                                    startDialing(blockNo);
+                                } else if (blockNo.length() == DeviceConfig.MOBILE_NO_LENGTH) {//手机号
+                                    if (true) {//正则判断
                                         startDialing(blockNo);
-                                    } else if (blockNo.length() == DeviceConfig.MOBILE_NO_LENGTH) {//手机号
-                                        if (true) {//正则判断
-                                            startDialing(blockNo);
-                                        }
-                                    }
-                                } else {//单元
-                                    if (blockNo.length() == DeviceConfig.UNIT_NO_LENGTH) {
-                                        startDialing(blockNo);
-                                    } else if (blockNo.length() == DeviceConfig.MOBILE_NO_LENGTH) {//手机号
-                                        if (true) {//正则判断
-                                            startDialing(blockNo);
-                                        }
                                     }
                                 }
-                            } else {
-                                Utils.DisplayToast(MainActivity.this, "可视对讲设备未登录，请稍后重试或重启应用");
+                            } else {//单元
+                                if (blockNo.length() == DeviceConfig.UNIT_NO_LENGTH) {
+                                    startDialing(blockNo);
+                                } else if (blockNo.length() == DeviceConfig.MOBILE_NO_LENGTH) {//手机号
+                                    if (true) {//正则判断
+                                        startDialing(blockNo);
+                                    }
+                                }
                             }
                         } else {//密码开门
                             if (guestPassword.length() == 6) {
@@ -2004,7 +2065,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     public void onRtcVideoOn() {
-        setDialValue1("和" + blockNo + "通话中，挂断按取消键");
+        setDialValue1("和" + blockNo + "通话中,挂断按取消键");
         initVideoViews();
         Log.e(TAG, "开始创建remoteView");
         if (mCamerarelease) {
@@ -2114,7 +2175,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
-    protected void takePicture1(final String imgUrl) {
+    protected void takePictureFromPhone(final String imgUrl) {
         Log.v("MainActivity", "开始启动拍照");
         //启动人脸识别
         if (faceHandler != null) {
@@ -2133,20 +2194,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     e.printStackTrace();
                 }
                 mCamerarelease = false;
-                try {
-                    camera = Camera.open(1);
-                    Log.e(TAG, "打开照相机 1");
-                } catch (Exception e) {
-                    Log.e(TAG, "打开照相机 2 " + e.toString());
-                }
                 Log.v(TAG, "打开照相机");
-                if (camera == null) {
-                    try {
-                        camera = Camera.open(0);
-                        Log.e(TAG, "打开照相机 3");
-                    } catch (Exception e) {
-                        Log.e(TAG, "打开照相机 4" + e.toString());
-                    }
+                try {
+                    camera = Camera.open(0);
+                    Log.e(TAG, "打开照相机 3");
+                } catch (Exception e) {
+                    Log.e(TAG, "打开照相机 4" + e.toString());
+                    DLLog.e(TAG, "错误 打开照相机 4 catch-> " + e.toString());
                 }
                 if (camera != null) {
                     try {
@@ -2161,7 +2215,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                             @Override
                             public void onPictureTaken(byte[] data, Camera camera1) {
                                 try {
-
                                     Log.v("MainActivity", "释放照相机资源");
                                     Log.v("MainActivity", "拍照成功");
                                     Bitmap bitmap = BitmapFactory.decodeByteArray(data, 0, data.length);
@@ -2343,21 +2396,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private synchronized void doTakePicture(final String thisValue, final String curUrl, final boolean isCall, final
     String uuid, final TakePictureCallback callback) {
         mCamerarelease = false;
-        try {
-            camera = Camera.open(1);
-            Log.e(TAG, "打开照相机 1");
-        } catch (Exception e) {
-            Log.e(TAG, "打开照相机 2 " + e.toString());
-        }
+
         Log.v(TAG, "打开照相机");
-        if (camera == null) {
-            try {
-                camera = Camera.open(0);
-                Log.e(TAG, "打开照相机 3");
-            } catch (Exception e) {
-                Log.e(TAG, "打开照相机 4" + e.toString());
-                DLLog.e(TAG, "错误 打开照相机 4 catch-> " + e.toString());
-            }
+        try {
+            camera = Camera.open(0);
+            Log.e(TAG, "打开照相机 3");
+        } catch (Exception e) {
+            Log.e(TAG, "打开照相机 5" + e.toString());
+            e.printStackTrace();
+            DLLog.e(TAG, "错误 doTakePicture 打开照相机 5 catch-> " + e.toString());
         }
         if (camera != null) {
             try {
@@ -2597,90 +2644,43 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      * @param blockNo
      */
     private void startDialing(String blockNo) {
-        /*if (blockNo.equals("9999") || blockNo.equals("99999999")) {
-            if (faceHandler != null) {
-                //人脸识别录入
-                faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 100);
-                faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_INPUT, 100);
-                return;
-            }
-        }*/
-
-        /*if (blockNo.equals(("8888")) || blockNo.equals("88888888")) {
-            if (faceHandler != null) {
-                // TODO: 2018/5/28 不暂停人脸识别
-//                faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 100);
-//                faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_INPUT, 100);
-                if (ArcsoftManager.getInstance().mFaceDB.mRegister.isEmpty()) {
-                    Utils.DisplayToast(MainActivity.this, "没有注册人脸，请先注册");
-                } else {
-                    rl_nfc.setVisibility(View.VISIBLE);
-                    tv_message.setText("");
-                    nfcFlag = true;
-                    isFlag = true;
-                    cardId = null;
-                    //录卡楼栋号输入栏强制获取焦点
-                    getFocus(et_unitno);
-                    et_unitno.setText("");
-                    return;
-                }
-            }
-        }*/
 
         if (blockNo.equals("9991") || blockNo.equals("99999991")) {
             DLLog.e(TAG, "手动重启");
             onReStartVideo();
-//            startFaceRefresh();
             return;
         }
 
-        if (blockNo.equals("9992") || blockNo.equals("99999992")) {
-            File file = DLLog.upLoadFile();
-            if (null != file) {
-                uploadLogToQiNiu(file);
-            } else {
-                DLLog.d("上传日志七牛", "没有日志");
-            }
-            return;
-        }
-
-        if (blockNo.equals("9993") || blockNo.equals("99999993")) {
-
-//            handler.sendEmptyMessageDelayed(START_FACE_CHECK2, 0);
-//            handler.sendEmptyMessageDelayed(START_FACE_CHECK3, 0);
-
-//            if (faceHandler != null) {
-//                faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 0);
-//            }
-//            startActivity(new Intent(this, PhotographActivity.class));
-//            handler.sendEmptyMessageDelayed(START_FACE_CHECK, 3000);
-
-//            File file = DLLog.upLoadFile1();
+//        if (blockNo.equals("9992") || blockNo.equals("99999992")) {
+//            File file = DLLog.upLoadFile();
 //            if (null != file) {
 //                uploadLogToQiNiu(file);
 //            } else {
-//                DLLog.d("上传日志七牛","没有日志");
+//                DLLog.d("上传日志七牛", "没有日志");
 //            }
+//            return;
+//        }
 
-//            Toast.makeText(MainActivity.this, "本机的IP：" + Intenet.getHostIP(), Toast.LENGTH_LONG).show();
-            sendMainMessager(MSG_TONGJI_VEDIO1, null);
-//            if (faceHandler != null) {
-//                faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 0);
-//                startActivity(new Intent(this, PhotographActivity.class));
-//            }
+        if (blockNo.equals("9993") || blockNo.equals("99999993")) {
+//            sendMainMessager(MSG_TONGJI_VEDIO1, null);
+//            changeAppBrightness(50);
             return;
         }
 
+        if (RTC_AVAILABLE) {
+            //呼叫前，确认摄像头不被占用 虹软
+            if (faceHandler != null) {
+                faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 0);
+            }
 
-        //呼叫前，确认摄像头不被占用 虹软
-        if (faceHandler != null) {
-            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 0);
+            Log.i(TAG, "拍摄访客照片 并进行呼叫" + blockNo);
+            setCurrentStatus(CALLING_MODE);
+            //拍摄访客照片 并进行呼叫
+            takePicture(blockNo, true, MainActivity.this);
+        } else {
+            Utils.DisplayToast(MainActivity.this, "可视对讲设备未登录，请稍后重试或重启应用");
+            return;
         }
-
-        Log.i(TAG, "拍摄访客照片 并进行呼叫" + blockNo);
-        setCurrentStatus(CALLING_MODE);
-        //拍摄访客照片 并进行呼叫
-        takePicture(blockNo, true, MainActivity.this);
     }
 
     /**
@@ -3060,7 +3060,12 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     case R.id.action_updateVersion:
                         Log.e(TAG, "menu 更新");
 //                        onReStartVideo();
-                        //点击，手动更新
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                tv_input_text.setText("sdflkjdsl");
+                            }
+                        }).start();
                         break;
                     case R.id.action_settings3://上传日志
 //                        clearMemory();
@@ -3176,7 +3181,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 MainActivity.this.runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-
                         if (ArcsoftManager.getInstance().mFaceDB.mRegister.isEmpty()) {
 //                            Log.v("人脸识别", "initFaceDetect-->" + 333);
 //                            Utils.DisplayToast(MainActivity.this, "没有注册人脸，请先注册");
@@ -3210,22 +3214,15 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
 
             try {
-                mCamera = Camera.open(1);//打开前置相机
-                Log.e(TAG, "相机 ID为1");
+                mCamera = Camera.open(0);//打开后置相机
+                Log.e(TAG, "相机 ID为0");
             } catch (Exception e) {
                 mCamera = null;
+                DLLog.e("错误 摄像头 MainActivity", "主页面 相机打开失败" + " setupCamera-->" + e.toString());
+                Constant.RESTART_PHONE_OR_AUDIO = 1;
+                e.printStackTrace();
             }
 
-            if (mCamera == null) {
-                try {
-                    mCamera = Camera.open(0);
-                    Log.e(TAG, "相机 ID为0");
-                } catch (Exception e) {
-                    DLLog.e("错误 摄像头 MainActivity", "主页面 相机打开失败" + " setupCamera-->" + e.toString());
-                    Constant.RESTART_PHONE_OR_AUDIO = 1;
-                    e.printStackTrace();
-                }
-            }
 
             // TODO: 2018/10/9 设置尺寸和指定图像的格式用下面两个方法试试
             // setPreviewSizes(); //设置预览分辨率

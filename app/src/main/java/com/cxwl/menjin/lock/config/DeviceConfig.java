@@ -5,6 +5,8 @@ package com.cxwl.menjin.lock.config;
  * Created by simon on 2016/7/23.
  */
 public class DeviceConfig {
+
+//    volatile 防止并发,适用于对变量的写操作不依赖于当前值,对变量的读取操作不依赖于非volatile变量,适用于读多写少的场景
     /********residential*****/
 
     public static final String LOCAL_FILE_PATH = "adv";//广告储存位置
@@ -34,7 +36,9 @@ public class DeviceConfig {
     public static int MOBILE_NO_LENGTH = 11;//手机号长度
     public static int UNIT_NO_LENGTH = 4;//房屋号长度
     public static int BLOCK_LENGTH = 8;//楼栋房屋号长度
+    public static int RTC_RELOAD_COUNT = 20;//天翼RTC自动重连次数,重连超过该次数后则停止重连,断开RTC连接
 
+    // TODO: 2019/2/12 尝试用volatile关键字修饰,避免并发错误?
     public static int PRINTSCREEN_STATE = 0;//各种方式(人脸/卡通过人脸线程截图)是否开始处理图片并上传日志的状态  0:未开始 1:人脸 2:卡成功 3:代表人脸线程未开
 
     public static final int DEVICE_KEYCODE_POUND = 66;//确认键

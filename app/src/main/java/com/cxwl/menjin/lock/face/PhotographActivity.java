@@ -1,20 +1,13 @@
 package com.cxwl.menjin.lock.face;
 
-import android.content.Intent;
-import android.graphics.ImageFormat;
 import android.hardware.Camera;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 
 import com.cxwl.menjin.lock.R;
-import com.cxwl.menjin.lock.utils.DLLog;
-import com.guo.android_extend.widget.CameraFrameData;
-import com.guo.android_extend.widget.CameraGLSurfaceView;
-import com.guo.android_extend.widget.CameraSurfaceView;
 
 /**
  * Created by William on 2018/7/30.
