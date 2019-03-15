@@ -11,6 +11,7 @@ import com.arcsoft.facerecognition.AFR_FSDKVersion;
 import com.cxwl.menjin.lock.config.Constant;
 import com.cxwl.menjin.lock.entity.FaceRegist;
 import com.cxwl.menjin.lock.utils.BitmapUtils;
+import com.cxwl.menjin.lock.utils.DLLog;
 import com.guo.android_extend.java.ExtInputStream;
 import com.guo.android_extend.java.ExtOutputStream;
 
@@ -21,7 +22,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 
 
 /**
@@ -44,12 +44,14 @@ public class FaceDB {
         mFRVersion = new AFR_FSDKVersion();
         mUpgrade = false;
         mFREngine = new AFR_FSDKEngine();
-        AFR_FSDKError error = mFREngine.AFR_FSDK_InitialEngine(Constant.arc_appid,Constant.fr_key);
+        AFR_FSDKError error = mFREngine.AFR_FSDK_InitialEngine(Constant.arc_appid, Constant.fr_key);
         if (error.getCode() != AFR_FSDKError.MOK) {
             Log.e(TAG, "AFR_FSDK_InitialEngine fail! error code :" + error.getCode());
+            DLLog.e(TAG, "AFR_FSDK_InitialEngine fail! error code :" + error.getCode());
         } else {
             mFREngine.AFR_FSDK_GetVersion(mFRVersion);
             Log.d(TAG, "AFR_FSDK_GetVersion=" + mFRVersion.toString());
+            DLLog.e(TAG, "AFR_FSDK_GetVersion=" + mFRVersion.toString());
         }
     }
 
@@ -176,9 +178,12 @@ public class FaceDB {
                 return true;
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
+                DLLog.e(TAG,"loadFaces/FileNotFoundException-->" + e.getMessage());
                 Log.v("人脸识别", "loadFaces/FileNotFoundException-->" + e.getMessage());
+
             } catch (IOException e) {
                 e.printStackTrace();
+                DLLog.e(TAG,"loadFaces/IOException-->" + e.getMessage());
                 Log.v("人脸识别", "loadFaces/IOException-->" + e.getMessage());
             }
         }

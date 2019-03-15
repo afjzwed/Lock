@@ -2179,6 +2179,7 @@ public class MainService extends Service {
         //在离线模式中需要把心跳线程间隔时间延长
         HttpApi.i("进入离线模式");
         DLLog.e(TAG, "进入离线模式");
+        RTC_AVAILABLE = false;//界面提示无法呼叫
         rtcLogout();//退出RTC
         if (initMacKey()) {
             HttpApi.i("通过MAC地址验证");
@@ -2532,9 +2533,10 @@ public class MainService extends Service {
                 //网络原因导致多次登陆不成功，由用户选择是否继续，如想继续尝试，可以重建device，不能自动重连rtc（因为可能死循环）
                 isRtcInit = false;
                 RTC_AVAILABLE = false; //界面提示无法呼叫
-                Constant.RESTART_PHONE_OR_AUDIO = 1;
                 DLLog.e(TAG, "天翼网络原因导致多次登陆不成功 不能自动重连rtc");
-                sendMessageToMainAcitivity(START_FACE_CHECK3, null);//开启人脸识别
+                rtcLogout();
+//                Constant.RESTART_PHONE_OR_AUDIO = 1;
+//                sendMessageToMainAcitivity(START_FACE_CHECK3, null);//开启人脸识别
                 Log.i(TAG, "天翼重连失败应用可以选择重新登录，应限制呼叫");
             } else if (result == RtcConst.DeviceEvt_KickedOff) {
                 //被另外一个终端踢下线，由用户选择是否继续，如果再次登录，需要重新获取token，重建device，不能自动重连rtc（因为可能死循环）
@@ -2570,7 +2572,8 @@ public class MainService extends Service {
                 //天翼RTC登录失败还是要开启人脸识别
 //                sendMessageToMainAcitivity(START_FACE_CHECK1, null);//开启人脸识别
                 Log.i(TAG, "天翼登陆失败 result=" + result);
-                DLLog.e(TAG, "天翼RTC登陆失败");
+                DLLog.e(TAG, "天翼RTC登陆失败 result= " + result);
+                rtcLogout();
             }
         }
 
@@ -2649,7 +2652,6 @@ public class MainService extends Service {
     private void rtcLogout() {
         Log.e(TAG, "退出天翼RTC " + rtcFreed);
         DLLog.e(TAG, "退出天翼RTC " + rtcFreed);
-        RTC_AVAILABLE = false;//界面提示无法呼叫
         if (rtcFreed) {
             rtcFreed = false;
             new Thread(new Runnable() {

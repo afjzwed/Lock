@@ -339,6 +339,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initQiniu();//初始化七牛
         initScreen();
         initHandle();
+
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                Log.v("人脸识别", "initFaceDetect-->" + 111);
+//                boolean b = ArcsoftManager.getInstance().mFaceDB.loadFaces();
+//                MainActivity.this.runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        if (ArcsoftManager.getInstance().mFaceDB.mRegister.isEmpty()) {
+//                            Log.v("人脸识别", "initFaceDetect-->" + 333);
+////                            Utils.DisplayToast(MainActivity.this, "没有注册人脸，请先注册");
+//                            return;
+//                        }
+//                        identification = true;
+//                        Log.v("人脸识别", "initFaceDetect-->" + 222);
+//                        Utils.DisplayToast(MainActivity.this, "人脸数据加载完成" + ArcsoftManager.getInstance().mFaceDB
+//                                .mRegister.size());
+//                    }
+//                });
+//            }
+//        }).start();
+
         initAexNfcReader();//初始化nfc本地广播
         initMainService();
         initVoiceVolume();//初始化音量设置
@@ -848,6 +871,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * 改变当前Window亮度
+     *
      * @param brightness
      */
     public void changeAppBrightness(int brightness) {
@@ -1159,10 +1183,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 DLLog.e(TAG, "人脸天翼登录状态有问题");
                             }
                         }, 3000);
-                        if (showMacText != null) {
-                            showMacText.setVisibility(View.VISIBLE);
-                            showMacText.setText("可视对讲设备未登录，请联系管理员");
-                        }
+//                        if (showMacText != null) {
+//                            showMacText.setVisibility(View.VISIBLE);
+//                            showMacText.setText("可视对讲设备未登录，请联系管理员");
+//                        }
                         break;
                     case MSG_CARD_KEY_INCOM://卡及按键回调
                         ComBean comBean = (ComBean) msg.obj;
@@ -3033,6 +3057,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         }
     }
 
+    String sd = null;
+
     /**
      * 初始化左上角弹出框
      */
@@ -3056,6 +3082,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Log.e(TAG, "menu 本机的固件版本");
 //                        Toast.makeText(MainActivity.this, "本机的固件版本：" + hwservice.getSdkVersion(),Toast.LENGTH_LONG)
 // .show();
+                        String s = sd;
+                        Log.e(TAG, s);
                         break;
                     case R.id.action_updateVersion:
                         Log.e(TAG, "menu 更新");
@@ -3170,9 +3198,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        mFRAbsLoop = new FRAbsLoop();
-        mFRAbsLoop.start();
-
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -3183,15 +3208,19 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     public void run() {
                         if (ArcsoftManager.getInstance().mFaceDB.mRegister.isEmpty()) {
 //                            Log.v("人脸识别", "initFaceDetect-->" + 333);
-//                            Utils.DisplayToast(MainActivity.this, "没有注册人脸，请先注册");
+                            Utils.DisplayToast(MainActivity.this, "没有注册人脸，请先注册");
                             return;
                         }
                         identification = true;
-//                        Utils.DisplayToast(MainActivity.this, "人脸数据加载完成");
+                        Utils.DisplayToast(MainActivity.this, "人脸数据加载完成" + ArcsoftManager.getInstance().mFaceDB
+                                .mRegister.size());
                     }
                 });
             }
         }).start();
+
+        mFRAbsLoop = new FRAbsLoop();
+        mFRAbsLoop.start();
     }
 
     /**
@@ -3488,6 +3517,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         //拿到本地数据库脸信息表
         List<FaceRegist> mResgist = ArcsoftManager.getInstance().mFaceDB.mRegister;
 
+
         private final Object lock = new Object();
         private boolean pause = false;
 
@@ -3495,6 +3525,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          * 调用这个方法实现暂停线程
          */
         void pauseThread() {
+            Log.e("人脸识别", " initFaceDetect--> 这里走了吗4");
             pause = true;
         }
 
@@ -3502,6 +3533,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          * 调用这个方法实现恢复线程的运行
          */
         void resumeThread() {
+            Log.e("人脸识别", " initFaceDetect--> 这里走了吗3");
             pause = false;
             synchronized (lock) {
                 lock.notifyAll();//唤醒所有正在等待该对象的线程
@@ -3512,6 +3544,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
          * 注意：这个方法只能在run方法里调用，不然会阻塞主线程，导致页面无响应
          */
         void onPause() {
+            Log.e("人脸识别", " initFaceDetect--> 这里走了吗2");
             synchronized (lock) {
                 try {
                     lock.wait();
@@ -3524,6 +3557,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void setup() {
+            Log.e("人脸识别", " initFaceDetect--> 这里走了吗1");
             AFR_FSDKError error = engine.AFR_FSDK_InitialEngine(arc_appid, fr_key);
             //Log.v(FACE_TAG, "AFR_FSDK_InitialEngine = " + error.getCode());
             error = engine.AFR_FSDK_GetVersion(version);
@@ -3533,7 +3567,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         @Override
         public void loop() {
-//            Log.e("人脸识别", "这里走了吗");
+//            Log.e("人脸识别", " initFaceDetect--> 这里走了吗");
 //            Log.v(FACE_TAG, "loop1:" + mImageNV21 + "/" + identification);
             while (pause) {
                 onPause();

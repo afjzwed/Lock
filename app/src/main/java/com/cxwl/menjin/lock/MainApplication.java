@@ -11,7 +11,6 @@ import com.cxwl.menjin.lock.db.DaoMaster;
 import com.cxwl.menjin.lock.db.DaoSession;
 import com.cxwl.menjin.lock.face.ArcsoftManager;
 import com.cxwl.menjin.lock.utils.DLLog;
-import com.squareup.leakcanary.LeakCanary;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.zhy.http.okhttp.OkHttpUtils;
 import com.zhy.http.okhttp.log.LoggerInterceptor;
@@ -24,7 +23,7 @@ import okhttp3.OkHttpClient;
  * Created by William on 2018/8/22.
  */
 
-public class MainApplication  extends Application {
+public class MainApplication extends Application {
 
     private static MainApplication application;
     PendingIntent restartIntent;
@@ -63,26 +62,16 @@ public class MainApplication  extends Application {
         @Override
         public void uncaughtException(Thread thread, Throwable ex) {
 
-//            StringBuffer sb = new StringBuffer();
-//            Log.e("崩溃重启", "错误 普通 " + ex);
-//            Log.e("崩溃重启", "错误 getMessage " + ex.getMessage());
-//            Log.e("崩溃重启", "错误 getLocalizedMessage " + ex.getLocalizedMessage());
-//            Log.e("崩溃重启", "错误 getCause " + ex.getCause());
-//            Log.e("崩溃重启", "错误 toString " + ex.toString());
-//            StackTraceElement[] stackTrace = ex.getStackTrace();// 提供编程访问由 printStackTrace() 输出的堆栈跟踪信息。
-//            for (int i = 0;i<stackTrace.length;i++) {
-//            for (StackTraceElement traceElement : stackTrace) {
-//
-//                sb.append("class: ").append(traceElement.getClassName())
-//                                    .append("; method: ").append(traceElement.getMethodName())
-//                                     .append("; line: ").append(traceElement.getLineNumber())
-//                                    .append(";  Exception: ").append(ex.toString() + "\n");
-//            }
-//            Log.e("崩溃重启", "错误 StackTraceElement " + sb);
-//            ex.printStackTrace();
+            StringBuffer sb = new StringBuffer();
+            StackTraceElement[] stackTrace = ex.getStackTrace();// 提供编程访问由 printStackTrace() 输出的堆栈跟踪信息。
+            for (StackTraceElement traceElement : stackTrace) {
+                sb.append("class: ").append(traceElement.getClassName())
+                        .append("; method: ").append(traceElement.getMethodName())
+                        .append("; line: ").append(traceElement.getLineNumber())
+                        .append(";  Exception: ").append(ex.toString() + "\n");
+            }
 
-
-            DLLog.e("崩溃重启", "错误 " + ex);
+            DLLog.e("崩溃重启", "错误 " + sb);
             AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000,
                     restartIntent); // 1秒钟后重启应用
