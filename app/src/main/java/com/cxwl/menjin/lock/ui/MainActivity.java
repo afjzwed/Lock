@@ -85,11 +85,13 @@ import com.cxwl.menjin.lock.utils.DbUtils;
 import com.cxwl.menjin.lock.utils.DialogUtil;
 import com.cxwl.menjin.lock.utils.HttpApi;
 import com.cxwl.menjin.lock.utils.HttpUtils;
+import com.cxwl.menjin.lock.utils.InstallUtil;
 import com.cxwl.menjin.lock.utils.Intenet;
 import com.cxwl.menjin.lock.utils.JsonUtil;
 import com.cxwl.menjin.lock.utils.MacUtils;
 import com.cxwl.menjin.lock.utils.NetWorkUtils;
 import com.cxwl.menjin.lock.utils.SPUtil;
+import com.cxwl.menjin.lock.utils.ShellUtils;
 import com.cxwl.menjin.lock.utils.StringUtils;
 import com.cxwl.menjin.lock.view.AutoScrollView;
 import com.google.gson.reflect.TypeToken;
@@ -173,7 +175,6 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_RTC_REGISTER;
 import static com.cxwl.menjin.lock.config.Constant.MSG_START_DIAL;
 import static com.cxwl.menjin.lock.config.Constant.MSG_START_DIAL_PICTURE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_TONGJI_VEDIO;
-import static com.cxwl.menjin.lock.config.Constant.MSG_TONGJI_VEDIO1;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPDATE_NETWORKSTATE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPLOAD_LIXIAN_IMG;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPLOAD_LOG;
@@ -1045,7 +1046,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                                 //删除单个人脸时处理速度可能过快，导致先人脸识别再人脸暂停，所以用定时器控制1秒后再人脸识别，保证在人脸暂停后
                                 handler.sendEmptyMessage(START_FACE_CHECK);
                             }
-                        }, 1000);
+                        }, 2000);
                         break;
                     case MSG_LOCK_OPENED://开锁
                         Log.i(TAG, "开锁");
@@ -2688,6 +2689,37 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (blockNo.equals("9993") || blockNo.equals("99999993")) {
 //            sendMainMessager(MSG_TONGJI_VEDIO1, null);
 //            changeAppBrightness(50);
+//            faceHandler.sendEmptyMessageDelayed(MSG_FACE_DETECT_PAUSE, 100);
+//            boolean delete = ArcsoftManager.getInstance().mFaceDB.delete1("15273288531");//删除
+//            Log.e(TAG, "人脸更新 遍历删除集合，删除人脸信息 " + "15273288531" + " " + delete);
+//            facetimer.schedule(new TimerTask() {
+//                public void run() {
+//                    //execute the task
+//                    //删除单个人脸时处理速度可能过快，导致先人脸识别再人脸暂停，所以用定时器控制1秒后再人脸识别，保证在人脸暂停后
+//                    handler.sendEmptyMessage(START_FACE_CHECK);
+//                }
+//            }, 2000);
+//            new Thread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    String cmd = "pm install -r " + "/mnt/internal_sd/myapk/door.apk";
+//                    HttpApi.i("UpdateService安装命令：" + cmd);
+//                    //以下两个方法应该等效
+//                    ShellUtils.CommandResult result = InstallUtil.executeCmd(cmd);
+////                ShellUtils.CommandResult commandResult = ShellUtils.execCommand(cmd, false);
+//                    HttpApi.i("UpdateService安装结果：" + result.toString());
+//                }
+//            }).start();
+
+            if (null != ArcsoftManager.getInstance().mFaceDB.mRegister1 && ArcsoftManager.getInstance().mFaceDB
+                    .mRegister1.size() > 0) {
+                Toast.makeText(MainActivity.this, "当前人脸数" + ArcsoftManager.getInstance().mFaceDB.mRegister1.size(),
+                        Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainActivity.this, "当前人脸数 0", Toast.LENGTH_SHORT).show();
+            }
+
+
             return;
         }
 
@@ -3198,27 +3230,29 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                Log.v("人脸识别", "initFaceDetect-->" + 111);
-                boolean b = ArcsoftManager.getInstance().mFaceDB.loadFaces();
-                MainActivity.this.runOnUiThread(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (ArcsoftManager.getInstance().mFaceDB.mRegister.isEmpty()) {
-//                            Log.v("人脸识别", "initFaceDetect-->" + 333);
-                            Utils.DisplayToast(MainActivity.this, "没有注册人脸，请先注册");
-                            return;
-                        }
-                        identification = true;
-                        Utils.DisplayToast(MainActivity.this, "人脸数据加载完成" + ArcsoftManager.getInstance().mFaceDB
-                                .mRegister.size());
-                    }
-                });
-            }
-        }).start();
-
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                Log.v("人脸识别", "initFaceDetect-->" + 111);
+//                boolean b = ArcsoftManager.getInstance().mFaceDB.loadFaces();
+//                MainActivity.this.runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        if (ArcsoftManager.getInstance().mFaceDB.mRegister.isEmpty()) {
+////                            Log.v("人脸识别", "initFaceDetect-->" + 333);
+//                            Utils.DisplayToast(MainActivity.this, "没有注册人脸，请先注册");
+//                            return;
+//                        }
+//                        identification = true;
+//                        Log.v("人脸识别", "initFaceDetect-->人脸数据加载完成 " + ArcsoftManager.getInstance().mFaceDB
+//                                .mRegister.size());
+//                        Utils.DisplayToast(MainActivity.this, "人脸数据加载完成" + ArcsoftManager.getInstance().mFaceDB
+//                                .mRegister.size());
+//                    }
+//                });
+//            }
+//        }).start();
+        Log.v("人脸识别", "initFaceDetect-->" + 111);
         mFRAbsLoop = new FRAbsLoop();
         mFRAbsLoop.start();
     }
@@ -3515,7 +3549,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         AFR_FSDKFace result = new AFR_FSDKFace();
 
         //拿到本地数据库脸信息表
-        List<FaceRegist> mResgist = ArcsoftManager.getInstance().mFaceDB.mRegister;
+//        List<FaceRegist> mResgist = ArcsoftManager.getInstance().mFaceDB.mRegister;
+        List<FaceRegist> mResgist = ArcsoftManager.getInstance().mFaceDB.mRegister1;
 
 
         private final Object lock = new Object();

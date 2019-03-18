@@ -1470,7 +1470,8 @@ public class MainService extends Service {
         Log.e(TAG, "人脸更新" + " deleteFaceList");
         if (null != faceDeleteList && faceDeleteList.size() > 0) {
             for (FaceUrlBean faceUrlBean : faceDeleteList) {
-                boolean delete = ArcsoftManager.getInstance().mFaceDB.delete(faceUrlBean.getYezhuPhone());//删除
+//                boolean delete = ArcsoftManager.getInstance().mFaceDB.delete(faceUrlBean.getYezhuPhone());//删除
+                boolean delete = ArcsoftManager.getInstance().mFaceDB.delete1(faceUrlBean.getYezhuPhone());//删除
                 Log.e(TAG, "人脸更新 遍历删除集合，删除人脸信息 " + faceUrlBean.getYezhuPhone() + " " + delete);
             }
         }
@@ -1527,7 +1528,9 @@ public class MainService extends Service {
                     mImageNV21 = b.clone();
                     AFR_FSDKFace result = new AFR_FSDKFace();
                     result.setFeatureData(mImageNV21);
-                    ArcsoftManager.getInstance().mFaceDB.addFace(faceUrlBean.getYezhuPhone(), result);
+//                    ArcsoftManager.getInstance().mFaceDB.addFace(faceUrlBean.getYezhuPhone(), result);
+                    boolean b1 = ArcsoftManager.getInstance().mFaceDB.addFace1(faceUrlBean.getYezhuPhone(), result);
+                    Log.e(TAG, "人脸添加成功" + b1);
                 } catch (IOException e) {
                     DLLog.e(TAG, "错误 restartFace e " + e.toString());
                     e.printStackTrace();
@@ -2405,7 +2408,7 @@ public class MainService extends Service {
     // TODO: 2019/2/12 尝试用volatile关键字修饰,避免并发错误?
     private boolean rtcFreed = true;//rtc是否释放完毕的标志
     // TODO: 2019/2/12 尝试用volatile关键字修饰,避免并发错误?
-    public  static boolean RTC_AVAILABLE = false;//rtc是否登录完成的标志，主页面可根据此变量提示用户能否呼叫
+    public static boolean RTC_AVAILABLE = false;//rtc是否登录完成的标志，主页面可根据此变量提示用户能否呼叫
 
     /**
      * 获取TOKEN

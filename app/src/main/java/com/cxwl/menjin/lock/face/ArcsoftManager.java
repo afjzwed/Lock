@@ -60,7 +60,7 @@ public class ArcsoftManager {
         mFaceDB = new FaceDB(path);
 //        mImage = null;
 
-        SharedPreferencesUtil.getInstance(application, "share_dysmart");
+//        SharedPreferencesUtil.getInstance(application, "share_dysmart");
     }
 
 //    public void setCaptureImage(Uri uri) {
