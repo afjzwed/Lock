@@ -3,6 +3,7 @@ package com.cxwl.menjin.lock.utils;
 import android.content.Context;
 import android.media.AudioManager;
 import android.media.SoundPool;
+import android.os.Environment;
 
 import com.cxwl.menjin.lock.R;
 
@@ -88,6 +89,11 @@ public class SoundPoolUtil {
                 break;
             case 011111:// 门开了语音
                 outgoing = soundPool.load(mContext, R.raw.menjinkaimen, 1);
+                break;
+            case 011112:// 门开了语音
+                String s = Environment.getExternalStorageDirectory() + "/" + "myvoice" + "/" + "menjinkaimen" + ".mp3";
+
+                outgoing = soundPool.load(s, 1);
                 break;
         }
     }

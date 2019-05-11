@@ -3,14 +3,23 @@ package com.cxwl.menjin.lock.utils;
 import android.app.Activity;
 import android.content.Context;
 import android.content.res.Configuration;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.media.Image;
+import android.os.Environment;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageView;
 
 import com.cxwl.menjin.lock.R;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 
 
 /**
@@ -19,10 +28,16 @@ import com.cxwl.menjin.lock.R;
  */
 
 public class DialogUtil {
+
+    public     Bitmap Mbitmap;
     public static android.app.Dialog showBottomDialog(final Context context) {
         final android.app.Dialog dialog = new android.app.Dialog(context, R.style.DialogStyle);
         dialog.setCancelable(false);
         View view = LayoutInflater.from(context).inflate(R.layout.dialog_weituo, null);
+        ImageView imageView = view.findViewById(R.id.iv_open);
+        Bitmap bitmap = getLoacalBitmap(Environment.getExternalStorageDirectory() + "/" + "myvoice" + "/" + "bg_dialog" + ".png"); //从本地取图片(在cdcard中获取)  //
+        imageView .setImageBitmap(bitmap); //设置Bitmap
+
         dialog.setContentView(view);
 
         Window mWindow = dialog.getWindow();
@@ -35,6 +50,8 @@ public class DialogUtil {
         mWindow.setGravity(Gravity.CENTER);
         //mWindow.setWindowAnimations(R.style.dialogAnim);
         mWindow.setAttributes(lp);
+
+        Log.e("DialogUtil", "读取图片 这里");
 //        dialog.show();
         return dialog;
     }
@@ -55,6 +72,22 @@ public class DialogUtil {
         DisplayMetrics dm = new DisplayMetrics();
         ((Activity) context).getWindowManager().getDefaultDisplay().getMetrics(dm);
         return dm.heightPixels;
+    }
+
+    /**
+     * 加载本地图片
+     * @param url
+     * @return
+     */
+    public static Bitmap getLoacalBitmap(String url) {
+        Log.e("DialogUtil", "读取图片");
+        try {
+            FileInputStream fis = new FileInputStream(url);
+            return BitmapFactory.decodeStream(fis);  ///把流转化为Bitmap图片
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
 }

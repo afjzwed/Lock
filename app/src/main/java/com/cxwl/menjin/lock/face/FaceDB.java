@@ -52,8 +52,8 @@ public class FaceDB {
             DLLog.e(TAG, "AFR_FSDK_InitialEngine fail! error code :" + error.getCode());
         } else {
             mFREngine.AFR_FSDK_GetVersion(mFRVersion);
-            Log.d(TAG, "AFR_FSDK_GetVersion=" + mFRVersion.toString());
-            DLLog.e(TAG, "AFR_FSDK_GetVersion=" + mFRVersion.toString());
+            Log.d(TAG, "AFR_FSDK_GetVersion=" + mFRVersion.toString() + " error " + error.getCode());
+//            DLLog.e(TAG, "AFR_FSDK_GetVersion=" + mFRVersion.toString() + " error " + error.getCode());
         }
 
         initFaceList(MainApplication.getApplication());

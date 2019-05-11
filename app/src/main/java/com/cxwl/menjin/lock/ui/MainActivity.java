@@ -92,6 +92,7 @@ import com.cxwl.menjin.lock.utils.MacUtils;
 import com.cxwl.menjin.lock.utils.NetWorkUtils;
 import com.cxwl.menjin.lock.utils.SPUtil;
 import com.cxwl.menjin.lock.utils.ShellUtils;
+import com.cxwl.menjin.lock.utils.SoundPoolUtil;
 import com.cxwl.menjin.lock.utils.StringUtils;
 import com.cxwl.menjin.lock.view.AutoScrollView;
 import com.google.gson.reflect.TypeToken;
@@ -2710,6 +2711,20 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                    HttpApi.i("UpdateService安装结果：" + result.toString());
 //                }
 //            }).start();
+//            SoundPoolUtil.getSoundPoolUtil().loadVoice(getBaseContext(), 011112);
+//            if (weituoDialog == null) {
+//                Log.e("DialogUtil", "创建弹框");
+//                weituoDialog = DialogUtil.showBottomDialog(MainActivity.this);
+//            }
+//            if (!weituoDialog.isShowing()) {
+//                weituoDialog.show();
+//                handler.postDelayed(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        weituoDialog.dismiss();
+//                    }
+//                }, 1000);
+//            }
 
             if (null != ArcsoftManager.getInstance().mFaceDB.mRegister1 && ArcsoftManager.getInstance().mFaceDB
                     .mRegister1.size() > 0) {
@@ -2718,8 +2733,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             } else {
                 Toast.makeText(MainActivity.this, "当前人脸数 0", Toast.LENGTH_SHORT).show();
             }
-
-
             return;
         }
 
@@ -3958,6 +3971,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (netTimer != null) {
             netTimer.cancel();
             netTimer = null;
+        }
+
+        if (null != weituoDialog) {
+            weituoDialog.dismiss();
         }
 
 //        mSurfaceView.setVisibility(View.GONE);
