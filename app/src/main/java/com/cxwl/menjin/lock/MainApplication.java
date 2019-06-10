@@ -38,7 +38,7 @@ public class MainApplication extends Application {
         super.onCreate();
 
         //初始化腾讯buggly
-        CrashReport.initCrashReport(this, "fd0b7bc576", true);
+        CrashReport.initCrashReport(this, "fd0b7bc576", false);
 
         //okhttp初始化
         OkHttpClient okHttpClient = new OkHttpClient.Builder().addInterceptor(new LoggerInterceptor("okhttp", true))

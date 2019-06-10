@@ -885,9 +885,8 @@ public class MainService extends Service {
                                 if (StringUtils.isNoEmpty(deviceBean.getVersion())) {
                                     String appVision = getVersionName();
                                     Log.i(TAG, "心跳--当前app版本：" + appVision + "   服务器app版本：" + (deviceBean.getVersion()));
-
-                                    if (Integer.parseInt(deviceBean.getVersion()) > Integer.parseInt(appVision
-                                            .replace(".", ""))) {
+                                    if (Integer.parseInt(deviceBean.getVersion().replace(".", "")) > Integer.parseInt
+                                            (appVision.replace(".", ""))) {
                                         Log.i(TAG, "心跳中有APP信息更新");
                                         if (lastVersionStatus.equals("D")) {//正在下载最新包
                                             //不获取地址
