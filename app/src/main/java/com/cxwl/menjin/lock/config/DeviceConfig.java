@@ -10,7 +10,7 @@ public class DeviceConfig {
     /********residential*****/
 
     public static final String LOCAL_FILE_PATH = "adv";//广告储存位置
-    public static final String LOCAL_ADV_PATH = "adv";//广告视频储存位置
+    public static final String LOCAL_VOICE_PATH = "myvoice";//开门用音频及图片储存位置
     public static final String LOCAL_ADP_PATH = "adp";//广告图片储存位置
     public static final String LOCAL_FACE_PATH = "myface";//人脸图片(bin文件)储存位置(下载)
     public static final String LOCAL_APK_PATH = "myapk";//apk文件储存位置
@@ -18,6 +18,12 @@ public class DeviceConfig {
     public static final String LOCAL_FACE_PATH_TEMP = "tempface";//人脸图片(bin文件)临时储存位置(上传)
     public static final String LOCAL_IMG_PATH = "img_local";//所有照片
 
+    public static final String LOCAL_VOICE_NAME = "menjinkaimen";//开门用音频文件名 mp3
+    public static final String LOCAL_IMG_NAME = "bg_dialog";//开门用照片文件名 png
+    public static boolean isLocalVoiceHint = false;//是否使用本地音频提示的标志 默认不使用
+    public static boolean isLocalPicHint = false;//是否使用本地图片提示的标志 默认不使用
+
+    public static boolean isLocalHint = false;//是否使用本地音频提示的标志 默认不使用
 
     public static String DEVICE_TYPE = "B"; //C：社区大门门禁 B:楼栋单元门禁
 
@@ -29,9 +35,12 @@ public class DeviceConfig {
     public static int PASSWORD_WAIT_TIME = 1000 * 20;//密码验证线程等待时间
 
     public static int VOLUME_STREAM_MUSIC = 5;//音乐音量
-    public static int VOLUME_STREAM_VOICE_CALL = 5;//通话音量
+    public static int VOLUME_STREAM_VOICE_CALL = 80;//通话音量
     public static int VOLUME_STREAM_RING = 5;//铃声音量
     public static int VOLUME_STREAM_SYSTEM = 5;//系统音量
+    public static int VOLUME_ALL = 5;//总音量
+
+    public static int LIGHT_ALL = 90;//屏幕亮度
 
     public static int MOBILE_NO_LENGTH = 11;//手机号长度
     public static int UNIT_NO_LENGTH = 4;//房屋号长度

@@ -5,96 +5,95 @@ package com.cxwl.menjin.lock.entity;
  */
 
 public class NewDoorBean {
+
     /**
-     * id : 1
-     * danyuan_id : null
-     * gongsi_id : 23
-     * key : 442c05e69cc5
-     * loudong_id : null
-     * mac : 44:2c:05:e6:9c:c5
-     * name : 十三区大门门禁
-     * type : 0
-     * xiangmu_id : 443
+     * xdoorBh : xd20190508162339
+     * gongsiBh : gs000018
+     * xiangmuBh : xm00000029
+     * qiqu : 二期
+     * loudong : 1栋
+     * danyuan : 3单元
+     * mac : 12:12:12:12:12:11
+     * key : null
+     * name : 胖胖单元门
+     * type : 1
      * shanchu : 1
-     * sheng_id : null
-     * shi_id : null
-     * xian_id : null
-     * jiedao_id : null
-     * shequ : null
-     * lixian_mima : null
+     * gongsiName : null
      * version : null
-     * danyuan_name : null
-     * loudong_name : null
-     * xiangmu_name : 13区
-     * gongsi_name : null
-     * tempPassword : null
-     * xinhao : 2
+     * lixianMima : null
      * online : false
+     * versionId : 19
+     * voice : 50
+     * luminance : 50
+     * xiangmuName : 门禁项目
      */
 
-    private int id;//macID
-    private String danyuan_id;//单元ID
-    private int gongsi_id;//公司ID
-    private String key;
-    private String loudong_id;//楼栋ID
+    private String xdoorBh;
+    private String gongsiBh;
+    private String xiangmuBh;
+    private String qiqu;
+    private String loudong;
+    private String danyuan;
     private String mac;
+    private Object key;
     private String name;
-    private String type;//0 为大门 1 为 单元门
-    private int xiangmu_id;//项目ID
+    private int type;//门禁类型:0大门,1单元门,2区期门
     private int shanchu;
-    private Object sheng_id;
-    private Object shi_id;
-    private Object xian_id;
-    private Object jiedao_id;
-    private Object shequ;
-    private Object lixian_mima;
+    private Object gongsiName;
     private Object version;
-    private Object danyuan_name;
-    private Object loudong_name;
-    private String xiangmu_name;//项目名
-    private Object gongsi_name;
-    private Object tempPassword;
-    private int xinhao;//型号
+    private Object lixianMima;
     private boolean online;
+    private int versionId;
+    private int voice;//声音
+    private int luminance;//亮度
+    private String xiangmuName;
 
-    public int getId() {
-        return id;
+    public String getXdoorBh() {
+        return xdoorBh;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setXdoorBh(String xdoorBh) {
+        this.xdoorBh = xdoorBh;
     }
 
-    public String getDanyuan_id() {
-        return danyuan_id;
+    public String getGongsiBh() {
+        return gongsiBh;
     }
 
-    public void setDanyuan_id(String danyuan_id) {
-        this.danyuan_id = danyuan_id;
+    public void setGongsiBh(String gongsiBh) {
+        this.gongsiBh = gongsiBh;
     }
 
-    public int getGongsi_id() {
-        return gongsi_id;
+    public String getXiangmuBh() {
+        return xiangmuBh;
     }
 
-    public void setGongsi_id(int gongsi_id) {
-        this.gongsi_id = gongsi_id;
+    public void setXiangmuBh(String xiangmuBh) {
+        this.xiangmuBh = xiangmuBh;
     }
 
-    public String getKey() {
-        return key;
+    public String getQiqu() {
+        return qiqu;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setQiqu(String qiqu) {
+        this.qiqu = qiqu;
     }
 
-    public String getLoudong_id() {
-        return loudong_id;
+    public String getLoudong() {
+        return loudong;
     }
 
-    public void setLoudong_id(String loudong_id) {
-        this.loudong_id = loudong_id;
+    public void setLoudong(String loudong) {
+        this.loudong = loudong;
+    }
+
+    public String getDanyuan() {
+        return danyuan;
+    }
+
+    public void setDanyuan(String danyuan) {
+        this.danyuan = danyuan;
     }
 
     public String getMac() {
@@ -105,6 +104,14 @@ public class NewDoorBean {
         this.mac = mac;
     }
 
+    public Object getKey() {
+        return key;
+    }
+
+    public void setKey(Object key) {
+        this.key = key;
+    }
+
     public String getName() {
         return name;
     }
@@ -113,20 +120,12 @@ public class NewDoorBean {
         this.name = name;
     }
 
-    public String getType() {
+    public int getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(int type) {
         this.type = type;
-    }
-
-    public int getXiangmu_id() {
-        return xiangmu_id;
-    }
-
-    public void setXiangmu_id(int xiangmu_id) {
-        this.xiangmu_id = xiangmu_id;
     }
 
     public int getShanchu() {
@@ -137,52 +136,12 @@ public class NewDoorBean {
         this.shanchu = shanchu;
     }
 
-    public Object getSheng_id() {
-        return sheng_id;
+    public Object getGongsiName() {
+        return gongsiName;
     }
 
-    public void setSheng_id(Object sheng_id) {
-        this.sheng_id = sheng_id;
-    }
-
-    public Object getShi_id() {
-        return shi_id;
-    }
-
-    public void setShi_id(Object shi_id) {
-        this.shi_id = shi_id;
-    }
-
-    public Object getXian_id() {
-        return xian_id;
-    }
-
-    public void setXian_id(Object xian_id) {
-        this.xian_id = xian_id;
-    }
-
-    public Object getJiedao_id() {
-        return jiedao_id;
-    }
-
-    public void setJiedao_id(Object jiedao_id) {
-        this.jiedao_id = jiedao_id;
-    }
-
-    public Object getShequ() {
-        return shequ;
-    }
-
-    public void setShequ(Object shequ) {
-        this.shequ = shequ;
-    }
-
-    public Object getLixian_mima() {
-        return lixian_mima;
-    }
-
-    public void setLixian_mima(Object lixian_mima) {
-        this.lixian_mima = lixian_mima;
+    public void setGongsiName(Object gongsiName) {
+        this.gongsiName = gongsiName;
     }
 
     public Object getVersion() {
@@ -193,52 +152,12 @@ public class NewDoorBean {
         this.version = version;
     }
 
-    public Object getDanyuan_name() {
-        return danyuan_name;
+    public Object getLixianMima() {
+        return lixianMima;
     }
 
-    public void setDanyuan_name(Object danyuan_name) {
-        this.danyuan_name = danyuan_name;
-    }
-
-    public Object getLoudong_name() {
-        return loudong_name;
-    }
-
-    public void setLoudong_name(Object loudong_name) {
-        this.loudong_name = loudong_name;
-    }
-
-    public String getXiangmu_name() {
-        return xiangmu_name;
-    }
-
-    public void setXiangmu_name(String xiangmu_name) {
-        this.xiangmu_name = xiangmu_name;
-    }
-
-    public Object getGongsi_name() {
-        return gongsi_name;
-    }
-
-    public void setGongsi_name(Object gongsi_name) {
-        this.gongsi_name = gongsi_name;
-    }
-
-    public Object getTempPassword() {
-        return tempPassword;
-    }
-
-    public void setTempPassword(Object tempPassword) {
-        this.tempPassword = tempPassword;
-    }
-
-    public int getXinhao() {
-        return xinhao;
-    }
-
-    public void setXinhao(int xinhao) {
-        this.xinhao = xinhao;
+    public void setLixianMima(Object lixianMima) {
+        this.lixianMima = lixianMima;
     }
 
     public boolean isOnline() {
@@ -249,33 +168,60 @@ public class NewDoorBean {
         this.online = online;
     }
 
+    public int getVersionId() {
+        return versionId;
+    }
+
+    public void setVersionId(int versionId) {
+        this.versionId = versionId;
+    }
+
+    public int getVoice() {
+        return voice;
+    }
+
+    public void setVoice(int voice) {
+        this.voice = voice;
+    }
+
+    public int getLuminance() {
+        return luminance;
+    }
+
+    public void setLuminance(int luminance) {
+        this.luminance = luminance;
+    }
+
+    public String getXiangmuName() {
+        return xiangmuName;
+    }
+
+    public void setXiangmuName(String xiangmuName) {
+        this.xiangmuName = xiangmuName;
+    }
+
     @Override
     public String toString() {
         return "NewDoorBean{" +
-                "id=" + id +
-                ", danyuan_id='" + danyuan_id + '\'' +
-                ", gongsi_id=" + gongsi_id +
-                ", key='" + key + '\'' +
-                ", loudong_id='" + loudong_id + '\'' +
+                "xdoorBh='" + xdoorBh + '\'' +
+                ", gongsiBh='" + gongsiBh + '\'' +
+                ", xiangmuBh='" + xiangmuBh + '\'' +
+                ", qiqu='" + qiqu + '\'' +
+                ", loudong='" + loudong + '\'' +
+                ", danyuan='" + danyuan + '\'' +
                 ", mac='" + mac + '\'' +
+                ", key=" + key +
                 ", name='" + name + '\'' +
-                ", type='" + type + '\'' +
-                ", xiangmu_id=" + xiangmu_id +
+                ", type=" + type +
                 ", shanchu=" + shanchu +
-                ", sheng_id=" + sheng_id +
-                ", shi_id=" + shi_id +
-                ", xian_id=" + xian_id +
-                ", jiedao_id=" + jiedao_id +
-                ", shequ=" + shequ +
-                ", lixian_mima=" + lixian_mima +
+                ", gongsiName=" + gongsiName +
                 ", version=" + version +
-                ", danyuan_name=" + danyuan_name +
-                ", loudong_name=" + loudong_name +
-                ", xiangmu_name='" + xiangmu_name + '\'' +
-                ", gongsi_name=" + gongsi_name +
-                ", tempPassword=" + tempPassword +
-                ", xinhao=" + xinhao +
+                ", lixianMima=" + lixianMima +
                 ", online=" + online +
+                ", versionId=" + versionId +
+                ", voice=" + voice +
+                ", luminance=" + luminance +
+                ", xiangmuName='" + xiangmuName + '\'' +
                 '}';
     }
 }

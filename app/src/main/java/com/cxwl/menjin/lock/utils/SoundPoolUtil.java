@@ -7,6 +7,9 @@ import android.os.Environment;
 
 import com.cxwl.menjin.lock.R;
 
+import static com.cxwl.menjin.lock.config.DeviceConfig.LOCAL_VOICE_NAME;
+import static com.cxwl.menjin.lock.config.DeviceConfig.LOCAL_VOICE_PATH;
+
 
 /**
  * 播放数字音频工具
@@ -91,8 +94,7 @@ public class SoundPoolUtil {
                 outgoing = soundPool.load(mContext, R.raw.menjinkaimen, 1);
                 break;
             case 011112:// 门开了语音
-                String s = Environment.getExternalStorageDirectory() + "/" + "myvoice" + "/" + "menjinkaimen" + ".mp3";
-
+                String s = Environment.getExternalStorageDirectory() + "/" + LOCAL_VOICE_PATH + "/" + LOCAL_VOICE_NAME + ".mp3";
                 outgoing = soundPool.load(s, 1);
                 break;
         }

@@ -29,26 +29,22 @@ public class BanbenBean {
      */
 
 
+
     private int id;
     private String ka;//卡
     private String ka_gx;
     private String lian;//脸
     private String lianGx;
-    private int mac_id;
     private String tonggao;//通告
     private String tonggaoGx;
     private String guanggao;//广告
     private String guanggaoGx;
     private String tupian;//图片
     private String tupianGx;
-    private Object xiangmu_id;
-    private Object xdoor;
-    private Object xintiao_time;
-    private Object beforeTime;
-    private Object fuwuqi_time;
-    private Object lixian_mima;
-    private Object version;
-    private Object token;
+    private String xdoorBh;
+    private Object xintiaoTime;
+    private String tishi;//提示
+    private String tishiGx;
 
     public int getId() {
         return id;
@@ -88,14 +84,6 @@ public class BanbenBean {
 
     public void setLianGx(String lianGx) {
         this.lianGx = lianGx;
-    }
-
-    public int getMac_id() {
-        return mac_id;
-    }
-
-    public void setMac_id(int mac_id) {
-        this.mac_id = mac_id;
     }
 
     public String getTonggao() {
@@ -146,68 +134,36 @@ public class BanbenBean {
         this.tupianGx = tupianGx;
     }
 
-    public Object getXiangmu_id() {
-        return xiangmu_id;
+    public String getXdoorBh() {
+        return xdoorBh;
     }
 
-    public void setXiangmu_id(Object xiangmu_id) {
-        this.xiangmu_id = xiangmu_id;
+    public void setXdoorBh(String xdoorBh) {
+        this.xdoorBh = xdoorBh;
     }
 
-    public Object getXdoor() {
-        return xdoor;
+    public Object getXintiaoTime() {
+        return xintiaoTime;
     }
 
-    public void setXdoor(Object xdoor) {
-        this.xdoor = xdoor;
+    public void setXintiaoTime(Object xintiaoTime) {
+        this.xintiaoTime = xintiaoTime;
     }
 
-    public Object getXintiao_time() {
-        return xintiao_time;
+    public String getTishi() {
+        return tishi;
     }
 
-    public void setXintiao_time(Object xintiao_time) {
-        this.xintiao_time = xintiao_time;
+    public void setTishi(String tishi) {
+        this.tishi = tishi;
     }
 
-    public Object getBeforeTime() {
-        return beforeTime;
+    public String getTishiGx() {
+        return tishiGx;
     }
 
-    public void setBeforeTime(Object beforeTime) {
-        this.beforeTime = beforeTime;
-    }
-
-    public Object getFuwuqi_time() {
-        return fuwuqi_time;
-    }
-
-    public void setFuwuqi_time(Object fuwuqi_time) {
-        this.fuwuqi_time = fuwuqi_time;
-    }
-
-    public Object getLixian_mima() {
-        return lixian_mima;
-    }
-
-    public void setLixian_mima(Object lixian_mima) {
-        this.lixian_mima = lixian_mima;
-    }
-
-    public Object getVersion() {
-        return version;
-    }
-
-    public void setVersion(Object version) {
-        this.version = version;
-    }
-
-    public Object getToken() {
-        return token;
-    }
-
-    public void setToken(Object token) {
-        this.token = token;
+    public void setTishiGx(String tishiGx) {
+        this.tishiGx = tishiGx;
     }
 
     @Override
@@ -218,21 +174,16 @@ public class BanbenBean {
                 ", ka_gx='" + ka_gx + '\'' +
                 ", lian='" + lian + '\'' +
                 ", lianGx='" + lianGx + '\'' +
-                ", mac_id=" + mac_id +
                 ", tonggao='" + tonggao + '\'' +
                 ", tonggaoGx='" + tonggaoGx + '\'' +
                 ", guanggao='" + guanggao + '\'' +
                 ", guanggaoGx='" + guanggaoGx + '\'' +
                 ", tupian='" + tupian + '\'' +
                 ", tupianGx='" + tupianGx + '\'' +
-                ", xiangmu_id=" + xiangmu_id +
-                ", xdoor=" + xdoor +
-                ", xintiao_time=" + xintiao_time +
-                ", beforeTime=" + beforeTime +
-                ", fuwuqi_time=" + fuwuqi_time +
-                ", lixian_mima=" + lixian_mima +
-                ", version=" + version +
-                ", token=" + token +
+                ", xdoorBh='" + xdoorBh + '\'' +
+                ", xintiaoTime=" + xintiaoTime +
+                ", tishi='" + tishi + '\'' +
+                ", tishiGx='" + tishiGx + '\'' +
                 '}';
     }
 }

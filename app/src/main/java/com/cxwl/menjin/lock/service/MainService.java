@@ -34,6 +34,7 @@ import com.cxwl.menjin.lock.entity.ConnectReportBean;
 import com.cxwl.menjin.lock.entity.DeviceBean;
 import com.cxwl.menjin.lock.entity.FaceUrlBean;
 import com.cxwl.menjin.lock.entity.GuangGaoBean;
+import com.cxwl.menjin.lock.entity.HintBean;
 import com.cxwl.menjin.lock.entity.LogListBean;
 import com.cxwl.menjin.lock.entity.NewDoorBean;
 import com.cxwl.menjin.lock.entity.NewTongJiBean;
@@ -118,6 +119,7 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_CALLMEMBER_TIMEOUT;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CANCEL_CALL;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CARD_INCOME;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CARD_OPENLOCK;
+import static com.cxwl.menjin.lock.config.Constant.MSG_CHANGE_DIALOG;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CHECK_PASSWORD;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CHECK_PASSWORD_PICTURE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_DISCONNECT_VIEDO;
@@ -127,6 +129,7 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_OPENLOCK;
 import static com.cxwl.menjin.lock.config.Constant.MSG_GET_NOTICE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_GUEST_PASSWORD_CHECK;
 import static com.cxwl.menjin.lock.config.Constant.MSG_INVALID_CARD;
+import static com.cxwl.menjin.lock.config.Constant.MSG_LIGHT_REFRESH;
 import static com.cxwl.menjin.lock.config.Constant.MSG_LIXIAN_PASSWORD_CHECK;
 import static com.cxwl.menjin.lock.config.Constant.MSG_LIXIAN_PASSWORD_CHECK_AFTER;
 import static com.cxwl.menjin.lock.config.Constant.MSG_LOADLOCAL_DATA;
@@ -148,6 +151,7 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_TONGJI_VEDIO1;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPDATE_NETWORKSTATE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPLOAD_LIXIAN_IMG;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPLOAD_LOG;
+import static com.cxwl.menjin.lock.config.Constant.MSG_VOICE_REFRESH;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_OPENLOCK;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_TAKEPIC;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_TAKEPIC1;
@@ -165,6 +169,8 @@ import static com.cxwl.menjin.lock.config.Constant.START_FACE_CHECK3;
 import static com.cxwl.menjin.lock.config.Constant.identification;
 import static com.cxwl.menjin.lock.config.DeviceConfig.LOCAL_APK_PATH;
 import static com.cxwl.menjin.lock.config.DeviceConfig.RTC_RELOAD_COUNT;
+import static com.cxwl.menjin.lock.config.DeviceConfig.isLocalPicHint;
+import static com.cxwl.menjin.lock.config.DeviceConfig.isLocalVoiceHint;
 import static com.cxwl.menjin.lock.ui.MainActivity.currentStatus;
 
 /**
@@ -207,12 +213,8 @@ public class MainService extends Service {
     private byte[] mImageNV21 = null;//人脸图像数据
 
     public String unitNo = "";//呼叫房号
-    public static int communityId = 0;//社区ID
-    public static int blockId = 0;//楼栋ID
     public static String communityName = "";//社区名字
     public static String lockName = "";//锁的名字
-    public int inputBlockId = 0;//这个也是楼栋ID，好像可以用来代表社区大门
-    public static int lockId = 0;//锁ID
     public String imageUrl = null;//对应呼叫访客图片地址
     public String imageUuid = null;//图片对应的uuid
     private LogDoor mLogDoor = null;//开门时上传日志的类
@@ -232,10 +234,11 @@ public class MainService extends Service {
     private int cardInfoStatus = 0;//门禁卡信息版本状态(默认为0)// 0:不一致（等待下载数据）1:不一致（正在下载数据）
     private int adInfoStatus = 0;//广告视频状态(默认为0) 0:不一致（等待下载数据）1:不一致（正在下载数据）
     private int adpicInfoStatus = 0;//广告图片状态(默认为0) 0:不一致（等待下载数据）1:不一致（正在下载数据）
+    private int hintInfoStatus = 0;//提示信息版本状态(默认为0)// 0:不一致（等待下载数据）1:不一致（正在下载数据）
     private String lastVersionStatus = "L"; //L: last version N: find new version D：downloading
     // P: pending to install I: installing  版本更新状态
     private int downloadingFlag = 0; //0：not downloading 1:downloading 2:stop download  apk下载状态
-    private String mac_id; //心跳接口传
+    private String xdoorBh; //心跳接口传
     private ActivityManager activityManager;//Activity管理类
 
     private ThreadPoolExecutor mThreadPoolExecutor;
@@ -406,7 +409,20 @@ public class MainService extends Service {
                         break;
                     case MSG_TONGJI_VEDIO1:
                         Log.i(TAG, "按键测试");
-                        rtcLogout();
+//                        rtcLogout();
+
+//                        String imgurl = "door/img/" + System.currentTimeMillis() + ".jpg";
+//                        sendMessageToMainAcitivity(MSG_YIJIANKAIMEN_TAKEPIC, imgurl);
+
+//                        getVersionInfo();
+
+//                        FaceUrlBean faceUrlBean = new FaceUrlBean();
+//                        faceUrlBean.setFileName("1551681099381.bin");
+//                        faceUrlBean.setYezhuPhone("15273288531");
+//                        faceUrlBean.setPath("/mnt/internal_sd/myface/1551681099381.bin");//文件名带后缀的话不用存路径（已知文件夹）
+//                        currentFaceList.clear();
+//                        currentFaceList.add(faceUrlBean);
+//                        restartFace();
                         break;
                     case MSG_TONGJI_PIC:
                         Log.i(TAG, "统计广告图片消息");
@@ -633,8 +649,6 @@ public class MainService extends Service {
             String url = API.OPENDOOR_BYTEMPKEY;
             JSONObject data = new JSONObject();
             data.put("mac", mac);
-            data.put("xiangmu_id", communityId + "");
-            data.put("loudong_id", blockId + "");
             data.put("temp_key", this.tempKey);
             if (imageUrl != null) {
                 data.put("kaimenjietu", this.imageUrl);
@@ -771,7 +785,7 @@ public class MainService extends Service {
         try {
             JSONObject data = new JSONObject();
             data.put("mac", mac);
-            data.put("mac_id", mac_id);
+            data.put("xdoorBh", xdoorBh);
             OkHttpUtils.postString().url(url).content(data.toString()).mediaType(MediaType.parse("application/json; "
                     + "charset=utf-8")).addHeader("Authorization", httpServerToken).tag(this).build().execute(new StringCallback() {
                 @Override
@@ -789,6 +803,7 @@ public class MainService extends Service {
                             String result = JsonUtil.getResult(response);
                             DeviceBean deviceBean = JsonUtil.parseJsonToBean(result, DeviceBean.class);
                             BanbenBean banbenBean = deviceBean.getBanben();
+                            NewDoorBean door = deviceBean.getDoor();
                             if (null != deviceBean && null != banbenBean) {
                                 if (StringUtils.isNoEmpty(deviceBean.getLixian_mima())) {
                                     Log.i(TAG, "心跳--服务器返回的离线密码" + deviceBean.getLixian_mima());
@@ -844,12 +859,33 @@ public class MainService extends Service {
                                         getGuanggao(Long.parseLong(banbenBean.getGuanggao()));
                                     }
                                 }
-                                //// TODO: 2018/5/17 拿app版本信息 去掉点
+
+                                if (StringUtils.isNoEmpty(banbenBean.getTishi())) {
+                                    long hintVision = (long) SPUtil.get(MainService.this, Constant.SP_VISION_HINT, 0L);
+                                    Log.i(TAG, "心跳--当前提示版本：" + hintVision + "  服务器提示版本：" + Long.parseLong(banbenBean
+                                            .getTishi()));
+                                    if (Long.parseLong(banbenBean.getTishi()) > hintVision) {
+                                        Log.i(TAG, "心跳中有提示信息更新");
+                                        getTishiInfo(Long.parseLong(banbenBean.getTishi()));
+                                    }
+                                }
+
+                                if (door.getVoice() != 0 && DeviceConfig.VOLUME_ALL != door.getVoice()) {
+                                    DeviceConfig.VOLUME_ALL = door.getVoice();
+                                    Log.e(TAG, "心跳中有音量更新");
+                                    sendMessageToMainAcitivity(MSG_VOICE_REFRESH, door.getVoice());
+                                }
+
+                                if (door.getLuminance() != 0 && DeviceConfig.LIGHT_ALL != door.getLuminance()) {
+                                    DeviceConfig.LIGHT_ALL = door.getLuminance();
+                                    Log.e(TAG, "心跳中有亮度更新");
+                                    sendMessageToMainAcitivity(MSG_LIGHT_REFRESH, door.getLuminance());
+                                }
+
                                 if (StringUtils.isNoEmpty(deviceBean.getVersion())) {
-//                                    String appVision = (String) SPUtil.get(MainService.this, Constant.SP_VISION_APP,
-//                                            getVersionName());
                                     String appVision = getVersionName();
                                     Log.i(TAG, "心跳--当前app版本：" + appVision + "   服务器app版本：" + (deviceBean.getVersion()));
+
                                     if (Integer.parseInt(deviceBean.getVersion()) > Integer.parseInt(appVision
                                             .replace(".", ""))) {
                                         Log.i(TAG, "心跳中有APP信息更新");
@@ -877,6 +913,7 @@ public class MainService extends Service {
                                 if (StringUtils.isNoEmpty(banbenBean.getTonggao())) {
                                     long tonggaoVision = (long) SPUtil.get(MainService.this, Constant
                                             .SP_VISION_TONGGAO, 0L);
+                                    Log.i(TAG, "心跳--当前通告版本：" + tonggaoVision + "  服务器通告版本：" + banbenBean.getTonggao());
                                     if (Long.parseLong(banbenBean.getTonggao()) > tonggaoVision) {
                                         Log.i(TAG, "心跳中有通告信息更新");
                                         if (noticesStatus == 0) {//判断是否正在下载
@@ -884,6 +921,8 @@ public class MainService extends Service {
                                         }
                                     }
                                 }
+
+
                                 //查询数据库中是否有离线照片
                                 List<ImgFile> imgFiles = DbUtils.getInstans().quaryImg();
                                 if (imgFiles != null && imgFiles.size() > 0) {
@@ -1149,6 +1188,7 @@ public class MainService extends Service {
                 cardInfoStatus = 0;
                 noticesStatus = 0;
                 faceStatus = 0;
+                hintInfoStatus = 0;
                 lastVersionStatus = "L";
                 Log.v("UpdateService", "不会出现这种情况 status is " + lastVersionStatus);
             }
@@ -1167,6 +1207,7 @@ public class MainService extends Service {
             cardInfoStatus = 0;
             noticesStatus = 0;
             faceStatus = 0;
+            hintInfoStatus = 0;
         }
     }
 
@@ -1179,8 +1220,6 @@ public class MainService extends Service {
             String url = API.VERSION_ADDRESS;
             Map<String, String> map = new HashMap<>();
             map.put("mac", mac);
-            map.put("version", getVersionName());
-            map.put("mac_id", mac_id);
             OkHttpUtils.postString().url(url).content(JsonUtil.parseMapToJson(map)).mediaType(MediaType.parse
                     ("application/json; " + "charset=utf-8")).addHeader("Authorization", httpServerToken).tag(this)
                     .build().execute(new StringCallback() {
@@ -1205,6 +1244,7 @@ public class MainService extends Service {
                                 cardInfoStatus = 1;
                                 noticesStatus = 1;
                                 faceStatus = 1;
+                                hintInfoStatus = 1;
                                 downloadApp(address, fileName);
                             }
                         }).start();
@@ -1245,6 +1285,7 @@ public class MainService extends Service {
             cardInfoStatus = 0;
             noticesStatus = 0;
             faceStatus = 0;
+            hintInfoStatus = 0;
         }
     }
 
@@ -1805,6 +1846,180 @@ public class MainService extends Service {
     }
 
     /**
+     * 获取提示信息接口
+     *
+     * @param version
+     */
+    private void getTishiInfo(final long version) {
+        hintInfoStatus = 1;//正在下载，避免重复下载
+        try {
+            String url = API.CALLALL_HINT;
+            JSONObject data = new JSONObject();
+            data.put("mac", mac);
+
+            OkHttpUtils.postString().url(url).content(data.toString()).mediaType(MediaType.parse("application/json; "
+                    + "charset=utf-8")).addHeader("Authorization", httpServerToken).tag(this).build().execute(new StringCallback() {
+                @Override
+                public void onError(Call call, Exception e, int id) {
+                    Log.e(TAG, "提示信息 服务器异常或没有网络 " + e.toString());
+                    hintInfoStatus = 0;//等待下载数据
+                }
+
+                @Override
+                public void onResponse(String response, int id) {
+                    Log.e("wh response 提示信息", response);
+                    if (null != response) {
+                        String code = JsonUtil.getFieldValue(response, "code");
+                        if ("0".equals(code)) {
+                            String result = JsonUtil.getResult(response);
+                            final HintBean hintBean = JsonUtil.parseJsonToBean(result, HintBean.class);
+                            Log.e(TAG, "准备下载提示信息 " + hintBean.toString());
+                            if (null != hintBean && (StringUtils.isNoEmpty(hintBean.getHuamianUrl()) || StringUtils
+                                    .isNoEmpty(hintBean.getTishiyinUrl()))) {
+                                isLocalPicHint = false;
+                                isLocalVoiceHint = false;
+                                sendMessageToMainAcitivity(MSG_CHANGE_DIALOG, null);//通知主线程，使用默认图片弹框
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        removeVoiceFiles();//下载前先删除之前下载所有文件
+                                        if (StringUtils.isNoEmpty(hintBean.getTishiyinUrl())) {
+                                            downLoadVoiceFiles(hintBean.getTishiyinUrl(), 1);
+                                        }
+
+                                        if (StringUtils.isNoEmpty(hintBean.getHuamianUrl())) {
+                                            downLoadVoiceFiles(hintBean.getHuamianUrl(), 2);
+                                        }
+                                        syncCallBack("6", version);//同步提示
+                                        hintInfoStatus = 0;//重置提示下载状态
+                                        sendMessageToMainAcitivity(MSG_CHANGE_DIALOG, null);
+                                    }
+                                }).start();
+                            } else {
+                                syncCallBack("6", version);//同步提示
+                                hintInfoStatus = 0;//重置提示下载状态
+                                isLocalPicHint = false;
+                                isLocalVoiceHint = false;
+                                return;
+                            }
+                        } else {
+                            hintInfoStatus = 0;//等待下载数据
+                            isLocalPicHint = false;
+                            isLocalVoiceHint = false;
+                        }
+                    } else {
+                        //服务器异常或没有网络
+                        HttpApi.e("提示信息 getClientInfo()->服务器无响应");
+                        hintInfoStatus = 0;//等待下载数据
+                        isLocalPicHint = false;
+                        isLocalVoiceHint = false;
+                    }
+                }
+            });
+        } catch (Exception e) {
+            DLLog.e(TAG, "提示信息错误 getClientInfo()->服务器数据解析异常 e " + e.toString());
+            hintInfoStatus = 0;//等待下载数据
+            isLocalPicHint = false;
+            isLocalVoiceHint = false;
+            HttpApi.e("提示信息 getClientInfo()->服务器数据解析异常");
+            e.printStackTrace();
+        }
+
+    }
+
+    /**
+     * 下载文件
+     *
+     * @param tishiyinUrl
+     * @param i
+     */
+    private void downLoadVoiceFiles(String tishiyinUrl, int i) {
+        Log.e(TAG, "提示更新" + " downLoadVoiceFiles " + i);
+        String path = Environment.getExternalStorageDirectory() + File.separator + DeviceConfig.LOCAL_VOICE_PATH;
+        try {
+            File file = new File(path);
+            if (!file.exists()) {
+                new File(path).mkdirs();//新建文件夹
+                file.createNewFile();//新建文件
+            }
+
+            if (i == 1) {
+                downLoadVoice(tishiyinUrl, 1);
+            } else if (i == 2) {
+                downLoadVoice(tishiyinUrl, 2);
+            }
+
+        } catch (IOException e) {
+            hintInfoStatus = 0;//重置提示下载状态
+            isLocalPicHint = false;
+            isLocalVoiceHint = false;
+            DLLog.e(TAG, "错误 downLoadVoiceFiles e " + e.toString());
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * 1下载音频 2下载图片
+     *
+     * @param tishiyinUrl
+     * @param i
+     */
+    private void downLoadVoice(String tishiyinUrl, int i) {
+        Log.e("wh", "开始下载提示i " + i + "  " + tishiyinUrl);
+        String url = tishiyinUrl;
+
+        String absolutePath = Environment.getExternalStorageDirectory() + File.separator + DeviceConfig
+                .LOCAL_VOICE_PATH;
+
+        String fileName = "";
+        if (i == 1) {
+            fileName = DeviceConfig.LOCAL_VOICE_NAME + ".mp3";
+        } else if (i == 2) {
+            fileName = DeviceConfig.LOCAL_IMG_NAME + ".png";
+        }
+
+        try {
+            Response execute = OkHttpUtils.get().url(url).tag(this).build().execute();
+            if (null != execute) {
+                Log.e("下载", "成功 开始保存文件" + absolutePath + " " + fileName);
+                File file = FileUtil.saveFile(execute, 0, absolutePath, fileName);
+                if (null != file && file.exists()) {
+                    Log.e("下载", "成功保存文件");
+                    if (i == 1) {
+                        isLocalVoiceHint = true;
+                    } else if (i == 2) {
+                        isLocalPicHint = true;
+                    }
+                }
+            }
+        } catch (IOException e) {
+            hintInfoStatus = 0;//重置提示下载状态
+            isLocalPicHint = false;
+            isLocalVoiceHint = false;
+            DLLog.e(TAG, "错误 downLoadFace catch-> " + e.toString());
+            e.printStackTrace();
+        }
+    }
+
+    private void removeVoiceFiles() {
+        Log.e(TAG, "提示更新 删除文件");
+        String dir = Environment.getExternalStorageDirectory() + "" + "/" + DeviceConfig.LOCAL_VOICE_PATH;
+        File filed = new File(dir);
+        if (!filed.exists()) {//不存在不用清除数据
+            Log.e(TAG, "提示更新 不存在 不用清除数据");
+        } else {
+            File[] files = FileUtil.getAllLocalFiles(dir);
+            if (null != files && files.length > 0) {
+                Log.e(TAG, "提示更新 删除所有文件");
+                for (int i = 0; i < files.length; i++) {
+                    File file = files[i];
+                    file.delete();
+                }
+            }
+        }
+    }
+
+    /**
      * 获取通告信息接口
      *
      * @param version
@@ -1991,6 +2206,10 @@ public class MainService extends Service {
                                 case "5":
                                     //保存最新广告视频版本
                                     SPUtil.put(MainService.this, Constant.SP_VISION_GUANGGAO_VIDEO, vision);
+                                    break;
+                                case "6":
+                                    //保存最新提示版本
+                                    SPUtil.put(MainService.this, Constant.SP_VISION_HINT, vision);
                                     break;
                                 default:
                                     break;
@@ -2247,7 +2466,6 @@ public class MainService extends Service {
 
             JSONObject data = new JSONObject();
             data.put("mac", mac);
-            data.put("key", key);
             data.put("version", getVersionName());
 
             Response execute = OkHttpUtils.postString().url(url).content(data.toString()).mediaType(MediaType.parse
@@ -2262,7 +2480,7 @@ public class MainService extends Service {
                         String result = JsonUtil.getResult(response);
                         DeviceBean deviceBean = JsonUtil.parseJsonToBean(result, DeviceBean.class);
                         httpServerToken = deviceBean.getToken();
-                        mac_id = deviceBean.getDoor().getId() + "";
+                        xdoorBh = deviceBean.getDoor().getXdoorBh() + "";
                         Log.e(TAG, deviceBean.toString());
                         //重置广告，图片，通知版本为0，登录时重新加载
                         saveVisionInfo();
@@ -2296,21 +2514,21 @@ public class MainService extends Service {
      */
     protected void onLogin(Message msg) {
         NewDoorBean result = (NewDoorBean) msg.obj;
-        if ("0".equals(result.getType())) {//大门
+        if (0 == result.getType()) {//大门
             DeviceConfig.DEVICE_TYPE = "C";
             lockName = "大门";
-        } else if ("1".equals(result.getType())) {//单元门
+        } else if (1 == result.getType()) {//单元门
             DeviceConfig.DEVICE_TYPE = "B";
-            blockId = Integer.parseInt(result.getLoudong_id());
-            lockId = Integer.parseInt(result.getDanyuan_id());
-            lockName = blockId + "栋" + lockId + "单元";
+            lockName = result.getLoudong() + "栋" + result.getDanyuan() + "单元";
+        } else if (2 == result.getType()) {
+            lockName = result.getQiqu() + "";
         }
-        communityId = result.getXiangmu_id();
+
         //目前服务器返回为空
-        communityName = result.getXiangmu_name() == null ? "欣社区" : result.getXiangmu_name();
+        communityName = result.getXiangmuName() == null ? "欣社区" : result.getXiangmuName();
 
         // 保存消息  需要操作
-        saveInfoIntoLocal(communityId, blockId, lockId, communityName, lockName);
+        saveInfoIntoLocal(communityName, lockName);
         Message message = Message.obtain();
         message.what = MSG_LOGIN_AFTER;
         message.obj = result;
@@ -2324,20 +2542,14 @@ public class MainService extends Service {
 
     protected void loadInfoFromLocal() {
         SharedPreferences sharedPreferences = getSharedPreferences("residential", Activity.MODE_PRIVATE);
-        communityId = sharedPreferences.getInt("communityId", 0);
-        blockId = sharedPreferences.getInt("blockId", 0);
-        lockId = sharedPreferences.getInt("lockId", 0);
         communityName = sharedPreferences.getString("communityName", "");
         lockName = sharedPreferences.getString("lockName", "");
     }
 
-    protected void saveInfoIntoLocal(int communityId, int blockId, int lockId, String communityName, String lockName) {
+    protected void saveInfoIntoLocal(String communityName, String lockName) {
         SharedPreferences sharedPreferences = getSharedPreferences("residential", Activity.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         //SPUtil.put(getApplicationContext(),);
-        editor.putInt("communityId", communityId);
-        editor.putInt("blockId", blockId);
-        editor.putInt("lockId", lockId);
         editor.putString("communityName", communityName);
         editor.putString("lockName", lockName);
         editor.commit();
@@ -3072,7 +3284,7 @@ public class MainService extends Service {
                     + "charset=utf-8")).addHeader("Authorization", httpServerToken).tag(this).build().execute(new StringCallback() {
                 @Override
                 public void onError(Call call, Exception e, int id) {
-                    Log.e(TAG, "服务器异常或没有网络 " + e.toString());
+                    Log.e(TAG, "获取成员接口 服务器异常或没有网络 " + e.toString());
                     Message message = mHandler.obtainMessage();
                     message.what = MSG_CALLMEMBER;
                     mHandler.sendMessage(message);
@@ -3080,7 +3292,7 @@ public class MainService extends Service {
 
                 @Override
                 public void onResponse(String response, int id) {
-                    Log.e(TAG, "服务器异常或没有网络 " + response.toString());
+                    Log.e(TAG, "获取成员接口 服务器返回 " + response.toString());
                     if (null != response) {
                         String code = JsonUtil.getFieldValue(response, "code");
                         if ("0".equals(code) && isCurrentCallWorking(callUuid)) {
@@ -3397,7 +3609,11 @@ public class MainService extends Service {
     /****************************卡相关end************************/
     protected void openLock(int type) {
         sendMessageToMainAcitivity(MSG_LOCK_OPENED, type);//开锁
-        SoundPoolUtil.getSoundPoolUtil().loadVoice(getBaseContext(), 011111);
+        if (hintInfoStatus == 1 || !isLocalVoiceHint) {//在下载时用默认提示音
+            SoundPoolUtil.getSoundPoolUtil().loadVoice(getBaseContext(), 011111);
+        } else {
+            SoundPoolUtil.getSoundPoolUtil().loadVoice(getBaseContext(), 011112);
+        }
     }
 
     /**

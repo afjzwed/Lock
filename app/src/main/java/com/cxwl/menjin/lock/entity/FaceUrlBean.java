@@ -5,40 +5,48 @@ package com.cxwl.menjin.lock.entity;
  */
 
 public class FaceUrlBean {
+
     /**
-     * xdoorId : 2
-     * chiyouren : 王祖贤
-     * xdoorLianId : 2
+     * lianYezhuid : null
+     * xdoorBh : xd20190508162339
+     * chiyouren : 秀熬汤
+     * xdoorLianId : 17
      * yezhuId : 0
-     * gongsiId : 23
-     * xiangmuId : 443
-     * yezhuPhone : 15347345968
+     * gongsiBh : gs000018
+     * xiangmuBh : xm00000029
+     * yezhuPhone : 15116852112
      * shanchu : 1
-     * bangdingTime : 2018-06-22 11:57:59
+     * bangdingTime : 2019-05-08 16:54:35
      * xiangmuName : null
      * gongsiName : null
-     * lianName : 王祖贤
-     * lianUrl : uploadan/1529637685929.bin
+     * lianName : 秀熬汤
+     * lianBinUrl : http://img0.hnchxwl.com/upload/lian/1557305670826.bin
+     * lianUrl : https://wsq.oss-cn-shenzhen.aliyuncs.com/GG/GG_21060143.jpg
+     * xdoorName : null
+     * bindingName : null
+     * bindingType : null
+     * bindingId : null
      */
 
     private Object lianYezhuid;
-    private String lianBinUrl;//脸地址
-    private Object xdoorName;
-
-    private int xdoorId;
+    private String xdoorBh;
     private String chiyouren;//持有人
     private int xdoorLianId;
     private int yezhuId;//业主ID
-    private int gongsiId;
-    private int xiangmuId;
+    private String gongsiBh;
+    private String xiangmuBh;
     private String yezhuPhone;//电话
     private int shanchu;//1新增-1删除2修改
     private String bangdingTime;
-    private String xiangmuName;
-    private String gongsiName;
+    private Object xiangmuName;
+    private Object gongsiName;
     private String lianName;
+    private String lianBinUrl;//脸地址
     private String lianUrl;
-
+    private Object xdoorName;
+    private Object bindingName;
+    private Object bindingType;
+    private Object bindingId;
     private String fileName;//文件名
     private String path;//本地路径
 
@@ -50,28 +58,12 @@ public class FaceUrlBean {
         this.lianYezhuid = lianYezhuid;
     }
 
-    public String getLianBinUrl() {
-        return lianBinUrl;
+    public String getXdoorBh() {
+        return xdoorBh;
     }
 
-    public void setLianBinUrl(String lianBinUrl) {
-        this.lianBinUrl = lianBinUrl;
-    }
-
-    public Object getXdoorName() {
-        return xdoorName;
-    }
-
-    public void setXdoorName(Object xdoorName) {
-        this.xdoorName = xdoorName;
-    }
-
-    public int getXdoorId() {
-        return xdoorId;
-    }
-
-    public void setXdoorId(int xdoorId) {
-        this.xdoorId = xdoorId;
+    public void setXdoorBh(String xdoorBh) {
+        this.xdoorBh = xdoorBh;
     }
 
     public String getChiyouren() {
@@ -98,20 +90,20 @@ public class FaceUrlBean {
         this.yezhuId = yezhuId;
     }
 
-    public int getGongsiId() {
-        return gongsiId;
+    public String getGongsiBh() {
+        return gongsiBh;
     }
 
-    public void setGongsiId(int gongsiId) {
-        this.gongsiId = gongsiId;
+    public void setGongsiBh(String gongsiBh) {
+        this.gongsiBh = gongsiBh;
     }
 
-    public int getXiangmuId() {
-        return xiangmuId;
+    public String getXiangmuBh() {
+        return xiangmuBh;
     }
 
-    public void setXiangmuId(int xiangmuId) {
-        this.xiangmuId = xiangmuId;
+    public void setXiangmuBh(String xiangmuBh) {
+        this.xiangmuBh = xiangmuBh;
     }
 
     public String getYezhuPhone() {
@@ -138,19 +130,19 @@ public class FaceUrlBean {
         this.bangdingTime = bangdingTime;
     }
 
-    public String getXiangmuName() {
+    public Object getXiangmuName() {
         return xiangmuName;
     }
 
-    public void setXiangmuName(String xiangmuName) {
+    public void setXiangmuName(Object xiangmuName) {
         this.xiangmuName = xiangmuName;
     }
 
-    public String getGongsiName() {
+    public Object getGongsiName() {
         return gongsiName;
     }
 
-    public void setGongsiName(String gongsiName) {
+    public void setGongsiName(Object gongsiName) {
         this.gongsiName = gongsiName;
     }
 
@@ -162,12 +154,52 @@ public class FaceUrlBean {
         this.lianName = lianName;
     }
 
+    public String getLianBinUrl() {
+        return lianBinUrl;
+    }
+
+    public void setLianBinUrl(String lianBinUrl) {
+        this.lianBinUrl = lianBinUrl;
+    }
+
     public String getLianUrl() {
         return lianUrl;
     }
 
     public void setLianUrl(String lianUrl) {
         this.lianUrl = lianUrl;
+    }
+
+    public Object getXdoorName() {
+        return xdoorName;
+    }
+
+    public void setXdoorName(Object xdoorName) {
+        this.xdoorName = xdoorName;
+    }
+
+    public Object getBindingName() {
+        return bindingName;
+    }
+
+    public void setBindingName(Object bindingName) {
+        this.bindingName = bindingName;
+    }
+
+    public Object getBindingType() {
+        return bindingType;
+    }
+
+    public void setBindingType(Object bindingType) {
+        this.bindingType = bindingType;
+    }
+
+    public Object getBindingId() {
+        return bindingId;
+    }
+
+    public void setBindingId(Object bindingId) {
+        this.bindingId = bindingId;
     }
 
     public String getFileName() {
@@ -190,21 +222,24 @@ public class FaceUrlBean {
     public String toString() {
         return "FaceUrlBean{" +
                 "lianYezhuid=" + lianYezhuid +
-                ", lianBinUrl='" + lianBinUrl + '\'' +
-                ", xdoorName=" + xdoorName +
-                ", xdoorId=" + xdoorId +
+                ", xdoorBh='" + xdoorBh + '\'' +
                 ", chiyouren='" + chiyouren + '\'' +
                 ", xdoorLianId=" + xdoorLianId +
                 ", yezhuId=" + yezhuId +
-                ", gongsiId=" + gongsiId +
-                ", xiangmuId=" + xiangmuId +
+                ", gongsiBh='" + gongsiBh + '\'' +
+                ", xiangmuBh='" + xiangmuBh + '\'' +
                 ", yezhuPhone='" + yezhuPhone + '\'' +
                 ", shanchu=" + shanchu +
                 ", bangdingTime='" + bangdingTime + '\'' +
-                ", xiangmuName='" + xiangmuName + '\'' +
-                ", gongsiName='" + gongsiName + '\'' +
+                ", xiangmuName=" + xiangmuName +
+                ", gongsiName=" + gongsiName +
                 ", lianName='" + lianName + '\'' +
+                ", lianBinUrl='" + lianBinUrl + '\'' +
                 ", lianUrl='" + lianUrl + '\'' +
+                ", xdoorName=" + xdoorName +
+                ", bindingName=" + bindingName +
+                ", bindingType=" + bindingType +
+                ", bindingId=" + bindingId +
                 ", fileName='" + fileName + '\'' +
                 ", path='" + path + '\'' +
                 '}';

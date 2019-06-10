@@ -113,6 +113,7 @@ public class Constant {
     public static final String SP_VISION_APP = "app_vison";//应用版本
     public static final String SP_LIXIAN_MIMA = "lixian_mima";//离线密码
     public static final String SP_XINTIAO_TIME = "xintiao_time";//心跳间隔时间
+    public static final String SP_VISION_HINT = "hint_vison";//提示版本
     /*******************sp保存的心跳信息****************/
 
     public static final int MAIN_ACTIVITY_INIT = 20031;
@@ -127,6 +128,9 @@ public class Constant {
     public static final int MSG_YIJIANKAIMEN_TAKEPIC = 10098;//手机一键开门拍照片
     public static final int MSG_YIJIANKAIMEN_TAKEPIC1 = 10099;//手机开门拍照片
     public static final int MSG_UPLOAD_LIXIAN_IMG = 100001;//上传离线img
+    public static final int MSG_VOICE_REFRESH = 100004;//修改声音设置
+    public static final int MSG_LIGHT_REFRESH = 100005;//修改屏幕亮度设置
+    public static final int MSG_CHANGE_DIALOG = 100006;//刷新提示设置
 
     public static final int MSG_CHECK_PASSWORD = 20006;//检查密码
     public static final int MSG_UPDATE_NETWORKSTATE = 20028;//网络状态改变
@@ -135,8 +139,8 @@ public class Constant {
     public static final int MSG_RESTART_VIDEO = 100002;//媒体流的重启
     public static final int MSG_UPLOAD_LOG = 100003;//日志上传
     public static boolean RESTART_PHONE = false;//手机重启
-//    public static boolean RESTART_AUDIO = false;//媒体流重启
+    //    public static boolean RESTART_AUDIO = false;//媒体流重启
     public static boolean UPLOAD_LOG = false;//上传日志
 
-    public static  int RESTART_PHONE_OR_AUDIO = 0;//0正常 1重启设备 2重启媒体
+    public static int RESTART_PHONE_OR_AUDIO = 0;//0正常 1重启设备 2重启媒体
 }

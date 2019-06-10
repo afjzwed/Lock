@@ -85,14 +85,11 @@ import com.cxwl.menjin.lock.utils.DbUtils;
 import com.cxwl.menjin.lock.utils.DialogUtil;
 import com.cxwl.menjin.lock.utils.HttpApi;
 import com.cxwl.menjin.lock.utils.HttpUtils;
-import com.cxwl.menjin.lock.utils.InstallUtil;
 import com.cxwl.menjin.lock.utils.Intenet;
 import com.cxwl.menjin.lock.utils.JsonUtil;
 import com.cxwl.menjin.lock.utils.MacUtils;
 import com.cxwl.menjin.lock.utils.NetWorkUtils;
 import com.cxwl.menjin.lock.utils.SPUtil;
-import com.cxwl.menjin.lock.utils.ShellUtils;
-import com.cxwl.menjin.lock.utils.SoundPoolUtil;
 import com.cxwl.menjin.lock.utils.StringUtils;
 import com.cxwl.menjin.lock.view.AutoScrollView;
 import com.google.gson.reflect.TypeToken;
@@ -149,6 +146,7 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_CANCEL_ONVIDEO;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CARD_INCOME;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CARD_KEY_INCOM;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CARD_OPENLOCK;
+import static com.cxwl.menjin.lock.config.Constant.MSG_CHANGE_DIALOG;
 import static com.cxwl.menjin.lock.config.Constant.MSG_CHECK_PASSWORD;
 import static com.cxwl.menjin.lock.config.Constant.MSG_DELETE_FACE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_DISCONNECT_VIEDO;
@@ -162,6 +160,7 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_OPENLOCK;
 import static com.cxwl.menjin.lock.config.Constant.MSG_GET_NOTICE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_INPUT_CARDINFO;
 import static com.cxwl.menjin.lock.config.Constant.MSG_INVALID_CARD;
+import static com.cxwl.menjin.lock.config.Constant.MSG_LIGHT_REFRESH;
 import static com.cxwl.menjin.lock.config.Constant.MSG_LIXIAN_PASSWORD_CHECK_AFTER;
 import static com.cxwl.menjin.lock.config.Constant.MSG_LOADLOCAL_DATA;
 import static com.cxwl.menjin.lock.config.Constant.MSG_LOCK_OPENED;
@@ -179,6 +178,7 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_TONGJI_VEDIO;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPDATE_NETWORKSTATE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPLOAD_LIXIAN_IMG;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPLOAD_LOG;
+import static com.cxwl.menjin.lock.config.Constant.MSG_VOICE_REFRESH;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_TAKEPIC;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_TAKEPIC1;
 import static com.cxwl.menjin.lock.config.Constant.ONVIDEO_MODE;
@@ -366,7 +366,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         initAexNfcReader();//初始化nfc本地广播
         initMainService();
-        initVoiceVolume();//初始化音量设置
+        initVoiceVolume(DeviceConfig.VOLUME_ALL);//初始化音量设置
 
 //        initLightVolume();//初始化屏幕亮度设置
 
@@ -610,7 +610,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**************************图片轮播***************/
     private void startPicTread() {
-        // TODO: 2018/9/5 没测
         if (null != picThread) {
             picThread.interrupt();
             picThread = null;
@@ -730,7 +729,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     }
 
     private boolean isPicStart() {
-        // TODO: 2018/9/5 没测
         Log.e(TAG, "开始图片广告判断");
         boolean b = false;
         if (null != picList && picList.size() > 0) {
@@ -826,12 +824,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     /**
      * 初始化音量设置
+     *
+     * @param voice
      */
-    protected void initVoiceVolume() {
+    protected void initVoiceVolume(int voice) {
         AudioManager audioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        initVoiceVolume(audioManager, AudioManager.STREAM_MUSIC, DeviceConfig.VOLUME_STREAM_MUSIC);
-        initVoiceVolume(audioManager, AudioManager.STREAM_RING, DeviceConfig.VOLUME_STREAM_RING);
-        initVoiceVolume(audioManager, AudioManager.STREAM_SYSTEM, DeviceConfig.VOLUME_STREAM_SYSTEM);
+//        initVoiceVolume(audioManager, AudioManager.STREAM_MUSIC, DeviceConfig.VOLUME_STREAM_MUSIC);
+//        initVoiceVolume(audioManager, AudioManager.STREAM_RING, DeviceConfig.VOLUME_STREAM_RING);
+//        initVoiceVolume(audioManager, AudioManager.STREAM_SYSTEM, DeviceConfig.VOLUME_STREAM_SYSTEM);
+//        initVoiceVolume(audioManager, AudioManager.STREAM_VOICE_CALL, DeviceConfig.VOLUME_STREAM_VOICE_CALL);
+        initVoiceVolume(audioManager, AudioManager.STREAM_MUSIC, voice);
+        initVoiceVolume(audioManager, AudioManager.STREAM_RING, voice);
+        initVoiceVolume(audioManager, AudioManager.STREAM_SYSTEM, voice);
         initVoiceVolume(audioManager, AudioManager.STREAM_VOICE_CALL, DeviceConfig.VOLUME_STREAM_VOICE_CALL);
     }
 
@@ -844,7 +848,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     protected void initVoiceVolume(AudioManager audioManager, int type, int value) {
         int thisValue = audioManager.getStreamMaxVolume(type);//得到最大音量
-        thisValue = thisValue * value / 30;//具体音量值
+        thisValue = thisValue * value / 100;//具体音量值
         audioManager.setStreamVolume(type, thisValue, AudioManager.FLAG_PLAY_SOUND);//调整音量时播放声音
     }
 
@@ -1198,6 +1202,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         Log.e(TAG, "定时挂断");
                         sendMainMessager(MSG_DISCONNECT_VIEDO, "");
                         break;
+                    case MSG_VOICE_REFRESH:
+                        Log.e(TAG, "声音音量设置");
+                        int voice = (int) msg.obj;
+                        initVoiceVolume(voice);
+                        break;
+                    case MSG_LIGHT_REFRESH:
+                        Log.e(TAG, "屏幕亮度设置");
+                        int light = (int) msg.obj;
+                        int brightness = light * 255 / 100;
+                        changeAppBrightness(brightness);
+                        break;
+                    case MSG_CHANGE_DIALOG:
+                        Log.e(TAG, "屏幕图片设置" + DeviceConfig.isLocalHint);
+                        weituoDialog = null;
+                        break;
                     default:
                         break;
                 }
@@ -1337,7 +1356,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             NewDoorBean result = (NewDoorBean) msg.obj;
             sendMainMessager(MSG_RTC_REGISTER, null);
             //初始化社区信息
-            setCommunityName(result.getXiangmu_name() == null ? "欣社区" : result.getXiangmu_name());
+            setCommunityName(result.getXiangmuName() == null ? "欣社区" : result.getXiangmuName());
             setLockName(MainService.lockName);
             if ("C".equals(DeviceConfig.DEVICE_TYPE)) {//判断是否社区大门
                 setDialStatus("请输入楼栋编号");
@@ -2344,7 +2363,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     int uploadImgStatus = 0; //0没上传 1正在上传
 
     private void uploadImgs(final List<ImgFile> imgFiles) {
-        // TODO: 2018/9/5 没测
         if (uploadImgStatus == 0) {
             //正在上传
             uploadImgStatus = 1;
@@ -3745,63 +3763,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             AFR_FSDKError error = engine.AFR_FSDK_UninitialEngine();//销毁引擎，释放内存资源
             //Log.v(FACE_TAG, "AFR_FSDK_UninitialEngine : " + error.getCode());
         }
-    }
-
-    private void commitData() {
-//        OkHttpUtils
-//                .postFile()
-//                .url(url)
-//                .file(file)
-//                .build()
-//                .execute(new Callback() {
-//                    @Override
-//                    public Object parseNetworkResponse(Response response, int id) throws Exception {
-//                        return null;
-//                    }
-//
-//                    @Override
-//                    public void onError(Call call, Exception e, int id) {
-//
-//                    }
-//
-//                    @Override
-//                    public void onResponse(Object response, int id) {
-//
-//                    }
-//                });
-    }
-
-    private void uploadBin() {
-        /*if (true) {//匹配，开门
-            byte[] data = mImageNV21;
-            String name = "";
-            if (data != null && data.length > 0) {
-                Bitmap bmp = BitmapUtils.byteToFile(data, mWidth, mHeight);
-                File file = null;
-                if (null != bmp) {
-                    file = BitmapUtils.saveBitmap(bmp);//本地截图文件地址
-                }
-                String[] parameters = new String[2];
-                parameters[0] = name;
-                if (null != file && !TextUtils.isEmpty(file.getPath())) {
-                    uploadToQiNiu(file, 3);//这里做上传到七牛的操作，不返回图片URL
-                    parameters[1] = faceOpenUrl;
-                } else {
-                    parameters[1] = "";
-                }
-                DLLog.e("人脸识别", "发出消息 " + name);
-                sendMainMessager(MSG_FACE_OPENLOCK, parameters);
-                // TODO: 2018/7/25 匹配成功后删除tempface文件夹中所有的文件
-                file = null;
-                bmp = null;
-                data = null;
-                name = null;
-            }
-        } else {
-            DeviceConfig.PRINTSCREEN_STATE = 0;//重置状态
-        }
-        mAFT_FSDKFace = null;
-        mImageNV21 = null;*/
     }
 
     /**
