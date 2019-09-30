@@ -2581,8 +2581,14 @@ public class MainService extends Service {
                     } else {
                         // 是否需要一直初始化，或者开线程延时间隔
                         //经测试，无限初始化并不会造成内存溢出
-                        isRtcInit = false;
-                        initTYSDK();
+//                        if (countReGetRtc < 3) {
+//                            isRtcInit = false;
+//                            initTYSDK();
+//                            countReGetRtc++;
+//                        } else {
+//                            rtcLogout();
+//                        }
+                        rtcLogout();
                     }
                 }
             });
