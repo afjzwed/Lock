@@ -1040,8 +1040,10 @@ public class MainService extends Service {
                     int[] myMempid = new int[]{appProcessInfo.pid};
                     Debug.MemoryInfo[] appMem = am.getProcessMemoryInfo(myMempid);
                     int memSize = appMem[0].dalvikPrivateDirty / 1024;
-                    if (memSize > 120) {//内存占用超过180M就重启
-                        onReStartVideo();
+                    if (memSize > 220) {//内存占用超过180M就重启
+                        DLLog.e("wh", "内存占用超过 进行设备的重启");
+                        Log.e(TAG, "内存占用超过 进行设备的重启");
+//                        onReStartVideo();
                     }
 //                    Log.d("进程", "当前进程 : " + appProcessInfo.processName + ":" + memSize);
                     DLLog.w("进程", appProcessInfo.processName + ":" + memSize);
@@ -1565,12 +1567,17 @@ public class MainService extends Service {
                     byte[] b = (byte[]) ois.readObject();
                     ois.close();
 //                Log.e("wh", "size " + b.length);
-                    mImageNV21 = b.clone();
-                    AFR_FSDKFace result = new AFR_FSDKFace();
-                    result.setFeatureData(mImageNV21);
+                    if (null != b) {//b可能为空
+                        mImageNV21 = b.clone();
+                        AFR_FSDKFace result = new AFR_FSDKFace();
+                        result.setFeatureData(mImageNV21);
 //                    ArcsoftManager.getInstance().mFaceDB.addFace(faceUrlBean.getYezhuPhone(), result);
-                    boolean b1 = ArcsoftManager.getInstance().mFaceDB.addFace1(faceUrlBean.getYezhuPhone(), result);
-                    Log.e(TAG, "人脸添加成功" + b1);
+                        boolean b1 = ArcsoftManager.getInstance().mFaceDB.addFace1(faceUrlBean.getYezhuPhone(), result);
+                        Log.e(TAG, "人脸添加成功" + b1);
+                    }
+                    // TODO: 2019/11/28 这两个置null需要吗??
+                    b = null;
+                    mImageNV21 = null;
                 } catch (IOException e) {
                     DLLog.e(TAG, "错误 restartFace e " + e.toString());
                     e.printStackTrace();
