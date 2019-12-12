@@ -25,6 +25,8 @@ public class DeviceConfig {
 
     public static boolean isLocalHint = false;//是否使用本地音频提示的标志 默认不使用
 
+    public static boolean isReconnect = false;//WebSocket是否重连的标志 默认不重连
+
     public static String DEVICE_TYPE = "B"; //C：社区大门门禁 B:楼栋单元门禁
 
     public static String RFID_PORT = "/dev/ttyS1";//卡阅读器使用
@@ -48,7 +50,7 @@ public class DeviceConfig {
     public static int RTC_RELOAD_COUNT = 20;//天翼RTC自动重连次数,重连超过该次数后则停止重连,断开RTC连接
 
     // TODO: 2019/2/12 尝试用volatile关键字修饰,避免并发错误?
-    public static int PRINTSCREEN_STATE = 0;//各种方式(人脸/卡通过人脸线程截图)是否开始处理图片并上传日志的状态  0:未开始 1:人脸 2:卡成功 3:代表人脸线程未开
+    public volatile static int PRINTSCREEN_STATE = 0;//各种方式(人脸/卡通过人脸线程截图)是否开始处理图片并上传日志的状态  0:未开始 1:人脸 2:卡成功 3:代表人脸线程未开
 
     public static final int DEVICE_KEYCODE_POUND = 66;//确认键
     public static final int DEVICE_KEYCODE_STAR = 67;//删除键

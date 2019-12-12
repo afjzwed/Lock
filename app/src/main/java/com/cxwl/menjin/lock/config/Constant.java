@@ -127,6 +127,7 @@ public class Constant {
     public static final int MSG_ADVERTISE_REFRESH_PIC = 10014;//刷新广告图片
     public static final int MSG_YIJIANKAIMEN_TAKEPIC = 10098;//手机一键开门拍照片
     public static final int MSG_YIJIANKAIMEN_TAKEPIC1 = 10099;//手机开门拍照片
+    public static final int MSG_WEBSOCKET = 10100;//重连websocket
     public static final int MSG_UPLOAD_LIXIAN_IMG = 100001;//上传离线img
     public static final int MSG_VOICE_REFRESH = 100004;//修改声音设置
     public static final int MSG_LIGHT_REFRESH = 100005;//修改屏幕亮度设置

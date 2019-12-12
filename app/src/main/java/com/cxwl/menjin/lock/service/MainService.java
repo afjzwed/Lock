@@ -152,6 +152,7 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_UPDATE_NETWORKSTATE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPLOAD_LIXIAN_IMG;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPLOAD_LOG;
 import static com.cxwl.menjin.lock.config.Constant.MSG_VOICE_REFRESH;
+import static com.cxwl.menjin.lock.config.Constant.MSG_WEBSOCKET;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_OPENLOCK;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_TAKEPIC;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_TAKEPIC1;
@@ -546,23 +547,44 @@ public class MainService extends Service {
                         break;
                     }
                     case MSG_YIJIANKAIMEN_OPENLOCK: {
-                        String pic_url = (String) msg.obj;
-                        if (null != mLogDoor) {
-                            mLogDoor.setMac(mac);
-                            mLogDoor.setKaimenfangshi(2);
-                            if (TextUtils.isEmpty(pic_url)) {
-                                mLogDoor.setKaimenjietu("");
-                            } else {
-                                mLogDoor.setKaimenjietu(pic_url);
-                            }
-                            mLogDoor.setKaimenshijian(StringUtils.transferLongToDate("yyyy-MM-dd HH:mm:ss", System
-                                    .currentTimeMillis()));
-                            mLogDoor.setState(1);
-                            List<LogDoor> list = new ArrayList<>();
-                            list.add(mLogDoor);
-                            createAccessLog(list);
-                            mLogDoor = null;
+//                        String pic_url = (String) msg.obj;
+//                        if (null != mLogDoor) {
+//                            mLogDoor.setMac(mac);
+//                            mLogDoor.setKaimenfangshi(2);
+//                            if (TextUtils.isEmpty(pic_url)) {
+//                                mLogDoor.setKaimenjietu("");
+//                            } else {
+//                                mLogDoor.setKaimenjietu(pic_url);
+//                            }
+//                            mLogDoor.setKaimenshijian(StringUtils.transferLongToDate("yyyy-MM-dd HH:mm:ss", System
+//                                    .currentTimeMillis()));
+//                            mLogDoor.setState(1);
+//                            List<LogDoor> list = new ArrayList<>();
+//                            list.add(mLogDoor);
+//                            createAccessLog(list);
+//                            mLogDoor = null;
+//                        }
+                        openLock(2);
+                        String[] parame = (String[]) msg.obj;
+                        String phoneNum = parame[0];//手机号码
+                        String picUrl = parame[1];//图片URL
+                        LogDoor data = new LogDoor();
+                        data.setMac(mac);
+                        data.setKaimenfangshi(2);
+                        if (TextUtils.isEmpty(picUrl)) {
+                            data.setKaimenjietu("");
+                        } else {
+                            data.setKaimenjietu(picUrl);
                         }
+                        data.setKaimenshijian(StringUtils.transferLongToDate("yyyy-MM-dd HH:mm:ss", System
+                                .currentTimeMillis()));
+                        data.setUuid("");
+                        data.setPhone(phoneNum);
+                        data.setKa_id("");
+                        data.setState(1);
+                        List<LogDoor> list = new ArrayList<>();
+                        list.add(data);
+                        createAccessLog(list);
                         break;
                     }
                     default:
@@ -771,6 +793,8 @@ public class MainService extends Service {
         sendMessageToMainAcitivity(MSG_LIXIAN_PASSWORD_CHECK_AFTER, result);
     }
 
+    private int websocketCount = 0;//每隔10分钟重连一次websocket
+
     /**
      * 心跳接口
      */
@@ -825,10 +849,12 @@ public class MainService extends Service {
                                         getCardInfo(Long.parseLong(banbenBean.getKa()));
                                     }
                                 }
+                                // TODO: 2019/12/12 暂时注释
+//                                if (DeviceConfig.DEVICE_TYPE.equals("B")) {//如果是大门不需要下载人脸
                                 if (StringUtils.isNoEmpty(banbenBean.getLian())) {
                                     long lianVision = (long) SPUtil.get(MainService.this, SP_VISION_LIAN, 0L);
-                                    Log.i(TAG, "人脸--当前人脸版本：" + lianVision + "   服务器人脸版本：" + Long.parseLong(banbenBean
-                                            .getLian()));
+                                    Log.i(TAG, "人脸--当前人脸版本：" + lianVision + "   服务器人脸版本：" + Long.parseLong
+                                            (banbenBean.getLian()));
                                     if (Long.parseLong(banbenBean.getLian()) > lianVision) {
                                         Log.i(TAG, "心跳中有人脸信息更新");
                                         if (currentStatus == CALL_MODE || currentStatus == PASSWORD_MODE)
@@ -839,6 +865,7 @@ public class MainService extends Service {
                                         }
                                     }
                                 }
+//                                }
                                 if (StringUtils.isNoEmpty(banbenBean.getTupian())) {
                                     long guanggaoVision = (long) SPUtil.get(MainService.this, Constant
                                             .SP_VISION_GUANGGAO, 0L);
@@ -881,7 +908,6 @@ public class MainService extends Service {
                                     Log.e(TAG, "心跳中有亮度更新");
                                     sendMessageToMainAcitivity(MSG_LIGHT_REFRESH, door.getLuminance());
                                 }
-
                                 if (StringUtils.isNoEmpty(deviceBean.getVersion())) {
                                     String appVision = getVersionName();
                                     Log.i(TAG, "心跳--当前app版本：" + appVision + "   服务器app版本：" + (deviceBean.getVersion()));
@@ -930,6 +956,18 @@ public class MainService extends Service {
                                 }
 
                                 lixianTongji();//上传离线统计日志
+
+                                if (DeviceConfig.isReconnect) {
+                                    websocketCount = 0;
+                                    sendMessageToMainAcitivity(Constant.MSG_WEBSOCKET, null);
+                                } else {
+                                    if (websocketCount < 10) {
+                                        websocketCount++;
+                                    } else {
+                                        websocketCount = 0;
+                                        DeviceConfig.isReconnect = true;
+                                    }
+                                }
 
                                 // TODO: 2018/10/8  心跳中查询本地数据如数据库或其它大数据量数据时，要做一个提醒或删除的最大阀值
                                 Log.e(TAG, "心跳结束");
@@ -1040,7 +1078,7 @@ public class MainService extends Service {
                     int[] myMempid = new int[]{appProcessInfo.pid};
                     Debug.MemoryInfo[] appMem = am.getProcessMemoryInfo(myMempid);
                     int memSize = appMem[0].dalvikPrivateDirty / 1024;
-                    if (memSize > 220) {//内存占用超过180M就重启
+                    if (memSize > 320) {//内存占用超过180M就重启
                         DLLog.e("wh", "内存占用超过 进行设备的重启");
                         Log.e(TAG, "内存占用超过 进行设备的重启");
 //                        onReStartVideo();
