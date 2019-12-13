@@ -28,6 +28,7 @@ public class DeviceConfig {
     public static boolean isReconnect = false;//WebSocket是否重连的标志 默认不重连
 
     public static String DEVICE_TYPE = "B"; //C：社区大门门禁 B:楼栋单元门禁
+    public static String imgName = ""; //图片名字的年月数字，门禁编号
 
     public static String RFID_PORT = "/dev/ttyS1";//卡阅读器使用
 

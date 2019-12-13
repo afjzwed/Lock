@@ -947,7 +947,6 @@ public class MainService extends Service {
                                     }
                                 }
 
-
                                 //查询数据库中是否有离线照片
                                 List<ImgFile> imgFiles = DbUtils.getInstans().quaryImg();
                                 if (imgFiles != null && imgFiles.size() > 0) {
@@ -989,6 +988,7 @@ public class MainService extends Service {
         try {
             Calendar calendar = Calendar.getInstance();
             int hour = calendar.get(Calendar.HOUR_OF_DAY);
+
 //            Log.e(TAG, "当前小时 " + hour + " " + RESTART_PHONE);
             if (hour == 1) {
                 Constant.UPLOAD_LOG = true;
@@ -2525,6 +2525,13 @@ public class MainService extends Service {
                         DeviceBean deviceBean = JsonUtil.parseJsonToBean(result, DeviceBean.class);
                         httpServerToken = deviceBean.getToken();
                         xdoorBh = deviceBean.getDoor().getXdoorBh() + "";
+
+                        Calendar calendar = Calendar.getInstance();
+                        int year = calendar.get(Calendar.YEAR);
+                        int month = calendar.get(Calendar.MONTH) + 1;
+                        DeviceConfig.imgName = "" + year + month + "/" + xdoorBh + "/";
+//                        Log.e(TAG, "登录 图片名字" + DeviceConfig.imgName);
+
                         Log.e(TAG, deviceBean.toString());
                         //重置广告，图片，通知版本为0，登录时重新加载
                         saveVisionInfo();
@@ -2971,7 +2978,7 @@ public class MainService extends Service {
                 if (logDoor.getKaimenfangshi() == 1) {
                     logDoor.setKaimenfangshi(2);
                     //一键开门拍照
-                    String imgurl = "door/img/" + System.currentTimeMillis() + ".jpg";
+                    String imgurl = "door/img/" + DeviceConfig.imgName + System.currentTimeMillis() + ".jpg";
                     sendMessageToMainAcitivity(MSG_YIJIANKAIMEN_TAKEPIC, imgurl);
                     logDoor.setKaimenjietu(imgurl);
                 } else {

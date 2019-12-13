@@ -6,18 +6,18 @@ package com.cxwl.menjin.lock.entity;
 
 public class Test {
 
-
     /**
      * code : 0
      * msg : 成功！
-     * data : {"banben":{"id":11786,"ka":"20191207093150353","ka_gx":"2019-12-07 09:31:50.0",
-     * "lian":"20191211202522086","lianGx":"2019-12-11 20:25:22.0","xdoorBh":"xd20191203173118","tonggao":null,
-     * "tonggaoGx":null,"guanggao":"20191205175219514","guanggaoGx":"2019-12-05 17:52:19.0","tupian":null,
-     * "tupianGx":null,"tishi":null,"tishiGx":null,"xintiaoTime":null},"door":{"xdoorBh":"xd20191203173118",
-     * "gongsiBh":"gsa001","xiangmuBh":"xma0324","qiqu":"","loudong":null,"danyuan":null,"mac":"8c:f7:10:65:bc:f4",
-     * "key":null,"name":"测试金秋小区大门3","type":0,"shanchu":1,"gongsiName":null,"version":null,"lixianMima":null,
-     * "online":false,"versionId":32,"voice":10,"luminance":50,"xiangmuName":"金秋小区"},"token":null,"version":"1.5.2",
-     * "fuwuqi_shijian":"2019-12-12 08:50:26","lixian_mima":"841014","xintiao_shijian":60}
+     * data : {"banben":{"id":11787,"ka":"20191205170151133","ka_gx":"2019-12-05 17:01:51.0",
+     * "lian":"20191212144254027","lianGx":"2019-12-12 14:42:54.0","xdoorBh":"xd20191203181455","tonggao":null,
+     * "tonggaoGx":null,"guanggao":"20191205175219543","guanggaoGx":"2019-12-05 17:52:19.0","tupian":null,
+     * "tupianGx":null,"tishi":null,"tishiGx":null,"xintiaoTime":null},"door":{"xdoorBh":"xd20191203181455",
+     * "gongsiBh":"gsa001","xiangmuBh":"xma0324","qiqu":"一期","loudong":"7","danyuan":"1","mac":"8c:f7:10:47:a6:64",
+     * "key":null,"name":"测试单元门禁","type":1,"shanchu":1,"gongsiName":null,"version":null,"lixianMima":null,
+     * "online":false,"versionId":32,"voice":10,"luminance":50,"xiangmuName":"金秋小区"},
+     * "token":"28596ce2-a171-4436-976c-4eaf9be64e5a","version":null,"fuwuqi_shijian":"2019-12-12 17:20:39",
+     * "lixian_mima":"841014","xintiao_shijian":60}
      */
 
     private String code;
@@ -50,25 +50,25 @@ public class Test {
 
     public static class DataBean {
         /**
-         * banben : {"id":11786,"ka":"20191207093150353","ka_gx":"2019-12-07 09:31:50.0","lian":"20191211202522086",
-         * "lianGx":"2019-12-11 20:25:22.0","xdoorBh":"xd20191203173118","tonggao":null,"tonggaoGx":null,
-         * "guanggao":"20191205175219514","guanggaoGx":"2019-12-05 17:52:19.0","tupian":null,"tupianGx":null,
+         * banben : {"id":11787,"ka":"20191205170151133","ka_gx":"2019-12-05 17:01:51.0","lian":"20191212144254027",
+         * "lianGx":"2019-12-12 14:42:54.0","xdoorBh":"xd20191203181455","tonggao":null,"tonggaoGx":null,
+         * "guanggao":"20191205175219543","guanggaoGx":"2019-12-05 17:52:19.0","tupian":null,"tupianGx":null,
          * "tishi":null,"tishiGx":null,"xintiaoTime":null}
-         * door : {"xdoorBh":"xd20191203173118","gongsiBh":"gsa001","xiangmuBh":"xma0324","qiqu":"","loudong":null,
-         * "danyuan":null,"mac":"8c:f7:10:65:bc:f4","key":null,"name":"测试金秋小区大门3","type":0,"shanchu":1,
-         * "gongsiName":null,"version":null,"lixianMima":null,"online":false,"versionId":32,"voice":10,
-         * "luminance":50,"xiangmuName":"金秋小区"}
-         * token : null
-         * version : 1.5.2
-         * fuwuqi_shijian : 2019-12-12 08:50:26
+         * door : {"xdoorBh":"xd20191203181455","gongsiBh":"gsa001","xiangmuBh":"xma0324","qiqu":"一期","loudong":"7",
+         * "danyuan":"1","mac":"8c:f7:10:47:a6:64","key":null,"name":"测试单元门禁","type":1,"shanchu":1,"gongsiName":null,
+         * "version":null,"lixianMima":null,"online":false,"versionId":32,"voice":10,"luminance":50,
+         * "xiangmuName":"金秋小区"}
+         * token : 28596ce2-a171-4436-976c-4eaf9be64e5a
+         * version : null
+         * fuwuqi_shijian : 2019-12-12 17:20:39
          * lixian_mima : 841014
          * xintiao_shijian : 60
          */
 
         private BanbenBean banben;
         private DoorBean door;
-        private Object token;
-        private String version;
+        private String token;
+        private Object version;
         private String fuwuqi_shijian;
         private String lixian_mima;
         private int xintiao_shijian;
@@ -89,19 +89,19 @@ public class Test {
             this.door = door;
         }
 
-        public Object getToken() {
+        public String getToken() {
             return token;
         }
 
-        public void setToken(Object token) {
+        public void setToken(String token) {
             this.token = token;
         }
 
-        public String getVersion() {
+        public Object getVersion() {
             return version;
         }
 
-        public void setVersion(String version) {
+        public void setVersion(Object version) {
             this.version = version;
         }
 
@@ -131,15 +131,15 @@ public class Test {
 
         public static class BanbenBean {
             /**
-             * id : 11786
-             * ka : 20191207093150353
-             * ka_gx : 2019-12-07 09:31:50.0
-             * lian : 20191211202522086
-             * lianGx : 2019-12-11 20:25:22.0
-             * xdoorBh : xd20191203173118
+             * id : 11787
+             * ka : 20191205170151133
+             * ka_gx : 2019-12-05 17:01:51.0
+             * lian : 20191212144254027
+             * lianGx : 2019-12-12 14:42:54.0
+             * xdoorBh : xd20191203181455
              * tonggao : null
              * tonggaoGx : null
-             * guanggao : 20191205175219514
+             * guanggao : 20191205175219543
              * guanggaoGx : 2019-12-05 17:52:19.0
              * tupian : null
              * tupianGx : null
@@ -287,16 +287,16 @@ public class Test {
 
         public static class DoorBean {
             /**
-             * xdoorBh : xd20191203173118
+             * xdoorBh : xd20191203181455
              * gongsiBh : gsa001
              * xiangmuBh : xma0324
-             * qiqu :
-             * loudong : null
-             * danyuan : null
-             * mac : 8c:f7:10:65:bc:f4
+             * qiqu : 一期
+             * loudong : 7
+             * danyuan : 1
+             * mac : 8c:f7:10:47:a6:64
              * key : null
-             * name : 测试金秋小区大门3
-             * type : 0
+             * name : 测试单元门禁
+             * type : 1
              * shanchu : 1
              * gongsiName : null
              * version : null
@@ -312,8 +312,8 @@ public class Test {
             private String gongsiBh;
             private String xiangmuBh;
             private String qiqu;
-            private Object loudong;
-            private Object danyuan;
+            private String loudong;
+            private String danyuan;
             private String mac;
             private Object key;
             private String name;
@@ -360,19 +360,19 @@ public class Test {
                 this.qiqu = qiqu;
             }
 
-            public Object getLoudong() {
+            public String getLoudong() {
                 return loudong;
             }
 
-            public void setLoudong(Object loudong) {
+            public void setLoudong(String loudong) {
                 this.loudong = loudong;
             }
 
-            public Object getDanyuan() {
+            public String getDanyuan() {
                 return danyuan;
             }
 
-            public void setDanyuan(Object danyuan) {
+            public void setDanyuan(String danyuan) {
                 this.danyuan = danyuan;
             }
 

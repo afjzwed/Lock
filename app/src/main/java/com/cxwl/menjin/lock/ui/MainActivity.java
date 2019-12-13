@@ -2241,7 +2241,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             lastImageUuid = uuid;
             setImageUuidAvaibale(uuid);
             //创建地址
-            curUrl = "door/img/" + System.currentTimeMillis() + ".jpg";
+            curUrl = "door/img/" + DeviceConfig.imgName + System.currentTimeMillis() + ".jpg";
             callback.beforeTakePickture(thisValue, curUrl, isCall, uuid);//校验房间号是否存在
             Log.v("MainActivity", "开始启动拍照");
             new Thread() {
@@ -3977,7 +3977,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
      */
     private void uploadToQiNiu(final File file, final int i) {
         //创建地址
-        faceOpenUrl = "door/img/" + System.currentTimeMillis() + ".jpg";
+        faceOpenUrl = "door/img/" + DeviceConfig.imgName + System.currentTimeMillis() + ".jpg";
         final ImgFile imgFile = new ImgFile();
         imgFile.setImg_localurl(file.getAbsolutePath());
         imgFile.setImg_uploadurl(faceOpenUrl);

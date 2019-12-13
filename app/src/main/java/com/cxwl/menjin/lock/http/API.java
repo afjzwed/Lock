@@ -34,7 +34,7 @@ public interface API {
 
     String CALLALL_MEMBERS = HTTP_HOST + "/xsq/web/xdoor/jiqi/callAllMembers";//获取成员 已完成
 
-    String QINIU_IMG = "http://119.23.139.180:8080/wygl_door" + "/qiniu/getQiniuToken";//获取七牛图片路径 已完成
+    String QINIU_IMG = HTTP_HOST + "/xsq/web/xdoor/jiqi/getQiniuToken";//获取七牛图片路径 已完成
 
     String NEW_TONGJI = HTTP_HOST + "/xsq/web/xdoor/jiqi/tongji";//新统计接口 已完成
 
@@ -44,7 +44,7 @@ public interface API {
 
     String UPLOAD_FACE = "http://192.168.8.137:9999" + "/ysk/ysk_door/comparison_your_peppaface";//上传人脸数据
 
-    String WEBSOCKET_PHONE1 =  "ws://47.106.247.31:8081/xdoor";//websocket手机
-    String WEBSOCKET_PHONE2 =  "ws://47.106.133.194:8081/xdoor";//websocket手机
+    String WEBSOCKET_PHONE1 = "ws://47.106.247.31:8081/xdoor";//websocket手机
+    String WEBSOCKET_PHONE2 = "ws://47.106.133.194:8081/xdoor";//websocket手机
 
 }
