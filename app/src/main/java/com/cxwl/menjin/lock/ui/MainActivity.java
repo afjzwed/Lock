@@ -74,7 +74,6 @@ import com.cxwl.menjin.lock.entity.NewDoorBean;
 import com.cxwl.menjin.lock.entity.NoticeBean;
 import com.cxwl.menjin.lock.entity.ResponseBean;
 import com.cxwl.menjin.lock.face.ArcsoftManager;
-import com.cxwl.menjin.lock.face.PhotographActivity2;
 import com.cxwl.menjin.lock.http.API;
 import com.cxwl.menjin.lock.interfac.TakePictureCallback;
 import com.cxwl.menjin.lock.service.MainService;
@@ -156,7 +155,6 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_DELETE_FACE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_DISCONNECT_VIEDO;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_DETECT_CHECK;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_DETECT_CONTRAST;
-import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_DETECT_INPUT;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_DETECT_PAUSE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_INFO;
 import static com.cxwl.menjin.lock.config.Constant.MSG_FACE_INFO_FINISH;
@@ -175,7 +173,6 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_RESTART_VIDEO;
 import static com.cxwl.menjin.lock.config.Constant.MSG_RTC_DISCONNECT;
 import static com.cxwl.menjin.lock.config.Constant.MSG_RTC_NEWCALL;
 import static com.cxwl.menjin.lock.config.Constant.MSG_RTC_ONVIDEO;
-import static com.cxwl.menjin.lock.config.Constant.MSG_RTC_REGISTER;
 import static com.cxwl.menjin.lock.config.Constant.MSG_START_DIAL;
 import static com.cxwl.menjin.lock.config.Constant.MSG_START_DIAL_PICTURE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_TONGJI_VEDIO;
@@ -346,28 +343,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         initQiniu();//初始化七牛
         initScreen();
         initHandle();
-
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                Log.v("人脸识别", "initFaceDetect-->" + 111);
-//                boolean b = ArcsoftManager.getInstance().mFaceDB.loadFaces();
-//                MainActivity.this.runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        if (ArcsoftManager.getInstance().mFaceDB.mRegister.isEmpty()) {
-//                            Log.v("人脸识别", "initFaceDetect-->" + 333);
-////                            Utils.DisplayToast(MainActivity.this, "没有注册人脸，请先注册");
-//                            return;
-//                        }
-//                        identification = true;
-//                        Log.v("人脸识别", "initFaceDetect-->" + 222);
-//                        Utils.DisplayToast(MainActivity.this, "人脸数据加载完成" + ArcsoftManager.getInstance().mFaceDB
-//                                .mRegister.size());
-//                    }
-//                });
-//            }
-//        }).start();
 
         initAexNfcReader();//初始化nfc本地广播
         initMainService();
@@ -3275,11 +3250,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                         identification = true;
 //                        idOperation =true;
                         break;
-                    case MSG_FACE_DETECT_INPUT://人脸识别录入(拿到网络图片后发出人脸识别暂停，然后发出录入消息)
-                        Log.e(TAG, "人脸识别录入");
-                        // TODO: 2018/5/11  这里要传入整个网络图片的所有地址过来给faceDetectInput方法使用
-                        faceDetectInput();
-                        break;
                     case MSG_FACE_DETECT_CONTRAST://人脸识别对比
                         Log.e(TAG, "人脸识别对比");
                         identification = true;
@@ -3310,28 +3280,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
             }
         });
 
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                Log.v("人脸识别", "initFaceDetect-->" + 111);
-//                boolean b = ArcsoftManager.getInstance().mFaceDB.loadFaces();
-//                MainActivity.this.runOnUiThread(new Runnable() {
-//                    @Override
-//                    public void run() {
-//                        if (ArcsoftManager.getInstance().mFaceDB.mRegister.isEmpty()) {
-////                            Log.v("人脸识别", "initFaceDetect-->" + 333);
-//                            Utils.DisplayToast(MainActivity.this, "没有注册人脸，请先注册");
-//                            return;
-//                        }
-//                        identification = true;
-//                        Log.v("人脸识别", "initFaceDetect-->人脸数据加载完成 " + ArcsoftManager.getInstance().mFaceDB
-//                                .mRegister.size());
-//                        Utils.DisplayToast(MainActivity.this, "人脸数据加载完成" + ArcsoftManager.getInstance().mFaceDB
-//                                .mRegister.size());
-//                    }
-//                });
-//            }
-//        }).start();
         Log.v("人脸识别", "initFaceDetect-->" + 111);
         mFRAbsLoop = new FRAbsLoop();
         mFRAbsLoop.start();
@@ -3610,14 +3558,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
         // TODO: 2018/10/11 这个方法用来在人脸框旁边加字(用于参考，https://www.jianshu.com/p/8dee89ec4a24)
 //        canvas.drawText(userName, aftFsdkFace.getRect().right + 30, aftFsdkFace.getRect().top + 50, paint);
-    }
-
-    /**
-     * 开始人脸录入
-     */
-    private void faceDetectInput() {
-        startActivity(new Intent(this, PhotographActivity2.class));
-        // TODO: 2018/6/19 sendMainMessager(MSG_FACE_DOWNLOAD, null);
     }
 
     @Override
