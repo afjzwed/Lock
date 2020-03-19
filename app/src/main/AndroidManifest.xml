@@ -103,7 +103,8 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".ui.SplashActivity"
+            android:exported="true"
             android:launchMode="singleTask"
             android:screenOrientation="landscape"
             android:windowSoftInputMode="stateHidden">
@@ -114,6 +115,12 @@
                 <category android:name="android.intent.category.DEFAULT"/>
             </intent-filter>
         </activity>
+
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true"
+            android:screenOrientation="landscape"
+            android:windowSoftInputMode="stateHidden"/>
 
         <service android:name=".service.MainService"/>
 

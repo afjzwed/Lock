@@ -10,8 +10,7 @@ import android.os.Bundle;
 import com.cxwl.menjin.lock.ui.MainActivity;
 import com.cxwl.menjin.lock.MainApplication;
 import com.cxwl.menjin.lock.config.DeviceConfig;
-
-
+import com.cxwl.menjin.lock.ui.SplashActivity;
 
 
 /**
@@ -28,7 +27,7 @@ public class NativeAccessReceiver extends BroadcastReceiver {
         if (action.equals(Intent.ACTION_PACKAGE_REPLACED) || action.equals(Intent.ACTION_PACKAGE_ADDED)) {
             String packageName = intent.getData().getSchemeSpecificPart();
             if (packageName.equals(Lockaxial_PackageName)) {
-                startActivity(context, MainActivity.class, null);
+                startActivity(context, SplashActivity.class, null);
             }else if(packageName.equals(DeviceConfig.Lockaxial_Monitor_PackageName)){
                 //启动监控程序
                 Intent i = new Intent();

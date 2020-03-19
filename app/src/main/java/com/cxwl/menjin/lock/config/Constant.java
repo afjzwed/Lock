@@ -13,15 +13,12 @@ public class Constant {
     public static String fr_key = "79kKgHjTgz27bkMMkKA8G6TzKEr6TYfhDa6UAuqxKK5r";//人脸识别(FR) Key :
     public static String age_key = "79kKgHjTgz27bkMMkKA8G6Uc8F9xjy9bcFCL3o9w8k6m";//年龄识别(Age) Key :
     public static String gender_key = "79kKgHjTgz27bkMMkKA8G6UjHeRAg5TZNJ4u8sPEKj9m";//性别识别
-    // (Gender) Key :
 
-    //    public static final String PIC_PREFIX = "arcsoft_";//虹软人脸照片文件夹名
+    public static final String arc_app_id = "Azj1c5dQCoWK3e3Yres4x7Nsy5pQ4Y1DC67mRAGrCgo7";
+    public static final String arc_sdk_key = "7CzG7nNCWZJmYW4AzCah4MHMHLPiorcKb3vkWkaCvMwf";
+
     public static final int MSG_FACE_DETECT_CONTRAST = 11100;//人脸识别对比
-    public static final int MSG_FACE_DETECT_INPUT = 11101;//人脸识别录入
     public static final int MSG_FACE_DETECT_PAUSE = 11102;//人脸识别暂停
-    public static final int MSG_ID_CARD_DETECT_PAUSE = 11103;//身份证识别暂停
-    public static final int MSG_ID_CARD_DETECT_RESTART = 11104;//身份证识别重新开始
-    public static final int MSG_ID_CARD_DETECT_INPUT = 11105;//身份证识别重新开始
 
     public static final int MSG_FACE_DETECT_CHECK = -1;//人脸识别重置标志位
 
@@ -29,7 +26,7 @@ public class Constant {
 
     public static final int MSG_FACE_INFO = 11106;//获取人脸照片URL
     public static final int MSG_FACE_INFO_FINISH = 11108;//获取人脸照片信息录入完成
-    public static final int MSG_DELETE_FACE = 11109;//删除人脸信息
+
 
     public static final int MSG_FACE_OPENLOCK = 40000;//人脸开门
 
@@ -39,7 +36,7 @@ public class Constant {
     public static final int START_FACE_CHECK2 = 11112;//登录天翼RTC之前先释放相机
     public static final int START_FACE_CHECK3 = 11115;//延时3秒打开人脸识别
 
-    public static float FACE_MAX = 0.55f;//
+    public static float FACE_MAX = 0.6f;//
     /********************虹软相关*********************/
 
     /********************天翼RTC相关******************/

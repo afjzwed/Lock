@@ -5,11 +5,9 @@ import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 
 import com.cxwl.menjin.lock.db.DaoMaster;
 import com.cxwl.menjin.lock.db.DaoSession;
-import com.cxwl.menjin.lock.face.ArcsoftManager;
 import com.cxwl.menjin.lock.utils.DLLog;
 import com.tencent.bugly.crashreport.CrashReport;
 import com.zhy.http.okhttp.OkHttpUtils;
@@ -32,8 +30,6 @@ public class MainApplication extends Application {
     public void onCreate() {
 
         application = this;
-        //人脸识别的数据存本地
-        ArcsoftManager.getInstance().initArcsoft(this);//虹软人脸识别初始化
 
         super.onCreate();
 

@@ -2,7 +2,9 @@ package com.cxwl.menjin.lock.utils;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 /**
  * @author xlei
@@ -89,5 +91,26 @@ public class StringUtils {
     public static String reverseNum(String acc) {
         String s = acc.substring(6, 8) + acc.substring(4, 6) + acc.substring(2, 4) + acc.substring(0, 2);
         return s.toLowerCase();
+    }
+
+    //将list转换为带有 ， 的字符串
+    private String listToString(List<String> list) {
+        StringBuilder sb = new StringBuilder();
+        if (list != null && list.size() > 0) {
+            for (int i = 0; i < list.size(); i++) {
+                if (i < list.size() - 1) {
+                    sb.append(list.get(i) + ",");
+                } else {
+                    sb.append(list.get(i));
+                }
+            }
+        }
+        return sb.toString();
+    }
+
+    //将list转换为带有 ， 的字符串
+    private List<String> stringToList(String str) {
+        String[] arr = str.split(",");
+        return Arrays.asList(arr);
     }
 }

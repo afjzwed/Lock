@@ -21,7 +21,7 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
-import com.arcsoft.facerecognition.AFR_FSDKFace;
+import com.arcsoft.face.FaceFeature;
 import com.cxwl.menjin.lock.MainApplication;
 import com.cxwl.menjin.lock.config.Constant;
 import com.cxwl.menjin.lock.config.DeviceConfig;
@@ -40,8 +40,8 @@ import com.cxwl.menjin.lock.entity.NewDoorBean;
 import com.cxwl.menjin.lock.entity.NewTongJiBean;
 import com.cxwl.menjin.lock.entity.ResponseBean;
 import com.cxwl.menjin.lock.entity.YeZhuBean;
-import com.cxwl.menjin.lock.face.ArcsoftManager;
 import com.cxwl.menjin.lock.http.API;
+import com.cxwl.menjin.lock.newface.FaceServer;
 import com.cxwl.menjin.lock.utils.CardRecord;
 import com.cxwl.menjin.lock.utils.DLLog;
 import com.cxwl.menjin.lock.utils.DbUtils;
@@ -152,7 +152,6 @@ import static com.cxwl.menjin.lock.config.Constant.MSG_UPDATE_NETWORKSTATE;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPLOAD_LIXIAN_IMG;
 import static com.cxwl.menjin.lock.config.Constant.MSG_UPLOAD_LOG;
 import static com.cxwl.menjin.lock.config.Constant.MSG_VOICE_REFRESH;
-import static com.cxwl.menjin.lock.config.Constant.MSG_WEBSOCKET;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_OPENLOCK;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_TAKEPIC;
 import static com.cxwl.menjin.lock.config.Constant.MSG_YIJIANKAIMEN_TAKEPIC1;
@@ -228,7 +227,7 @@ public class MainService extends Service {
     private Ka kaInfo = null;
     private String cardId;//卡ID,用于卡开门失败时保存卡id
 
-    private AFR_FSDKFace mAFR_FSDKFace;//用于保存到数据库中的人脸特征信息
+//    private AFR_FSDKFace mAFR_FSDKFace;//用于保存到数据库中的人脸特征信息
 
     private int noticesStatus = 0;//门禁卡信息版本状态(默认为0)// 0:不一致（等待下载数据）1:不一致（正在下载数据）
     private int faceStatus = 0;//人脸信息版本状态(默认为0)// 0:不一致（等待下载数据）1:不一致（正在下载数据）
@@ -1550,8 +1549,7 @@ public class MainService extends Service {
         Log.e(TAG, "人脸更新" + " deleteFaceList");
         if (null != faceDeleteList && faceDeleteList.size() > 0) {
             for (FaceUrlBean faceUrlBean : faceDeleteList) {
-//                boolean delete = ArcsoftManager.getInstance().mFaceDB.delete(faceUrlBean.getYezhuPhone());//删除
-                boolean delete = ArcsoftManager.getInstance().mFaceDB.delete1(faceUrlBean.getYezhuPhone());//删除
+                boolean delete = FaceServer.getInstance().delete(faceUrlBean.getYezhuPhone());//删除
                 Log.e(TAG, "人脸更新 遍历删除集合，删除人脸信息 " + faceUrlBean.getYezhuPhone() + " " + delete);
             }
         }
@@ -1564,7 +1562,8 @@ public class MainService extends Service {
      */
     private void removeFaceFiles(int b) {
         Log.e(TAG, "人脸更新" + " 删除文件");
-        String dir = Environment.getExternalStorageDirectory() + "" + "/" + DeviceConfig.LOCAL_FACE_PATH;
+//        String dir = Environment.getExternalStorageDirectory() + "" + "/" + DeviceConfig.LOCAL_FACE_PATH;
+        String dir = Environment.getExternalStorageDirectory() + "" + "/" + DeviceConfig.NEW_LOCAL_FACE_PATH;
         File filed = new File(dir);
         if (!filed.exists()) {//不存在不用清除数据
             Log.e(TAG, "人脸更新 不存在 不用清除数据");
@@ -1604,14 +1603,14 @@ public class MainService extends Service {
                     ObjectInputStream ois = new ObjectInputStream(new FileInputStream(faceUrlBean.getPath()));
                     byte[] b = (byte[]) ois.readObject();
                     ois.close();
-//                Log.e("wh", "size " + b.length);
+//                    Log.e("wh", "size " + b.length);
                     if (null != b) {//b可能为空
                         mImageNV21 = b.clone();
-                        AFR_FSDKFace result = new AFR_FSDKFace();
-                        result.setFeatureData(mImageNV21);
-//                    ArcsoftManager.getInstance().mFaceDB.addFace(faceUrlBean.getYezhuPhone(), result);
-                        boolean b1 = ArcsoftManager.getInstance().mFaceDB.addFace1(faceUrlBean.getYezhuPhone(), result);
-                        Log.e(TAG, "人脸添加成功" + b1);
+
+                        FaceFeature faceFeature = new FaceFeature();
+                        faceFeature.setFeatureData(mImageNV21);
+                        boolean b1 = FaceServer.getInstance().addFace(faceUrlBean.getYezhuPhone(), faceFeature);
+//                        Log.e(TAG, "人脸添加成功" + b1);
                     }
                     // TODO: 2019/11/28 这两个置null需要吗??
                     b = null;
@@ -1662,7 +1661,8 @@ public class MainService extends Service {
     private void downLoadFaceList(ArrayList<FaceUrlBean> faceUrlList) {
         Log.e(TAG, "人脸更新" + " downLoadFaceList");
         if (null != faceUrlList && faceUrlList.size() > 0) {
-            String path = Environment.getExternalStorageDirectory() + File.separator + DeviceConfig.LOCAL_FACE_PATH;
+//            String path = Environment.getExternalStorageDirectory() + File.separator + DeviceConfig.LOCAL_FACE_PATH;
+            String path = Environment.getExternalStorageDirectory() + File.separator + DeviceConfig.NEW_LOCAL_FACE_PATH;
             try {
                 File file = new File(path);
                 if (!file.exists()) {
@@ -3541,7 +3541,9 @@ public class MainService extends Service {
 
 //        String absolutePath = Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator +
 //                DeviceConfig.LOCAL_FACE_PATH;
-        String absolutePath = Environment.getExternalStorageDirectory() + File.separator + DeviceConfig.LOCAL_FACE_PATH;
+//        String absolutePath = Environment.getExternalStorageDirectory() + File.separator + DeviceConfig
+// .LOCAL_FACE_PATH;
+        String absolutePath = Environment.getExternalStorageDirectory() + File.separator + DeviceConfig.NEW_LOCAL_FACE_PATH;
         int lastIndex = url.lastIndexOf("/");
         String fileName = url.substring(lastIndex + 1);//文件名，带.bin后缀
 

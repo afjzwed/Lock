@@ -69,11 +69,13 @@ dependencies {
     //七牛
     compile 'com.qiniu:qiniu-android-sdk:7.3.+'
     //以下6个都是虹软相关
-    compile files('libs/ageestimation.jar')
-    compile files('libs/facedetection.jar')
-    compile files('libs/facerecognition.jar')
-    compile files('libs/facetracking.jar')
-    compile files('libs/genderestimation.jar')
+//    compile files('libs/ageestimation.jar')
+//    compile files('libs/facedetection.jar')
+//    compile files('libs/facerecognition.jar')
+//    compile files('libs/facetracking.jar')
+//    compile files('libs/genderestimation.jar')
+    compile files('libs/arcsoft_face.jar')
+    compile files('libs/arcsoft_image_util.jar')
     compile 'com.guo.android_extend:android-extend:1.0.1'
     // banner
     compile 'com.youth.banner:banner:1.4.10'
@@ -87,6 +89,9 @@ dependencies {
     //https://github.com/TakahikoKawasaki/nv-websocket-client
     //https://www.helplib.com/GitHub/article_124416
     compile 'com.neovisionaries:nv-websocket-client:2.9'
+
+    compile 'io.reactivex.rxjava2:rxjava:2.2.6'
+    compile 'io.reactivex.rxjava2:rxandroid:2.1.0'
 
     //在release和test版本中，使用的是LeakCanary的no-op版本，也就是没有实际代码和操作的Wrapper版本，只包含LeakCanary和RefWatcher类的空实现，这样不会对生成的APK包体积和应用性能造成影响
 //    debugCompile 'com.squareup.leakcanary:leakcanary-android:1.5'
