@@ -165,9 +165,10 @@ public class FaceServer {
             Log.e(TAG, "比对相似度 faceSimilar " + faceSimilar.getScore());
             // TODO: 2020/3/16 如果在这里设置阈值,超过阈值后直接跳出循环可以减少对比时间,但是会增加误识别率
             if (faceSimilar.getScore() > maxSimilar) {//此处未设阈值,在所有人脸比较完后,拿到最相似人脸
-                maxSimilar = faceSimilar.getScore();
-                name = faceRegisterInfoList.get(i).getName();
                 if (maxSimilar > Constant.FACE_MAX) {
+                    maxSimilar = faceSimilar.getScore();
+                    name = faceRegisterInfoList.get(i).getName();
+                    Log.e(TAG, "比对相似度 faceSimilar " + maxSimilar);
                     break;
                 }
             }
@@ -196,6 +197,11 @@ public class FaceServer {
             if (!featureDir.exists() && !featureDir.mkdirs()) {
                 Log.e(TAG, "registerNv21: can not create feature directory");
             } else {
+                if (null == faceRegisterInfoList) {
+                    faceRegisterInfoList = new ArrayList<>();
+                }
+                faceRegisterInfoList.add(new FaceRegisterInfo(faceFeature.getFeatureData(), name));
+
                 FileOutputStream fosFeature = new FileOutputStream(featureDir + File.separator + name);
                 fosFeature.write(faceFeature.getFeatureData());
                 fosFeature.close();
@@ -203,6 +209,7 @@ public class FaceServer {
                 Log.v("人脸识别", "addFace-->" + 222);
             }
         } catch (IOException e) {
+            Log.e(TAG, "人脸添加失败 IOException " + e.getMessage());
             DLLog.e(TAG, "人脸添加失败 IOException " + e.getMessage());
             e.printStackTrace();
         }

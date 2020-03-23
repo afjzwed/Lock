@@ -5,6 +5,7 @@ import android.app.Application;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
 
 import com.cxwl.menjin.lock.db.DaoMaster;
 import com.cxwl.menjin.lock.db.DaoSession;
@@ -49,7 +50,8 @@ public class MainApplication extends Application {
 
         Intent intent = new Intent();
         // 参数1：包名，参数2：程序入口的activity
-        intent.setClassName("com.cxwl.menjin.lock", "com.cxwl.menjin.lock.ui.MainActivity");
+//        intent.setClassName("com.cxwl.menjin.lock", "com.cxwl.menjin.lock.ui.MainActivity");
+        intent.setClassName("com.cxwl.menjin.lock", "com.cxwl.menjin.lock.ui.SplashActivity");
         restartIntent = PendingIntent.getActivity(getApplicationContext(), 0,
                 intent, Intent.FLAG_ACTIVITY_NEW_TASK);
     }
@@ -67,6 +69,7 @@ public class MainApplication extends Application {
                         .append(";  Exception: ").append(ex.toString() + "\n");
             }
 
+            Log.e("崩溃重启", "错误 " + sb);
             DLLog.e("崩溃重启", "错误 " + sb);
             AlarmManager mgr = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
             mgr.set(AlarmManager.RTC, System.currentTimeMillis() + 1000,

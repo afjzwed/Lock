@@ -3543,7 +3543,8 @@ public class MainService extends Service {
 //                DeviceConfig.LOCAL_FACE_PATH;
 //        String absolutePath = Environment.getExternalStorageDirectory() + File.separator + DeviceConfig
 // .LOCAL_FACE_PATH;
-        String absolutePath = Environment.getExternalStorageDirectory() + File.separator + DeviceConfig.NEW_LOCAL_FACE_PATH;
+        String absolutePath = Environment.getExternalStorageDirectory() + File.separator + DeviceConfig
+                .NEW_LOCAL_FACE_PATH;
         int lastIndex = url.lastIndexOf("/");
         String fileName = url.substring(lastIndex + 1);//文件名，带.bin后缀
 

@@ -3479,8 +3479,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         TrackUtil.keepMaxFace(faceInfoList);//获取最大的那个人脸
 
 //        if (mImageNV21 == null && faceInfo == null) {
-        if (code == 0 && mImageNV21 == null) {
-            if (faceInfoList.size() > 0) {
+        if (code == 0) {
+            if (mImageNV21 == null && faceInfoList.size() > 0) {
                 faceInfo = faceInfoList.get(0).clone();//保存集合中第一个人脸信息
                 mImageNV21 = data.clone();//保存图像数据
             }
@@ -3704,7 +3704,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 //                    Log.i(TAG, "run: fr costTime = " + (System.currentTimeMillis() - frStartTime) + "ms");
 
                     if (frCode == ErrorInfo.MOK) {//人脸特征信息提取成功
-                        Log.e(TAG, "人脸特征信息提取成功");
+//                        Log.e(TAG, "人脸特征信息提取成功 " + (System.currentTimeMillis() - frStartTime) + "ms");
                         CompareResult compareResult = FaceServer.getInstance().getTopOfFaceLib(faceFeature);//在特征库中搜索
                         if (null != compareResult && null != compareResult.getUserName() && !cardRecord
                                 .checkLastCardNew(compareResult.getUserName())) {//判断距离上次刷脸时间是否超过10秒
