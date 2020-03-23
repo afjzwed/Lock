@@ -3638,27 +3638,35 @@ public class MainService extends Service {
             Log.v("MainService", "onCard====卡信息：" + card);
 //            DbUtils.getInstans().quaryAllKa();
             kaInfo = DbUtils.getInstans().getKaInfo(card);
-            if (kaInfo != null && System.currentTimeMillis() < Long.parseLong(kaInfo.getGuoqi_time())) {//判断数据库中是否有卡
-                Log.v("MainService", "onCard====当前时间：" + System.currentTimeMillis() + "卡过期时间：" + kaInfo.getGuoqi_time
-                        () + "是否失效  》0表示失效" + (System.currentTimeMillis() - Long.parseLong(kaInfo.getGuoqi_time())));
-                Log.i(TAG, "刷卡开门成功" + card);
+//            if (kaInfo != null && System.currentTimeMillis() < Long.parseLong(kaInfo.getGuoqi_time())) {//判断数据库中是否有卡
+//            Log.e(TAG, "处理卡过期时间 " + kaInfo.getGuoqi_time() + " , " + StringUtils.transferDateToLong(kaInfo
+//                    .getGuoqi_time()));
+//            String s = StringUtils.transferDateToLong(kaInfo.getGuoqi_time());
+//            long l = Long.parseLong(StringUtils.transferDateToLong(kaInfo.getGuoqi_time()));
+//            Log.e(TAG, "卡 " + l);
+            if (kaInfo != null && System.currentTimeMillis() < Long.parseLong(StringUtils.transferDateToLong(kaInfo
+                    .getGuoqi_time()))) {//判断数据库中是否有卡
+//                Log.v("MainService", "onCard====当前时间：" + System.currentTimeMillis() + "卡过期时间：" + kaInfo.getGuoqi_time
+//                        () + "是否失效  》0表示失效" + (System.currentTimeMillis() - Long.parseLong(StringUtils
+//                        .transferDateToLong(kaInfo.getGuoqi_time()))));
+//                Log.i(TAG, "刷卡开门成功" + card);
                 if (identification) {//只有在人脸线程开启时才能卡开门并截图
                     //开始截图
                     if (DeviceConfig.PRINTSCREEN_STATE == 0) {
-                        Log.e(TAG, "刷卡开门，开始截图");
+//                        Log.e(TAG, "刷卡开门，开始截图");
                         DeviceConfig.PRINTSCREEN_STATE = 2;
                     }
                     openLock(1);
                 }
-                Log.e(TAG, "onCard====:" + card);
+//                Log.e(TAG, "onCard====:" + card);
             } else {//数据库中无此卡
-                Log.e(TAG, "数据库中不存在这个卡 刷卡开门失败" + card);
+//                Log.e(TAG, "数据库中不存在这个卡 刷卡开门失败" + card);
                 cardId = card;
                 kaInfo = null;//卡信息置为空
                 if (identification) {//只有在人脸线程开启时才能卡开门并截图
                     if (DeviceConfig.PRINTSCREEN_STATE == 0) {//只有在人脸线程开启时才能截图
                         DeviceConfig.PRINTSCREEN_STATE = 2;
-                        Log.e(TAG, "刷卡开门失败，开始截图" + DeviceConfig.PRINTSCREEN_STATE);
+//                        Log.e(TAG, "刷卡开门失败，开始截图" + DeviceConfig.PRINTSCREEN_STATE);
                     }
                     sendMessageToMainAcitivity(MSG_INVALID_CARD, null);//无效房卡
                 }
