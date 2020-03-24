@@ -8,8 +8,8 @@ android {
         applicationId "com.cxwl.menjin.lock"
         minSdkVersion 19
         targetSdkVersion 22
-        versionCode 53
-        versionName "1.5.3"
+        versionCode 55
+        versionName "1.5.5"
         sourceSets.main {
             jniLibs.srcDirs = ['libs']
         }
