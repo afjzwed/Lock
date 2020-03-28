@@ -1229,6 +1229,7 @@ public class MainService extends Service {
                 hintInfoStatus = 0;
                 lastVersionStatus = "L";
                 Log.v("UpdateService", "不会出现这种情况 status is " + lastVersionStatus);
+                DLLog.e("UpdateService", "出现这种情况 lastFile == null");
             }
         } else {
             // TODO: 2018/5/18  下载失败，整理.temp文件  absolutePath为apk存储路径的文件夹
@@ -1246,6 +1247,7 @@ public class MainService extends Service {
             noticesStatus = 0;
             faceStatus = 0;
             hintInfoStatus = 0;
+            DLLog.e("UpdateService", "下载失败 出现这种情况 " );
         }
     }
 
@@ -1324,6 +1326,7 @@ public class MainService extends Service {
             noticesStatus = 0;
             faceStatus = 0;
             hintInfoStatus = 0;
+            DLLog.e("UpdateService", "出现这种情况 文件不存在");
         }
     }
 

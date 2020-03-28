@@ -126,7 +126,7 @@ public class FaceServer {
             Log.e(TAG, "人脸 myfaceinfo文件夹中有数据 " + featureFiles.length);
             faceRegisterInfoList = new ArrayList<>();
             for (File featureFile : featureFiles) {
-                Log.e(TAG, "path " + featureFile.getAbsolutePath());
+//                Log.e(TAG, "path " + featureFile.getAbsolutePath());
                 try {
                     FileInputStream fis = new FileInputStream(featureFile);
                     byte[] feature = new byte[FaceFeature.FEATURE_SIZE];
@@ -220,7 +220,7 @@ public class FaceServer {
         return faceRegisterInfoList;
     }
 
-    public boolean addFace1(FaceUrlBean faceUrlBean){
+    public boolean addFace1(FaceUrlBean faceUrlBean) {
         boolean bool = false;
         Log.e(TAG, "人脸更新 bin文件转换 " + faceUrlBean.toString());
         try {
@@ -239,7 +239,8 @@ public class FaceServer {
                 if (!featureDir.exists() && !featureDir.mkdirs()) {
                     Log.e(TAG, "registerNv21: can not create feature directory");
                 } else {
-                    FileOutputStream fosFeature = new FileOutputStream(featureDir + File.separator + faceUrlBean.getYezhuPhone());
+                    FileOutputStream fosFeature = new FileOutputStream(featureDir + File.separator + faceUrlBean
+                            .getYezhuPhone());
                     fosFeature.write(faceFeature.getFeatureData());
                     fosFeature.close();
                     bool = true;

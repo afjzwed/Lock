@@ -23,12 +23,12 @@ import java.util.Enumeration;
 
 public class MacUtils {
     public static String getMac() {
-//        String mac = getWifiMac();
-//        if (mac == null) {
-//            return getEthMac();
-//        } else {
-//            return mac;
-//        }
+        String mac = getWifiMac();
+        if (mac == null) {
+            return getEthMac();
+        } else {
+            return mac;
+        }
 //        return "28:ed:e0:77:81:ee";
 //        return "28:ed:e0:77:e4:6a";
 //        return "cc:cc:cc:cc:cc:18";
@@ -36,7 +36,7 @@ public class MacUtils {
 //        return "8c:f7:10:47:a6:65";
 //        return "8c:f7:10:47:a6:64";
 //        return "44:2c:05:e6:9c:c5";
-        return "8c:f7:10:34:6d:70";
+//        return "8c:f7:10:34:6d:70";
     }
 
     @SuppressLint("WifiManagerLeak")
